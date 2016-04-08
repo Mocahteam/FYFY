@@ -1,0 +1,23 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2008
+
+Project("{0E8EF045-0A4E-71F3-DD4D-29725AD10793}") = "Defenses_immunitaires", "Assembly-CSharp.csproj", "{A5DBB173-B9BD-A5DE-060D-35C7314300FD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A5DBB173-B9BD-A5DE-060D-35C7314300FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5DBB173-B9BD-A5DE-060D-35C7314300FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5DBB173-B9BD-A5DE-060D-35C7314300FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5DBB173-B9BD-A5DE-060D-35C7314300FD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Assembly-CSharp.csproj
+	EndGlobalSection
+EndGlobal
