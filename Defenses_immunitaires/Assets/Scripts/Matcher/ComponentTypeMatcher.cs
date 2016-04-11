@@ -24,9 +24,9 @@ public class AllOfTypes : ComponentTypeMatcher {
 	public AllOfTypes(params System.Type[] componentTypes) : base(componentTypes) {
 	}
 
-	internal override bool matches(UECS.Entity e){
+	internal override bool matches(UECS.EntityWrapper ew){
 		for (int i = 0; i < _componentTypeIds.Length; ++i)
-			if (e._componentTypeIds.Contains(_componentTypeIds[i]) == false)
+			if (ew._componentTypeIds.Contains(_componentTypeIds[i]) == false)
 				return false;
 		return true;
 	}
@@ -36,9 +36,9 @@ public class NoneOfTypes : ComponentTypeMatcher {
 	public NoneOfTypes(params System.Type[] componentTypes) : base(componentTypes) {
 	}
 
-	internal override bool matches(UECS.Entity e){
+	internal override bool matches(UECS.EntityWrapper ew){
 		for (int i = 0; i < _componentTypeIds.Length; ++i)
-			if (e._componentTypeIds.Contains(_componentTypeIds[i]) == true)
+			if (ew._componentTypeIds.Contains(_componentTypeIds[i]) == true)
 				return false;
 		return true;
 	}
@@ -48,9 +48,9 @@ public class AnyOfTypes : ComponentTypeMatcher {
 	public AnyOfTypes(params System.Type[] componentTypes) : base(componentTypes) {
 	}
 
-	internal override bool matches(UECS.Entity e){
+	internal override bool matches(UECS.EntityWrapper ew){
 		for (int i = 0; i < _componentTypeIds.Length; ++i)
-			if (e._componentTypeIds.Contains(_componentTypeIds[i]) == true)
+			if (ew._componentTypeIds.Contains(_componentTypeIds[i]) == true)
 				return true;
 		return false;
 	}

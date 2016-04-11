@@ -46,19 +46,21 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Component\TargetPositionComponent.cs" />
-     <Compile Include="Assets\Scripts\Entity\Entity.cs" />
      <Compile Include="Assets\Scripts\Entity\EntityManager.cs" />
-     <Compile Include="Assets\Scripts\Entity\IEntityManagerAction.cs" />
+     <Compile Include="Assets\Scripts\Entity\EntityManagerAction\AddComponentAction.cs" />
+     <Compile Include="Assets\Scripts\Entity\EntityManagerAction\IEntityManagerAction.cs" />
+     <Compile Include="Assets\Scripts\Entity\EntityManagerAction\RemoveComponentAction.cs" />
+     <Compile Include="Assets\Scripts\Entity\EntityWrapper.cs" />
      <Compile Include="Assets\Scripts\Family\Family.cs" />
      <Compile Include="Assets\Scripts\Family\FamilyManager.cs" />
      <Compile Include="Assets\Scripts\Family\FamilyManagerAction.cs" />
-     <Compile Include="Assets\Scripts\MainLoop.cs" />
+     <Compile Include="Assets\Scripts\MainLoop\MainLoop.cs" />
+     <Compile Include="Assets\Scripts\MainLoop\MainLoopInspector.cs" />
      <Compile Include="Assets\Scripts\Matcher\ComponentTypeMatcher.cs" />
      <Compile Include="Assets\Scripts\Matcher\Matcher.cs" />
+     <Compile Include="Assets\Scripts\System\MovementSystem.cs" />
      <Compile Include="Assets\Scripts\System\System.cs" />
-     <Compile Include="Assets\Scripts\System\SystemManager.cs" />
-     <Compile Include="Assets\Scripts\Test\TestList.cs" />
-     <Compile Include="Assets\Scripts\Test\TestListInspector.cs" />
+     <Compile Include="Assets\Scripts\System\TargetSystem.cs" />
      <Compile Include="Assets\Scripts\TypeManager.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
