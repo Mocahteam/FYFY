@@ -3,25 +3,25 @@ using System.Collections.Generic;
 
 public class Family : IEnumerable<GameObject> {
 	internal readonly string _descriptor;
-	internal readonly HashSet<int> _entitiesIds;
+	internal readonly HashSet<int> _entityWrapperIds;
 	internal readonly Matcher[] _matchers;
 	internal bool _entityAdded;
 	internal bool _entityRemoved;
 
 	internal Family(string descriptor, Matcher[] matchers){
 		_descriptor = descriptor;
-		_entitiesIds = new HashSet<int> ();
+		_entityWrapperIds = new HashSet<int> ();
 		_matchers = matchers;
 		_entityAdded = false;
 		_entityRemoved = false;
 	}
 
 	public string Descriptor { get { return _descriptor; } }
-	public int Count { get { return _entitiesIds.Count; } }
+	public int Count { get { return _entityWrapperIds.Count; } }
 
-	internal bool matches(UECS.Entity e) {
+	internal bool matches(UECS.EntityWrapper ew) {
 		for (int i = 0; i < _matchers.Length; ++i)
-			if (_matchers [i].matches (e) == false)
+			if (_matchers [i].matches(ew) == false)
 				return false;
 		return true;
 	}
@@ -31,8 +31,8 @@ public class Family : IEnumerable<GameObject> {
 	}
 
 	public IEnumerator<GameObject> GetEnumerator(){
-		foreach (int id in _entitiesIds) {
-			GameObject go = UECS.EntityManager._entities[id]._gameObject;
+		foreach (int id in _entityWrapperIds) {
+			GameObject go = UECS.EntityManager._entityWrappers[id]._gameObject;
 			yield return go;
 		}
 	}

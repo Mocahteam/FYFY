@@ -28,24 +28,24 @@ public static class FamilyManager {
 		return family;
 	}
 
-	internal static void updateAfterComponentsUpdated(int entityId, UECS.Entity entity){
+	internal static void updateAfterComponentsUpdated(int entityWrapperId, UECS.EntityWrapper entityWrapper){
 		foreach (Family family in FamilyManager._families.Values) {
-			if(family.matches(entity))
-				family._entitiesIds.Add(entityId);
+			if(family.matches(entityWrapper))
+				family._entityWrapperIds.Add(entityWrapperId);
 			else
-				family._entitiesIds.Remove(entityId);
+				family._entityWrapperIds.Remove(entityWrapperId);
 		}
 	}
 
-	internal static void updateAfterEntityAdded(int entityId, UECS.Entity entity){
+	internal static void updateAfterEntityAdded(int entityWrapperId, UECS.EntityWrapper entityWrapper){
 		foreach(Family family in FamilyManager._families.Values)
-			if(family.matches(entity))
-				family._entitiesIds.Add(entityId);
+			if(family.matches(entityWrapper))
+				family._entityWrapperIds.Add(entityWrapperId);
 	}
 
-	internal static void updateAfterEntityRemoved(int entityId){
+	internal static void updateAfterEntityRemoved(int entityWrapperId){
 		foreach(Family family in FamilyManager._families.Values)
-			family._entitiesIds.Remove(entityId);
+			family._entityWrapperIds.Remove(entityWrapperId);
 	}
 }
 
