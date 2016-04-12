@@ -7,10 +7,16 @@
           <Node name="Defenses_immunitaires" expanded="True">
             <Node name="Assembly-CSharp" expanded="True">
               <Node name="Scripts" expanded="True">
-                <Node name="MainLoop" expanded="True" />
-                <Node name="System" expanded="True">
-                  <Node name="System.cs" selected="True" />
+                <Node name="Component" expanded="True" />
+                <Node name="Entity" expanded="True">
+                  <Node name="EntityManagerAction" expanded="True" />
                 </Node>
+                <Node name="Family" expanded="True" />
+                <Node name="MainLoop" expanded="True">
+                  <Node name="MainLoopInspector.cs" selected="True" />
+                </Node>
+                <Node name="Matcher" expanded="True" />
+                <Node name="System" expanded="True" />
               </Node>
             </Node>
           </Node>

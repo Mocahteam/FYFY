@@ -10,10 +10,13 @@ public class TargetSystem : UECS.System {
 
 			if (position.x == tpc.x || position.y == tpc.y) {
 				UECS.EntityManager.removeComponent<TargetPositionComponent>(go);
-				UECS.EntityManager.addComponent<TargetPositionComponent> (go, new System.Collections.Generic.Dictionary<string, object> () {
-					{ "x", Random.Range(-3, 3) },
-					{ "y", Random.Range(-3, 3) }
-				});
+				UECS.EntityManager.addComponent<TargetPositionComponent> (go);
+
+//  				UECS.EntityManager.addComponent<TargetPositionComponent> (go, new { x = Random.Range (-3, 3), y = Random.Range(-3, 3) });
+//				UECS.EntityManager.addComponent<TargetPositionComponent> (go, new System.Collections.Generic.Dictionary<string, object> () {
+//					{ "x", Random.Range(-3, 3) },
+//					{ "y", Random.Range(-3, 3) }
+//				});
 			}
 		}
 	}

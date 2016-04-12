@@ -5,15 +5,15 @@ public class Family : IEnumerable<GameObject> {
 	internal readonly string _descriptor;
 	internal readonly HashSet<int> _entityWrapperIds;
 	internal readonly Matcher[] _matchers;
-	internal bool _entityAdded;
-	internal bool _entityRemoved;
+//	internal bool _entityAdded;
+//	internal bool _entityRemoved;
 
 	internal Family(string descriptor, Matcher[] matchers){
 		_descriptor = descriptor;
 		_entityWrapperIds = new HashSet<int> ();
 		_matchers = matchers;
-		_entityAdded = false;
-		_entityRemoved = false;
+//		_entityAdded = false;
+//		_entityRemoved = false;
 	}
 
 	public string Descriptor { get { return _descriptor; } }
