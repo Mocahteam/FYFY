@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
+[DisallowMultipleComponent]
 public class MainLoop : MonoBehaviour {
 	public MonoScript[] _systemFiles;
 

@@ -14,6 +14,7 @@ internal class RemoveComponentAction<T> : IEntityManagerAction where T : Compone
 		_componentTypeId = TypeManager.getTypeId(typeof(T));
 
 		Object.Destroy(component);
+		Debug.Log ("COMPONENT REMOVED : " + typeof(T));
 	}
 
 	void IEntityManagerAction.perform() {

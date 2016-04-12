@@ -39,7 +39,7 @@ namespace UECS {
 			_delayedActions.Enqueue (new RemoveComponentAction<T> (gameObject));
 		}
 
-		public static void addComponent<T>(GameObject gameObject, Dictionary<string, object> componentValues = null) where T : Component{
+		public static void addComponent<T>(GameObject gameObject, object componentValues = null) where T : Component{
 			_delayedActions.Enqueue (new AddComponentAction<T> (gameObject, componentValues));
 		}
 

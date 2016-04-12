@@ -19,11 +19,14 @@ internal class RemoveGameObjectAction : IEntityManagerAction {
 	}
 }
 
-internal class CreateGameObjectAction : IEntityManagerAction {
+//internal class InstantiateEntityAction : IEntityManagerAction {
+//}
+
+internal class CreateEntityAction : IEntityManagerAction {
 	private readonly string _gameObjectName;
 	private readonly global::System.Type[] _componentsTypes;
-
-	internal CreateGameObjectAction(string gameObjectName, global::System.Type[] componentsTypes){
+	
+	internal CreateEntityAction(string gameObjectName, global::System.Type[] componentsTypes){
 		_gameObjectName = gameObjectName;
 		_componentsTypes = componentsTypes;
 	}
@@ -42,5 +45,3 @@ internal class CreateGameObjectAction : IEntityManagerAction {
 		FamilyManager.updateAfterEntityAdded(gameObjectId, entityWrapper);
 	}
 }
-
-// duplicate action -> MAJ en différé donc attention de pas faire 2* le meme truc dans 2 systemes

@@ -22,8 +22,8 @@ public static class FamilyManager {
 			family = new Family (familyDescriptor, matchers);
 			_families.Add (familyDescriptor, family);
 
-			// if(UECS.EntityManager._sceneParsed)
-				// > WARNING
+			if (UECS.EntityManager._sceneParsed)
+				throw new UnityEngine.UnityException(); // > WARNING
 		}
 		return family;
 	}
