@@ -55,6 +55,7 @@
      <Compile Include="Assets\Scripts\Family\FamilyManager.cs" />
      <Compile Include="Assets\Scripts\Family\FamilyManagerAction.cs" />
      <Compile Include="Assets\Scripts\MainLoop\MainLoop.cs" />
+     <Compile Include="Assets\Scripts\MainLoop\MainLoopCreationMenu.cs" />
      <Compile Include="Assets\Scripts\MainLoop\MainLoopInspector.cs" />
      <Compile Include="Assets\Scripts\Matcher\ComponentTypeMatcher.cs" />
      <Compile Include="Assets\Scripts\Matcher\Matcher.cs" />

@@ -3,40 +3,20 @@ using UnityEditor;
 
 [CustomEditor(typeof(MainLoop))]
 public class MainLoopInspector : Editor {
-	private static int? _mainLoopInstanceId = null;
-
 	private SerializedProperty _systemFiles;
 	private GUILayoutOption _minButtonWidth;
 	private GUIContent _addButton;
 	private GUIContent _moveUpButton;
 	private GUIContent _moveDownButton;
 	private GUIContent _removeButton;
-	private int _targetInstanceId;
 
 	private void OnEnable(){
-		if (_mainLoopInstanceId == null) {
-			_mainLoopInstanceId = target.GetInstanceID();
-		} else if(_mainLoopInstanceId != target.GetInstanceID()) {
-			DestroyImmediate(target);
-			EditorUtility.DisplayDialog (
-				"Invalid operation.", 
-				"Can't add 'MainLoop' because a 'MainLoop' is already added to another game object!",
-				"Ok");
-			return;
-		}
-
 		_systemFiles = serializedObject.FindProperty("_systemFiles");
 		_minButtonWidth = GUILayout.MinWidth(20f);
 		_addButton = new GUIContent("+", "add");
 		_moveUpButton = new GUIContent("\u25B2", "move up");
 		_moveDownButton = new GUIContent("\u25BC", "move down");
 		_removeButton = new GUIContent("-", "remove");
-		_targetInstanceId = target.GetInstanceID ();
-	}
-
-	private void OnDestroy(){
-		if (target == null && _mainLoopInstanceId == _targetInstanceId)
-			_mainLoopInstanceId = null;
 	}
 
 	public override void OnInspectorGUI(){
@@ -61,7 +41,7 @@ public class MainLoopInspector : Editor {
 				_systemFiles.DeleteArrayElementAtIndex(i);
 			}
 			//---------------------------------------------------------------------------------------------------------------
-			EditorGUILayout.EndHorizontal ();
+			EditorGUILayout.EndHorizontal();
 		}
 
 		if (GUILayout.Button (_addButton, EditorStyles.miniButtonLeft)) {
@@ -69,6 +49,8 @@ public class MainLoopInspector : Editor {
 			_systemFiles.InsertArrayElementAtIndex(index);
 			_systemFiles.GetArrayElementAtIndex(index).objectReferenceValue = null;
 		}
+
+		EditorGUILayout.HelpBox ("Set all the systems you need", MessageType.Info, true);
 
 		serializedObject.ApplyModifiedProperties();
 	}
