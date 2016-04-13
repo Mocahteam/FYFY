@@ -2,8 +2,9 @@
 using UnityEditor;
 
 [DisallowMultipleComponent]
+[AddComponentMenu("")] // hide in Component list
 public class MainLoop : MonoBehaviour {
-	public MonoScript[] _systemFiles;
+	public MonoScript[] _systemFiles; // = {}; // -> to avoid runtime add problem if mainLoopMenu active during playing mode
 
 	private UECS.System[] _systems;
 	private int _systemsLength;
