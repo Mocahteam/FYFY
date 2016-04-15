@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 internal class RemoveComponentAction<T> : IEntityManagerAction where T : Component {
-	private readonly int _gameObjectId;
+	private readonly int _entityWrapperId;
 	private readonly uint _componentTypeId;
 
 	internal RemoveComponentAction(GameObject gameObject) {
@@ -10,17 +10,16 @@ internal class RemoveComponentAction<T> : IEntityManagerAction where T : Compone
 		if (component == null)
 			throw new MissingComponentException();
 
-		_gameObjectId = gameObject.GetInstanceID();
+		_entityWrapperId = gameObject.GetInstanceID();
 		_componentTypeId = TypeManager.getTypeId(typeof(T));
 
 		Object.Destroy(component);
-		Debug.Log ("COMPONENT REMOVED : " + typeof(T));
 	}
 
 	void IEntityManagerAction.perform() {
-		UECS.EntityWrapper entityWrapper = UECS.EntityManager._entityWrappers[_gameObjectId];
+		UECS.EntityWrapper entityWrapper = UECS.EntityManager._entityWrappers[_entityWrapperId];
 		entityWrapper._componentTypeIds.Remove(_componentTypeId);
 
-		FamilyManager.updateAfterComponentsUpdated(_gameObjectId, entityWrapper);
+		FamilyManager.updateAfterComponentsUpdated(_entityWrapperId, entityWrapper);
 	}
 }

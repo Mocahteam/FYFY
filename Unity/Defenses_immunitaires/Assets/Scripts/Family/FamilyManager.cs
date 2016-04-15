@@ -15,7 +15,7 @@ public static class FamilyManager {
 			matchersDescriptors[i] = matchers[i]._descriptor;
 		System.Array.Sort(matchersDescriptors);
 
-		string familyDescriptor = string.Join ("/", matchersDescriptors);
+		string familyDescriptor = string.Join("/", matchersDescriptors);
 
 		Family family;
 		if (_families.TryGetValue (familyDescriptor, out family) == false) {
@@ -30,7 +30,7 @@ public static class FamilyManager {
 
 	internal static void updateAfterComponentsUpdated(int entityWrapperId, UECS.EntityWrapper entityWrapper){
 		foreach (Family family in FamilyManager._families.Values) {
-			if(family.matches(entityWrapper))
+			if (family.matches (entityWrapper))
 				family._entityWrapperIds.Add(entityWrapperId);
 			else
 				family._entityWrapperIds.Remove(entityWrapperId);
@@ -38,14 +38,15 @@ public static class FamilyManager {
 	}
 
 	internal static void updateAfterEntityAdded(int entityWrapperId, UECS.EntityWrapper entityWrapper){
-		foreach(Family family in FamilyManager._families.Values)
-			if(family.matches(entityWrapper))
+		foreach (Family family in FamilyManager._families.Values)
+			if (family.matches (entityWrapper))
 				family._entityWrapperIds.Add(entityWrapperId);
 	}
 
 	internal static void updateAfterEntityRemoved(int entityWrapperId){
-		foreach(Family family in FamilyManager._families.Values)
+		foreach (Family family in FamilyManager._families.Values) {
 			family._entityWrapperIds.Remove(entityWrapperId);
+		}
 	}
 }
 

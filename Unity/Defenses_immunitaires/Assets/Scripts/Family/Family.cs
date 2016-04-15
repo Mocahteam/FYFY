@@ -2,22 +2,38 @@
 using System.Collections.Generic;
 
 public class Family : IEnumerable<GameObject> {
+	public delegate void OnEntityEnteredCallback();
+	public delegate void OnEntityExitedCallback();
+
+	internal OnEntityEnteredCallback _onEntityEnteredCallbacks;
+	internal OnEntityExitedCallback _onEntityExitedCallbacks;
+
 	internal readonly string _descriptor;
 	internal readonly HashSet<int> _entityWrapperIds;
 	internal readonly Matcher[] _matchers;
-//	internal bool _entityAdded;
-//	internal bool _entityRemoved;
+	internal readonly Queue<int> _enteredEntities;
+	internal readonly Queue<int> _exitedEntities;
 
 	internal Family(string descriptor, Matcher[] matchers){
+		_onEntityEnteredCallbacks = null;
+		_onEntityExitedCallbacks  = null;
 		_descriptor = descriptor;
 		_entityWrapperIds = new HashSet<int> ();
 		_matchers = matchers;
-//		_entityAdded = false;
-//		_entityRemoved = false;
+		_enteredEntities = new Queue<int>();
+		_exitedEntities = new Queue<int>();
 	}
 
 	public string Descriptor { get { return _descriptor; } }
 	public int Count { get { return _entityWrapperIds.Count; } }
+
+	public void addOnEntityEnteredCallback(OnEntityEnteredCallback f) {
+		_onEntityEnteredCallbacks += f;
+	}
+
+	public void addOnEntityExitedCallback(OnEntityExitedCallback f) {
+		_onEntityExitedCallbacks += f;
+	}
 
 	internal bool matches(UECS.EntityWrapper ew) {
 		for (int i = 0; i < _matchers.Length; ++i)
