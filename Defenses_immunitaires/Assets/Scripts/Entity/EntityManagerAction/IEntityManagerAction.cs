@@ -5,43 +5,40 @@ internal interface IEntityManagerAction {
 	void perform();
 }
 
-internal class RemoveGameObjectAction : IEntityManagerAction {
-	private readonly int _gameObjectId;
+// enable -> attention si dans la scene lors du parse il y avait des entites disabled ?
+// disable
 
-	internal RemoveGameObjectAction(GameObject gameObject) {
-		_gameObjectId = gameObject.GetInstanceID();
+//internal class InstantiatePrefabAction : IEntityManagerAction {
+//}
 
-		Object.Destroy(gameObject);
-	}
-
-	void IEntityManagerAction.perform() {
-		FamilyManager.updateAfterEntityRemoved(_gameObjectId);
-	}
-}
-
-//internal class InstantiateEntityAction : IEntityManagerAction {
+//internal class CreatePrimitiveAction : IEntityManagerAction {
 //}
 
 internal class CreateEntityAction : IEntityManagerAction {
 	private readonly string _gameObjectName;
-	private readonly global::System.Type[] _componentsTypes;
+	private readonly global::System.Type[] _componentDescriptions;
 	
-	internal CreateEntityAction(string gameObjectName, global::System.Type[] componentsTypes){
+	internal CreateEntityAction(string gameObjectName, global::System.Type[] componentDescriptions){
 		_gameObjectName = gameObjectName;
-		_componentsTypes = componentsTypes;
+		_componentDescriptions = componentDescriptions;
 	}
 
 	void IEntityManagerAction.perform(){
-		GameObject gameObject = new GameObject (_gameObjectName, _componentsTypes);
-		int gameObjectId = gameObject.GetInstanceID();
-		HashSet<uint> componentTypeIds = new HashSet<uint> ();
+		GameObject gameObject = new GameObject(_gameObjectName);
+		int entityWrapperId = gameObject.GetInstanceID();
+		HashSet<uint> componentTypeIds = new HashSet<uint>();
 
-		for (int i = 0; i < _componentsTypes.Length; ++i)
-			componentTypeIds.Add(TypeManager.getTypeId(_componentsTypes[i]));
-		componentTypeIds.Add(TypeManager.getTypeId(typeof(Transform)));
+		// -----------------------------------------------------------------------
+		if (_componentDescriptions != null) {
+			for (int i = 0; i < _componentDescriptions.Length; ++i) {
+				// System.Type componentType = null;
+			}
+		}
+		componentTypeIds.Add(TypeManager.getTypeId(typeof(Transform)));		
+		// -----------------------------------------------------------------------
 
 		UECS.EntityWrapper entityWrapper = new UECS.EntityWrapper(gameObject, componentTypeIds);
-		UECS.EntityManager._entityWrappers.Add(gameObjectId, entityWrapper);
-		FamilyManager.updateAfterEntityAdded(gameObjectId, entityWrapper);
+		UECS.EntityManager._entityWrappers.Add(entityWrapperId, entityWrapper);
+		FamilyManager.updateAfterEntityAdded(entityWrapperId, entityWrapper);
 	}
 }

@@ -44,7 +44,7 @@ namespace UECS {
 		}
 
 		public static void removeGameObject(GameObject gameObject){
-			_delayedActions.Enqueue (new RemoveGameObjectAction(gameObject));
+			_delayedActions.Enqueue (new RemoveEntityAction(gameObject));
 		}
 
 //		public static void createGameObject(string name, params global::System.Type[] componentsTypes/*, */) {
