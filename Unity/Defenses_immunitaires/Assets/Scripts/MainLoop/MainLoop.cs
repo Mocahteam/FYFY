@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 [DisallowMultipleComponent]
 [AddComponentMenu("")] // hide in Component list
@@ -20,35 +21,62 @@ public class MainLoop : MonoBehaviour {
 
 		for (int i = 0; i < _systemFiles.Length; ++i) {
 			if (_systemFiles [i] != null) {
-				System.Type systemType = _systemFiles [i].GetClass ();
-				_systems [i] = (UECS.System) System.Activator.CreateInstance(systemType);
+				System.Type systemType = _systemFiles[i].GetClass();
+				_systems[i] = (UECS.System) System.Activator.CreateInstance(systemType);
 			} else
-				_systems [i] = null;
+				_systems[i] = null;
 		}
 	}
 
-	private void Start(){
-		UECS.EntityManager.parseScene();
+	private void Start() {
+		GameObject[] sceneGameObjects = Resources.FindObjectsOfTypeAll<GameObject>(); // -> find also inactive GO
+		for (int i = 0; i < sceneGameObjects.Length; ++i) {
+			GameObject gameObject = sceneGameObjects[i];
+			int gameObjectId = gameObject.GetInstanceID();
+
+			if(EntityManager._gameObjectWrappers.ContainsKey(gameObjectId))
+				continue;
+
+			HashSet<uint> componentTypeIds = new HashSet<uint>();
+			foreach(Component c in gameObject.GetComponents<Component>()) {
+				global::System.Type type = c.GetType();
+				uint typeId = TypeManager.getTypeId(type);
+				componentTypeIds.Add(typeId);
+			}
+
+			GameObjectWrapper gameObjectWrapper = new GameObjectWrapper(gameObject, componentTypeIds);
+			EntityManager._gameObjectWrappers.Add(gameObjectId, gameObjectWrapper);
+			EntityManager._modifiedGameObjectIds.Add(gameObjectId);
+		}
 	}
 
 	private void FixedUpdate(){
-		int count = UECS.EntityManager._delayedActions.Count;
+		int count = EntityManager._delayedActions.Count;
 		while(count-- > 0)
-			UECS.EntityManager._delayedActions.Dequeue().perform();
+			EntityManager._delayedActions.Dequeue().perform();
+		
+		foreach(int gameObjectId in EntityManager._destroyedGameObjectIds) {
+			FamilyManager.updateAfterGameObjectDestroyed(gameObjectId);
+			EntityManager._modifiedGameObjectIds.Remove(gameObjectId);
+		}
+		EntityManager._destroyedGameObjectIds.Clear();
 
-		// _onEntityEnteredCallbacks && _onEntityExitedCallbacks
+		foreach(int gameObjectId in EntityManager._modifiedGameObjectIds)
+			FamilyManager.updateAfterGameObjectModified(gameObjectId);
+		EntityManager._modifiedGameObjectIds.Clear();
 
+		foreach (Family family in FamilyManager._families.Values) {
+			family.invokeGameObjectsEnteredCallbacks();
+			family.invokeGameObjectsExitedCallbacks();
+		}
+
+		int currentFrame = Time.frameCount;
 		for (int i = 0; i < _order.Length; ++i) {
 			int index = _order[i];
-			if(_activate[index] == true && _systems[index] != null)
-				_systems[index].process();
+			UECS.System system = _systems[index];
+			
+			if(_activate[index] == true && system != null && system.Pause == false)
+				system.process(currentFrame);
 		}
 	}
 }
-
-// _systemFiles; // = {}; // -> to avoid runtime add problem if mainLoopMenu active during playing mod
-// variable to know if main kept editor value, so it is initialized ? => avoid to add component main in script | Probleme si cest plus en editor mode car elle sera jamais setted ??
-
-// GameObject hiddenMainLoop = new GameObject("Hidden_Main_Loop");
-// hiddenMainLoop.hideFlags = HideFlags.HideInHierarchy;
-// hiddenMainLoop.AddComponent<>();
