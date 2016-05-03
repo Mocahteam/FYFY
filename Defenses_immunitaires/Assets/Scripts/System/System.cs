@@ -1,9 +1,7 @@
 ﻿namespace UECS {
 	public abstract class System {
-		protected virtual void onProcess(){}
+		public bool Pause { get; set; }
 
-		internal void process(){
-			this.onProcess();
-		}
+		public abstract void process(int currentFrame);
 	}
 }

@@ -20,39 +20,43 @@ public static class FamilyManager {
 		Family family;
 		if (_families.TryGetValue (familyDescriptor, out family) == false) {
 			family = new Family (familyDescriptor, matchers);
-			_families.Add (familyDescriptor, family);
+			_families.Add(familyDescriptor, family);
 
-			if (UECS.EntityManager._sceneParsed)
-				throw new UnityEngine.UnityException(); // > WARNING
+			if(EntityManager._gameObjectWrappers.Count > 0) {
+				throw new UnityEngine.UnityException(); 
+
+				// > WARNING --> callback delayed next frame if getFamily in process function
+//				foreach(KeyValuePair<int, GameObjectWrapper> valuePair in EntityManager._gameObjectWrappers) {
+//					int gameObjectId = valuePair.Key;
+//					GameObjectWrapper gameObjectWrapper = valuePair.Value;
+//
+//					if (family.matches(gameObjectWrapper))
+//						if (family._gameObjectIds.Add(gameObjectId) && family._gameObjectsEnteredCallbacks != null)
+//							family._gameObjectIdsEntered.Enqueue(gameObjectId);
+//				}
+			}
 		}
 		return family;
 	}
 
-	internal static void updateAfterComponentsUpdated(int entityWrapperId, UECS.EntityWrapper entityWrapper){
+	internal static void updateAfterGameObjectModified(int gameObjectId){
+		GameObjectWrapper gameObjectWrapper = EntityManager._gameObjectWrappers[gameObjectId];
+
 		foreach (Family family in FamilyManager._families.Values) {
-			if (family.matches (entityWrapper))
-				family._entityWrapperIds.Add(entityWrapperId);
-			else
-				family._entityWrapperIds.Remove(entityWrapperId);
+			if (family.matches(gameObjectWrapper)) {
+				if (family._gameObjectIds.Add(gameObjectId) && family._gameObjectsEnteredCallbacks != null)
+					family._gameObjectIdsEntered.Enqueue(gameObjectId);
+			} else {
+				if(family._gameObjectIds.Remove(gameObjectId) && family._gameObjectsExitedCallbacks != null)
+					family._gameObjectIdsExited.Enqueue(gameObjectId);
+			}
 		}
 	}
 
-	internal static void updateAfterEntityAdded(int entityWrapperId, UECS.EntityWrapper entityWrapper){
-		foreach (Family family in FamilyManager._families.Values)
-			if (family.matches (entityWrapper))
-				family._entityWrapperIds.Add(entityWrapperId);
-	}
-
-	internal static void updateAfterEntityRemoved(int entityWrapperId){
+	internal static void updateAfterGameObjectDestroyed(int gameObjectId){
 		foreach (Family family in FamilyManager._families.Values) {
-			family._entityWrapperIds.Remove(entityWrapperId);
+			if(family._gameObjectIds.Remove(gameObjectId) && family._gameObjectsExitedCallbacks != null)
+				family._gameObjectIdsExited.Enqueue(gameObjectId);
 		}
 	}
 }
-
-// internal static readonly Dictionary<uint, List<Family>> // uid of component Type -> seulement dans le cas des ComponentTypeMatcher .....
-
-//			foreach(Entity e in EntityManager._entities.Values){ // ENTITYMANAGER DONC FORCEMENT CONSTRUIT AVANT LES FAMILLES (STATIC CONSTRUCTOR)
-//				if(family.matches(e))
-//					family._entitiesIds.Add(e._gameObject.GetInstanceID());
-//			}

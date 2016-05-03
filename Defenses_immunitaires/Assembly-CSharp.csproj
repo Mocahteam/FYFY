@@ -45,25 +45,29 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Component\AbleToCatchMouseEvents.cs" />
      <Compile Include="Assets\Scripts\Component\TargetPositionComponent.cs" />
      <Compile Include="Assets\Scripts\Entity\EntityManager.cs" />
-     <Compile Include="Assets\Scripts\Entity\EntityManagerAction\AddComponentAction.cs" />
+     <Compile Include="Assets\Scripts\Entity\EntityManagerAction\AddComponent.cs" />
+     <Compile Include="Assets\Scripts\Entity\EntityManagerAction\CreateGameObjectWrapper.cs" />
+     <Compile Include="Assets\Scripts\Entity\EntityManagerAction\DestroyGameObject.cs" />
      <Compile Include="Assets\Scripts\Entity\EntityManagerAction\IEntityManagerAction.cs" />
-     <Compile Include="Assets\Scripts\Entity\EntityManagerAction\RemoveComponentAction.cs" />
-     <Compile Include="Assets\Scripts\Entity\EntityManagerAction\RemoveEntityAction.cs" />
-     <Compile Include="Assets\Scripts\Entity\EntityWrapper.cs" />
+     <Compile Include="Assets\Scripts\Entity\EntityManagerAction\RemoveComponent.cs" />
+     <Compile Include="Assets\Scripts\Entity\GameObjectWrapper.cs" />
+     <Compile Include="Assets\Scripts\Entity\Test.cs" />
      <Compile Include="Assets\Scripts\Family\Family.cs" />
      <Compile Include="Assets\Scripts\Family\FamilyManager.cs" />
      <Compile Include="Assets\Scripts\Family\FamilyManagerAction.cs" />
      <Compile Include="Assets\Scripts\MainLoop\MainLoop.cs" />
      <Compile Include="Assets\Scripts\MainLoop\MainLoopCreationMenu.cs" />
      <Compile Include="Assets\Scripts\MainLoop\MainLoopInspector.cs" />
-     <Compile Include="Assets\Scripts\MainLoop\Test.cs" />
      <Compile Include="Assets\Scripts\Matcher\ComponentTypeMatcher\AllOfTypes.cs" />
      <Compile Include="Assets\Scripts\Matcher\ComponentTypeMatcher\AnyOfTypes.cs" />
      <Compile Include="Assets\Scripts\Matcher\ComponentTypeMatcher\ComponentTypeMatcher.cs" />
      <Compile Include="Assets\Scripts\Matcher\ComponentTypeMatcher\NoneOfTypes.cs" />
+     <Compile Include="Assets\Scripts\Matcher\GameObjectStateMatcher.cs" />
      <Compile Include="Assets\Scripts\Matcher\Matcher.cs" />
+     <Compile Include="Assets\Scripts\System\MouseSystem.cs" />
      <Compile Include="Assets\Scripts\System\MovementSystem.cs" />
      <Compile Include="Assets\Scripts\System\System.cs" />
      <Compile Include="Assets\Scripts\System\TargetSystem.cs" />

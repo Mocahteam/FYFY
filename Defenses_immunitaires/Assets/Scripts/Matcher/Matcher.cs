@@ -3,5 +3,5 @@
 
 	public string Descriptor { get { return _descriptor; } }
 
-	internal abstract bool matches(UECS.EntityWrapper entityWrapper);
+	internal abstract bool matches(GameObjectWrapper gameObjectWrapper);
 }

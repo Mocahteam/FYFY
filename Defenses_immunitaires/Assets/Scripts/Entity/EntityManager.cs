@@ -1,55 +1,100 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-namespace UECS {
-	public static class EntityManager { // -> GameObjectManager
-		internal static readonly Dictionary<int, EntityWrapper> _entityWrappers = new Dictionary<int, EntityWrapper> ();
-		internal static readonly Queue<IEntityManagerAction> _delayedActions = new Queue<IEntityManagerAction>();
-		internal static bool _sceneParsed = false;
+public static class EntityManager {
+	internal static readonly Dictionary<string, GameObject> _prefabResources        = new Dictionary<string, GameObject>();
+	internal static readonly Dictionary<int, GameObjectWrapper> _gameObjectWrappers = new Dictionary<int, GameObjectWrapper>(); // indexed by gameobject's id
+	internal static readonly Queue<IEntityManagerAction> _delayedActions            = new Queue<IEntityManagerAction>();
+	internal static readonly HashSet<int> _destroyedGameObjectIds                   = new HashSet<int>(); // destroyEntity
+	internal static readonly HashSet<int> _modifiedGameObjectIds                    = new HashSet<int>(); // createEntity or addComponent or removeComponent
 
-		public static int Count { get { return _entityWrappers.Count; } }
+	public static int Count { get { return _gameObjectWrappers.Count; } }
 
-		internal static void parseScene(){ // NE PEUT ETRE APPELE QUUNE FOIS LA SCENE CONSTRUITE A CAUSE DU FIND DONC NE JAMAIS LAPPELER DANS UN CONSTRUCTOR
-			if (_sceneParsed)
-				return; // throw exception ?
+	public static GameObject createGameObject() {
+		GameObject gameObject = new GameObject();
+		_delayedActions.Enqueue(new CreateGameObjectWrapper(gameObject, new HashSet<uint>{ TypeManager.getTypeId (typeof(Transform)) }));
 
-			GameObject[] sceneGameObjects = Object.FindObjectsOfType<GameObject> ();
-			for (int i = 0; i < sceneGameObjects.Length; ++i) {
-				GameObject go = sceneGameObjects [i];
-				Component[] components = go.GetComponents<Component>();
-				HashSet<uint> componentTypeIds = new HashSet<uint> ();
-		
-				for (int j = 0; j < components.Length; ++j) {
-					global::System.Type cType = components[j].GetType(); // GLOBAL:: TO TAKE OF
-					uint cTypeId = TypeManager.getTypeId(cType);
-					componentTypeIds.Add (cTypeId);
-				}
+		return gameObject;
+	}
 
-				int entityWrapperId = go.GetInstanceID ();
-				UECS.EntityWrapper entityWrapper = new EntityWrapper(go, componentTypeIds);
+	public static GameObject createPrimitive(PrimitiveType type) {
+		GameObject gameObject = GameObject.CreatePrimitive(type);
+		_delayedActions.Enqueue(new CreateGameObjectWrapper(gameObject));
 
-				_entityWrappers.Add(entityWrapperId, entityWrapper);
-				FamilyManager.updateAfterEntityAdded(entityWrapperId, entityWrapper);
+		return gameObject;
+	}
+
+	public static GameObject instantiatePrefab(string prefabName) {
+		if(prefabName == null)
+			throw new MissingReferenceException();
+
+		GameObject prefabResource;
+		if (_prefabResources.TryGetValue(prefabName, out prefabResource) == false) {
+			if ((prefabResource = Resources.Load<GameObject>(prefabName)) == null) {
+				Debug.LogWarning("Can't instantiate '" + prefabName + "', because it doesn't exist or it isn't present in 'Assets/Resources' folder.");
+				return null;
 			}
-
-			_sceneParsed = true;
+				
+			_prefabResources.Add(prefabName, prefabResource);
 		}
 
-		public static void removeComponent<T>(GameObject gameObject) where T : Component{
-			_delayedActions.Enqueue (new RemoveComponentAction<T> (gameObject));
+		GameObject gameObject = GameObject.Instantiate<GameObject>(prefabResource);
+		_delayedActions.Enqueue(new CreateGameObjectWrapper(gameObject));
+
+		return gameObject;
+	}
+
+	public static void destroyGameObject(GameObject gameObject){
+		if(gameObject == null)
+			throw new MissingReferenceException();
+		
+		_delayedActions.Enqueue(new DestroyGameObject(gameObject));
+	}
+
+	public static void addComponent<T>(GameObject gameObject, object componentValues = null) where T : Component {
+		if(gameObject == null)
+			throw new MissingReferenceException();
+	
+		_delayedActions.Enqueue(new AddComponent<T>(gameObject, componentValues));
+	}
+
+	public static void addComponent(GameObject gameObject, System.Type componentType, object componentValues = null) {
+		if(gameObject == null || componentType == null)
+			throw new MissingReferenceException();
+		
+		if (componentType.IsSubclassOf(typeof(Component)) == false) {
+			Debug.LogWarning("Can't add '" + componentType + "' to " + gameObject.name + " because a '" + componentType + "' isn't a Component!");
+			return;
 		}
 
-		public static void addComponent<T>(GameObject gameObject, object componentValues = null) where T : Component{
-			_delayedActions.Enqueue (new AddComponentAction<T> (gameObject, componentValues));
+		_delayedActions.Enqueue(new AddComponent(gameObject, componentType, componentValues));
+	}
+
+	public static void removeComponent<T>(GameObject gameObject) where T : Component {
+		if(gameObject == null)
+			throw new MissingReferenceException();
+	
+		System.Type componentType = typeof(T);
+		if (componentType == typeof(Transform)) {
+			Debug.Log("Removing 'Transform' from " + gameObject.name + " is not allowed!");
+			return;
 		}
 
-		public static void removeGameObject(GameObject gameObject){
-			_delayedActions.Enqueue (new RemoveEntityAction(gameObject));
+		_delayedActions.Enqueue(new RemoveComponent<T>(gameObject, componentType));
+	}
+
+	public static void removeComponent(Component component) {
+		if(component == null)
+			throw new MissingReferenceException();
+
+		GameObject gameObject = component.gameObject;
+		System.Type componentType = component.GetType();
+		if (componentType == typeof(Transform)) {
+			Debug.Log("Removing 'Transform' from " + gameObject.name + " is not allowed!");
+			return;
 		}
 
-//		public static void createGameObject(string name, params global::System.Type[] componentsTypes/*, */) {
-//			_delayedActions.Enqueue (new CreateGameObjectAction(name, componentsTypes));
-//		}
+		_delayedActions.Enqueue(new RemoveComponent(gameObject, component, componentType));
 	}
 }
 

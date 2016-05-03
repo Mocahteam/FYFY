@@ -2,9 +2,9 @@
 	public NoneOfTypes(params System.Type[] componentTypes) : base(componentTypes) {
 	}
 
-	internal override bool matches(UECS.EntityWrapper ew){
+	internal override bool matches(GameObjectWrapper gameObjectWrapper){
 		for (int i = 0; i < _componentTypeIds.Length; ++i)
-			if (ew._componentTypeIds.Contains(_componentTypeIds[i]) == true)
+			if(gameObjectWrapper._componentTypeIds.Contains(_componentTypeIds[i]) == true)
 				return false;
 		return true;
 	}

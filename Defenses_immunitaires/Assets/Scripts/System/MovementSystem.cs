@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
 
 public class MovementSystem : UECS.System {
-	private Family family = FamilyManager.getFamily(new AllOfTypes(typeof(TargetPositionComponent)));
+	private Family family;
 
-	protected override void onProcess(){
+	public MovementSystem(){
+		family = FamilyManager.getFamily(new AllOfTypes(typeof(TargetPositionComponent), typeof(MeshFilter)), new GameObjectStateMatcher(GameObjectStateMatcher.STATE.ACTIVE));
+	}
+
+	public override void process(int currentFrame){
 		foreach (GameObject go in family) {
 			TargetPositionComponent tpc = go.GetComponent<TargetPositionComponent> ();
 			Vector3 position = go.transform.position;
