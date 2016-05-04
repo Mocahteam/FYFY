@@ -1,36 +1,38 @@
 ﻿using UnityEngine;
 
-[AddComponentMenu("")] // hide in Component list
+[AddComponentMenu("")]
 public class MousePressedOn : MonoBehaviour {
 }
 
 public class MouseSystem : UECS.System {
-	Family _family;
+	Family _pointableFamily;
+	Family _pointedFamily;
 
-	public MouseSystem() { // 3D OR 2D
-		_family = FamilyManager.getFamily(new AllOfTypes(typeof(AbleToCatchMouseEvents)), new GameObjectStateMatcher(GameObjectStateMatcher.STATE.ACTIVE));
+	public MouseSystem() {
+		_pointableFamily = FamilyManager.getFamily(new AllOfTypes(typeof(AbleToCatchMouseEvents)), new GameObjectStateMatcher(GameObjectStateMatcher.STATE.ACTIVE));
+		_pointedFamily   = FamilyManager.getFamily(new AllOfTypes(typeof(MousePressedOn)));
 	}
 
 	public override void process(int currentFrame) {
+		foreach (GameObject gameObject in _pointedFamily)
+			EntityManager.removeComponent<MousePressedOn>(gameObject);
+
 		Vector3 mousePosition = Input.mousePosition;
 		Ray ray = Camera.main.ScreenPointToRay(mousePosition);
 		RaycastHit hit;
 
-		if(Physics.Raycast(ray, out hit) == true){
+		if(Physics.Raycast(ray, out hit) == true) {
 			GameObject gameObject = hit.transform.gameObject;
 			int gameObjectId = gameObject.GetInstanceID();
 
-			if(_family._gameObjectIds.Contains(gameObjectId) == false)
+			if(_pointableFamily._gameObjectIds.Contains(gameObjectId) == false)
 				return;
-
-//			switch
-//			gameObject.AddComponent<>();
-
-			// how to deal with family ? update now or later ?
-
-			//			add to list
-
-			// get all raycasted object ? -> ordonné du plus proche au plus loin (comment traverse le rayon)
+			
+			if (Input.GetMouseButtonDown(0))
+				EntityManager.addComponent<MousePressedOn>(gameObject);
 		}
 	}
 }
+
+// 3D OR 2D
+// get all raycasted object ? -> ordonné du plus proche au plus loin (comment traverse le rayon)
