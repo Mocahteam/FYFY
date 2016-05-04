@@ -67,6 +67,7 @@
      <Compile Include="Assets\Scripts\Matcher\ComponentTypeMatcher\NoneOfTypes.cs" />
      <Compile Include="Assets\Scripts\Matcher\GameObjectStateMatcher.cs" />
      <Compile Include="Assets\Scripts\Matcher\Matcher.cs" />
+     <Compile Include="Assets\Scripts\System\ColorSystem.cs" />
      <Compile Include="Assets\Scripts\System\MouseSystem.cs" />
      <Compile Include="Assets\Scripts\System\MovementSystem.cs" />
      <Compile Include="Assets\Scripts\System\System.cs" />

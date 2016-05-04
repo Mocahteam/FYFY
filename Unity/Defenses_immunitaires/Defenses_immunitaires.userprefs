@@ -1,8 +1,9 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.AndroidPlayer" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\MainLoop\MainLoop.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\System\MouseSystem.cs">
     <Files>
-      <File FileName="Assets\Scripts\MainLoop\MainLoop.cs" Line="66" Column="48" />
+      <File FileName="Assets\Scripts\MainLoop\MainLoop.cs" Line="30" Column="2" />
+      <File FileName="Assets\Scripts\System\MouseSystem.cs" Line="31" Column="32" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
