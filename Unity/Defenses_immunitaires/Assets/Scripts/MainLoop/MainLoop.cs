@@ -5,11 +5,12 @@ using System.Collections.Generic;
 [DisallowMultipleComponent]
 [AddComponentMenu("")] // hide in Component list
 public class MainLoop : MonoBehaviour {
+	// EDITING MODE
 	public MonoScript[] _systemFiles;
-	public bool[] _activate;
-	public int[] _order;
+	public bool[] _pause;
 
-	private UECS.System[] _systems;
+	// PLAYING MODE
+	public List<UECS.System> _systems;
 
 	private void Awake() {
 		if(_systemFiles == null) { // MainLoop Added in script & not in editor so it can't be kept editor value
@@ -17,14 +18,15 @@ public class MainLoop : MonoBehaviour {
 			throw new UnityException();
 		}
 
-		_systems = new UECS.System[_systemFiles.Length];
-
+		_systems = new List<UECS.System>();
 		for (int i = 0; i < _systemFiles.Length; ++i) {
 			if (_systemFiles [i] != null) {
 				System.Type systemType = _systemFiles[i].GetClass();
-				_systems[i] = (UECS.System) System.Activator.CreateInstance(systemType);
-			} else
-				_systems[i] = null;
+				UECS.System system = (UECS.System) System.Activator.CreateInstance (systemType);
+				system.Pause = _pause[i];
+
+				_systems.Add(system);
+			}
 		}
 	}
 
@@ -66,11 +68,8 @@ public class MainLoop : MonoBehaviour {
 		EntityManager._modifiedGameObjectIds.Clear();
 
 		int currentFrame = Time.frameCount;
-		for (int i = 0; i < _order.Length; ++i) {
-			int index = _order[i];
-			UECS.System system = _systems[index];
-			
-			if(_activate[index] == true && system != null /*&& system.Pause == false*/)
+		foreach(UECS.System system in _systems) {			
+			if(system.Pause == false)
 				system.process(currentFrame);
 		}
 
