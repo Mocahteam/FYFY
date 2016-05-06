@@ -34,7 +34,7 @@ public class MainLoopInspector : Editor {
 
 	private void editingModeInspector() {
 		for (int i = 0; i < _systemFiles.arraySize; ++i) {
-			EditorGUILayout.BeginHorizontal ();
+			EditorGUILayout.BeginHorizontal();
 
 			SerializedProperty systemFile = _systemFiles.GetArrayElementAtIndex(i);
 			MonoScript script = (MonoScript) EditorGUILayout.ObjectField(systemFile.objectReferenceValue, typeof(MonoScript), false);

@@ -65,18 +65,18 @@ public class MainLoop : MonoBehaviour {
 			FamilyManager.updateAfterGameObjectModified(gameObjectId);
 		EntityManager._modifiedGameObjectIds.Clear();
 
-		foreach (Family family in FamilyManager._families.Values) {
-			family.invokeGameObjectsEnteredCallbacks();
-			family.invokeGameObjectsExitedCallbacks();
-		}
-
 		int currentFrame = Time.frameCount;
 		for (int i = 0; i < _order.Length; ++i) {
 			int index = _order[i];
 			UECS.System system = _systems[index];
 			
-			if(_activate[index] == true && system != null && system.Pause == false)
+			if(_activate[index] == true && system != null /*&& system.Pause == false*/)
 				system.process(currentFrame);
+		}
+
+		foreach (Family family in FamilyManager._families.Values) {
+			family._entries.Clear();
+			family._exits.Clear();
 		}
 	}
 }
