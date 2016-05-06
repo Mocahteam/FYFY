@@ -1,10 +1,26 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.AndroidPlayer" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\System\MouseSystem.cs">
-    <Files>
-      <File FileName="Assets\Scripts\MainLoop\MainLoop.cs" Line="30" Column="2" />
-      <File FileName="Assets\Scripts\System\MouseSystem.cs" Line="31" Column="32" />
-    </Files>
+  <MonoDevelop.Ide.Workbench>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Defenses_immunitaires" expanded="True">
+            <Node name="Assembly-CSharp" expanded="True">
+              <Node name="Scripts" expanded="True">
+                <Node name="Entity" expanded="True">
+                  <Node name="EntityManagerAction" expanded="True" />
+                </Node>
+                <Node name="Family" expanded="True">
+                  <Node name="Family.cs" selected="True" />
+                </Node>
+                <Node name="MainLoop" expanded="True" />
+                <Node name="System" expanded="True" />
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

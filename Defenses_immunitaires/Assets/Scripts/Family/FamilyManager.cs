@@ -8,7 +8,7 @@ public static class FamilyManager {
 	public static Family getFamily(params Matcher[] matchers){
 		int mLength = matchers.Length;
 		if (mLength == 0)
-			throw new System.ArgumentException ();
+			throw new System.ArgumentException();
 		
 		string[] matchersDescriptors = new string[mLength];
 		for (int i = 0; i < mLength; ++i)
@@ -44,19 +44,18 @@ public static class FamilyManager {
 
 		foreach (Family family in FamilyManager._families.Values) {
 			if (family.matches(gameObjectWrapper)) {
-				if (family._gameObjectIds.Add(gameObjectId) && family._gameObjectsEnteredCallbacks != null)
-					family._gameObjectIdsEntered.Enqueue(gameObjectId);
-			} else {
-				if(family._gameObjectIds.Remove(gameObjectId) && family._gameObjectsExitedCallbacks != null)
-					family._gameObjectIdsExited.Enqueue(gameObjectId);
+				if (family._gameObjectIds.Add(gameObjectId))
+					family._entries.Add(gameObjectId);
+			} else if(family._gameObjectIds.Remove(gameObjectId)) {
+					family._exits.Add(gameObjectId);
 			}
 		}
 	}
 
 	internal static void updateAfterGameObjectDestroyed(int gameObjectId){
 		foreach (Family family in FamilyManager._families.Values) {
-			if(family._gameObjectIds.Remove(gameObjectId) && family._gameObjectsExitedCallbacks != null)
-				family._gameObjectIdsExited.Enqueue(gameObjectId);
+			if(family._gameObjectIds.Remove(gameObjectId))
+				family._exits.Add(gameObjectId);
 		}
 	}
 }
