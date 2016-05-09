@@ -4,7 +4,11 @@ public class MovementSystem : UECS.System {
 	private Family family;
 
 	public MovementSystem(){
-		family = FamilyManager.getFamily(new AllOfTypes(typeof(TargetPositionComponent), typeof(MeshFilter)), new GameObjectStateMatcher(GameObjectStateMatcher.STATE.ACTIVE));
+		family = FamilyManager.getFamily(
+			new AllOfTypes(typeof(TargetPositionComponent), typeof(MeshFilter)), 
+			new GameObjectStateMatcher(GameObjectStateMatcher.STATE.ACTIVE),
+			new AnyOfTags("Player")
+		);
 	}
 
 	public override void process(int currentFrame){

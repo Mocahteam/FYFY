@@ -15,9 +15,6 @@ public class MainLoopInspector : Editor {
 	private GUIContent _addButton;
 	private GUIContent _removeButton;
 
-	// PLAYING MODE
-	private MainLoop _target;
-
 	private void OnEnable(){
 		if (Object.FindObjectsOfType<MainLoop>().Length > 1) { // due to duplicate hotkeys & option on GO
 			DestroyImmediate(this.target);
@@ -34,8 +31,6 @@ public class MainLoopInspector : Editor {
 			_pause = serializedObject.FindProperty("_pause");
 			_addButton = new GUIContent("+", "add");
 			_removeButton = new GUIContent("-", "remove");
-		} else {
-			_target = (MainLoop)this.target;
 		}
 	}
 
@@ -50,7 +45,7 @@ public class MainLoopInspector : Editor {
 	}
 
 	private void playingModeInspector(){		
-		List<UECS.System> systems = _target._systems;
+		List<UECS.System> systems = SystemManager._systems;
 		int systemsCount = systems.Count;
 
 		for(int i = 0; i < systemsCount; ++i) {
