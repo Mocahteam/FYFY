@@ -18,22 +18,26 @@ public static class FamilyManager {
 		string familyDescriptor = string.Join("/", matchersDescriptors);
 
 		Family family;
-		if (_families.TryGetValue (familyDescriptor, out family) == false) {
+		if (_families.TryGetValue(familyDescriptor, out family) == false) {
 			family = new Family (familyDescriptor, matchers);
 			_families.Add(familyDescriptor, family);
 
 			if(EntityManager._gameObjectWrappers.Count > 0) {
-				throw new UnityEngine.UnityException(); 
+				// UnityEngine.Debug.LogWarning("FAMILY " + family._descriptor);
 
-				// > WARNING --> callback delayed next frame if getFamily in process function
-//				foreach(KeyValuePair<int, GameObjectWrapper> valuePair in EntityManager._gameObjectWrappers) {
-//					int gameObjectId = valuePair.Key;
-//					GameObjectWrapper gameObjectWrapper = valuePair.Value;
-//
-//					if (family.matches(gameObjectWrapper))
-//						if (family._gameObjectIds.Add(gameObjectId) && family._gameObjectsEnteredCallbacks != null)
-//							family._gameObjectIdsEntered.Enqueue(gameObjectId);
-//				}
+				foreach (KeyValuePair<int, GameObjectWrapper> valuePair in EntityManager._gameObjectWrappers) {
+					int gameObjectId = valuePair.Key;
+					GameObjectWrapper gameObjectWrapper = valuePair.Value;
+
+					if (family.matches (gameObjectWrapper)) {
+						//
+						if(family._gameObjectIds.Contains(gameObjectId))
+							UnityEngine.Debug.LogWarning ("WTFFFFFFFFFFFFF");
+						//
+						family._gameObjectIds.Add(gameObjectId);
+						family._entries.Add (gameObjectId);
+					}
+				}
 			}
 		}
 		return family;

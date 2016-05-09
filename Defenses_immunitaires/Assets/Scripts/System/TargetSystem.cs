@@ -7,20 +7,19 @@ public class TargetSystem : UECS.System {
 	public TargetSystem() {
 		family = FamilyManager.getFamily(new AllOfTypes(typeof(TargetPositionComponent)), new GameObjectStateMatcher(GameObjectStateMatcher.STATE.ACTIVE));
 
-//		TEST FAILED
 		GameObject go = EntityManager.createPrimitive(PrimitiveType.Cube);
 		go.name = "test";
 		EntityManager.addComponent<TargetPositionComponent>(go);
 	}
 
 	public override void process(int currentFrame){
-		foreach(GameObject go in family.entries()) {
-			Debug.Log ("ENTERED " + go.name);
-		}
-
-		foreach(int id in family.exits()) {
-			Debug.Log ("EXITED " + id);
-		}
+//		foreach(GameObject go in family.entries()) {
+//			Debug.Log ("ENTERED " + go.name);
+//		}
+//
+//		foreach(int id in family.exits()) {
+//			Debug.Log ("EXITED " + id);
+//		}
 
 		foreach (GameObject go in family) {
 			TargetPositionComponent tpc = go.GetComponent<TargetPositionComponent>();
