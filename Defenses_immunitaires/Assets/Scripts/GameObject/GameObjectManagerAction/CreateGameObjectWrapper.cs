@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-internal class CreateGameObjectWrapper : IEntityManagerAction {
+internal class CreateGameObjectWrapper : IGameObjectManagerAction {
 	private readonly GameObject _gameObject;
 	private readonly HashSet<uint> _componentTypeIds;
 
@@ -28,17 +28,17 @@ internal class CreateGameObjectWrapper : IEntityManagerAction {
 		_componentTypeIds = componentTypeIds;
 	}
 
-	void IEntityManagerAction.perform(){
+	void IGameObjectManagerAction.perform(){
 		if (_gameObject == null || _componentTypeIds == null)
 			throw new MissingReferenceException();
 
 		int gameObjectId = _gameObject.GetInstanceID();
-		if(EntityManager._gameObjectWrappers.ContainsKey(gameObjectId) == true)
+		if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == true)
 			throw new UnityException(); // own exception
 		
 		GameObjectWrapper gameObjectWrapper = new GameObjectWrapper(_gameObject, _componentTypeIds);
-		EntityManager._gameObjectWrappers.Add(gameObjectId, gameObjectWrapper);
-		EntityManager._modifiedGameObjectIds.Add(gameObjectId);
+		GameObjectManager._gameObjectWrappers.Add(gameObjectId, gameObjectWrapper);
+		GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
 	}
 }
 

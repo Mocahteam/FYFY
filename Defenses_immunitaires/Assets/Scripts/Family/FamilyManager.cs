@@ -22,10 +22,10 @@ public static class FamilyManager {
 			family = new Family (familyDescriptor, matchers);
 			_families.Add(familyDescriptor, family);
 
-			if(EntityManager._gameObjectWrappers.Count > 0) {
+			if(GameObjectManager._gameObjectWrappers.Count > 0) {
 				// UnityEngine.Debug.LogWarning("FAMILY " + family._descriptor);
 
-				foreach (KeyValuePair<int, GameObjectWrapper> valuePair in EntityManager._gameObjectWrappers) {
+				foreach (KeyValuePair<int, GameObjectWrapper> valuePair in GameObjectManager._gameObjectWrappers) {
 					int gameObjectId = valuePair.Key;
 					GameObjectWrapper gameObjectWrapper = valuePair.Value;
 
@@ -44,7 +44,7 @@ public static class FamilyManager {
 	}
 
 	internal static void updateAfterGameObjectModified(int gameObjectId){
-		GameObjectWrapper gameObjectWrapper = EntityManager._gameObjectWrappers[gameObjectId];
+		GameObjectWrapper gameObjectWrapper = GameObjectManager._gameObjectWrappers[gameObjectId];
 
 		foreach (Family family in FamilyManager._families.Values) {
 			if (family.matches(gameObjectWrapper)) {

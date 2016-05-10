@@ -27,7 +27,7 @@ public class Family : IEnumerable<GameObject> {
 
 	public IEnumerator<GameObject> GetEnumerator(){
 		foreach(int id in _gameObjectIds)
-			yield return EntityManager._gameObjectWrappers[id]._gameObject;
+			yield return GameObjectManager._gameObjectWrappers[id]._gameObject;
 	}
 
 	public bool contains(int gameObjectId) {
@@ -36,7 +36,7 @@ public class Family : IEnumerable<GameObject> {
 
 	public IEnumerable<GameObject> entries() {
 		foreach(int gameObjectId in _entries)
-			yield return EntityManager._gameObjectWrappers[gameObjectId]._gameObject;
+			yield return GameObjectManager._gameObjectWrappers[gameObjectId]._gameObject;
 	}
 
 	public IEnumerable<int> exits() {

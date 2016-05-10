@@ -28,66 +28,66 @@ public static class SystemManager {
 			return _systems[index];
 		return null;
 	}
-
-	public static bool addSystem<T>(bool pause) where T : UECS.System, new() {
-		System.Type systemType = typeof(T);
-		if (_indexes.ContainsKey(systemType) == false) {
-			UECS.System system = new T();
-			system.Pause = pause;
-
-			_indexes.Add(systemType, _systems.Count);
-			_systems.Add(system);
-			return true;
-		}
-		return false;
-	}
-
-	public static bool addSystem(System.Type systemType, bool pause) {
-		if(systemType == null)
-			throw new MissingReferenceException();
-
-		if (systemType.IsSubclassOf(typeof(UECS.System)) == false) {
-			Debug.LogWarning("Can't add '" + systemType + " because a '" + systemType + "' isn't a System!");
-			return false;
-		}
-
-		if (_indexes.ContainsKey(systemType) == false) {
-			UECS.System system = (UECS.System) System.Activator.CreateInstance(systemType);
-			system.Pause = pause;
-
-			_indexes.Add(systemType, _systems.Count);
-			_systems.Add(system);
-			return true;
-		}
-		return false;
-	}
-
-	public static bool removeSystem<T>() where T : UECS.System {
-		System.Type systemType = typeof(T);
-		int index;
-		if (_indexes.TryGetValue(systemType, out index) == true) {
-			_systems.RemoveAt(index);
-			_indexes.Remove(systemType);
-			return true;
-		}
-		return false;
-	}
-
-	public static bool removeSystem(System.Type systemType) {
-		if(systemType == null)
-			throw new MissingReferenceException();
-
-		if (systemType.IsSubclassOf(typeof(UECS.System)) == false) {
-			Debug.LogWarning("Can't remove '" + systemType + " because a '" + systemType + "' isn't a System!");
-			return false;
-		}
-
-		int index;
-		if (_indexes.TryGetValue(systemType, out index) == true) {
-			_systems.RemoveAt(index);
-			_indexes.Remove(systemType);
-			return true;
-		}
-		return false;
-	}
 }
+
+//	public static bool addSystem<T>(bool pause) where T : UECS.System, new() {
+//		System.Type systemType = typeof(T);
+//		if (_indexes.ContainsKey(systemType) == false) {
+//			UECS.System system = new T();
+//			system.Pause = pause;
+//
+//			_indexes.Add(systemType, _systems.Count);
+//			_systems.Add(system);
+//			return true;
+//		}
+//		return false;
+//	}
+//
+//	public static bool addSystem(System.Type systemType, bool pause) {
+//		if(systemType == null)
+//			throw new MissingReferenceException();
+//
+//		if (systemType.IsSubclassOf(typeof(UECS.System)) == false) {
+//			Debug.LogWarning("Can't add '" + systemType + " because a '" + systemType + "' isn't a System!");
+//			return false;
+//		}
+//
+//		if (_indexes.ContainsKey(systemType) == false) {
+//			UECS.System system = (UECS.System) System.Activator.CreateInstance(systemType);
+//			system.Pause = pause;
+//
+//			_indexes.Add(systemType, _systems.Count);
+//			_systems.Add(system);
+//			return true;
+//		}
+//		return false;
+//	}
+
+//	public static bool removeSystem<T>() where T : UECS.System {
+//		System.Type systemType = typeof(T);
+//		int index;
+//		if (_indexes.TryGetValue(systemType, out index) == true) {
+//			_systems.RemoveAt(index);
+//			_indexes.Remove(systemType);
+//			return true;
+//		}
+//		return false;
+//	}
+//
+//	public static bool removeSystem(System.Type systemType) {
+//		if(systemType == null)
+//			throw new MissingReferenceException();
+//
+//		if (systemType.IsSubclassOf(typeof(UECS.System)) == false) {
+//			Debug.LogWarning("Can't remove '" + systemType + " because a '" + systemType + "' isn't a System!");
+//			return false;
+//		}
+//
+//		int index;
+//		if (_indexes.TryGetValue(systemType, out index) == true) {
+//			_systems.RemoveAt(index);
+//			_indexes.Remove(systemType);
+//			return true;
+//		}
+//		return false;
+//	}
