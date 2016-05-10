@@ -28,30 +28,39 @@ public class MainLoop : MonoBehaviour {
 			}
 
 			GameObjectWrapper gameObjectWrapper = new GameObjectWrapper(gameObject, componentTypeIds);
-			EntityManager._gameObjectWrappers.Add(gameObjectId, gameObjectWrapper);
+			GameObjectManager._gameObjectWrappers.Add(gameObjectId, gameObjectWrapper);
 		}
 	}
 
 	private void Start() {
-		for (int i = 0; i < _systemFiles.Length; ++i)
-			if (_systemFiles[i] != null)
-				SystemManager.addSystem(_systemFiles[i].GetClass(), _pause[i]);
+		for (int i = 0; i < _systemFiles.Length; ++i) {
+			if (_systemFiles [i] != null) {
+				System.Type systemType = _systemFiles[i].GetClass();
+				if (SystemManager._indexes.ContainsKey(systemType) == false) {
+					UECS.System system = (UECS.System) System.Activator.CreateInstance(systemType);
+					system.Pause = _pause[i];
+
+					SystemManager._indexes.Add(systemType, SystemManager._systems.Count);
+					SystemManager._systems.Add(system);
+				}
+			}
+		}
 	}
 
 	private void FixedUpdate(){
-		int count = EntityManager._delayedActions.Count;
+		int count = GameObjectManager._delayedActions.Count;
 		while(count-- > 0)
-			EntityManager._delayedActions.Dequeue().perform();
+			GameObjectManager._delayedActions.Dequeue().perform();
 		
-		foreach(int gameObjectId in EntityManager._destroyedGameObjectIds) {
+		foreach(int gameObjectId in GameObjectManager._destroyedGameObjectIds) {
 			FamilyManager.updateAfterGameObjectDestroyed(gameObjectId);
-			EntityManager._modifiedGameObjectIds.Remove(gameObjectId);
+			GameObjectManager._modifiedGameObjectIds.Remove(gameObjectId);
 		}
-		EntityManager._destroyedGameObjectIds.Clear();
+		GameObjectManager._destroyedGameObjectIds.Clear();
 
-		foreach(int gameObjectId in EntityManager._modifiedGameObjectIds)
+		foreach(int gameObjectId in GameObjectManager._modifiedGameObjectIds)
 			FamilyManager.updateAfterGameObjectModified(gameObjectId);
-		EntityManager._modifiedGameObjectIds.Clear();
+		GameObjectManager._modifiedGameObjectIds.Clear();
 
 		int currentFrame = Time.frameCount;
 		foreach(UECS.System system in SystemManager._systems) {			

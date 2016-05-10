@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-internal class RemoveComponent<T> : IEntityManagerAction where T : Component {
+internal class RemoveComponent<T> : IGameObjectManagerAction where T : Component {
 	private readonly GameObject _gameObject;
 	private readonly System.Type _componentType;
 
@@ -12,12 +12,12 @@ internal class RemoveComponent<T> : IEntityManagerAction where T : Component {
 		_componentType = componentType;
 	}
 
-	void IEntityManagerAction.perform() {
+	void IGameObjectManagerAction.perform() {
 		if (_gameObject == null || _componentType == null)
 			throw new MissingReferenceException();
 
 		int gameObjectId = _gameObject.GetInstanceID();
-		if(EntityManager._gameObjectWrappers.ContainsKey(gameObjectId) == false)
+		if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false)
 			throw new UnityException(); // own exception
 
 		T component = _gameObject.GetComponent<T>();
@@ -28,12 +28,12 @@ internal class RemoveComponent<T> : IEntityManagerAction where T : Component {
 		Object.DestroyImmediate(component);
 
 		uint componentTypeId = TypeManager.getTypeId(_componentType);
-		EntityManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Remove(componentTypeId); // -> remove exception if doesnt exist
-		EntityManager._modifiedGameObjectIds.Add(gameObjectId);
+		GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Remove(componentTypeId); // -> remove exception if doesnt exist
+		GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
 	}
 }
 
-internal class RemoveComponent : IEntityManagerAction {
+internal class RemoveComponent : IGameObjectManagerAction {
 	private readonly GameObject _gameObject;
 	private readonly Component _component;
 	private readonly System.Type _componentType;
@@ -47,23 +47,18 @@ internal class RemoveComponent : IEntityManagerAction {
 		_componentType = componentType;
 	}
 
-	void IEntityManagerAction.perform() {
+	void IGameObjectManagerAction.perform() {
 		if (_gameObject == null || _component == null || _componentType == null)
 			throw new MissingReferenceException();
 
 		int gameObjectId = _gameObject.GetInstanceID();
-		if(EntityManager._gameObjectWrappers.ContainsKey(gameObjectId) == false)
+		if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false)
 			throw new UnityException(); // own exception
 
 		Object.DestroyImmediate(_component);
 
 		uint componentTypeId = TypeManager.getTypeId(_componentType);
-		EntityManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Remove(componentTypeId); // -> remove exception if doesnt exist
-		EntityManager._modifiedGameObjectIds.Add(gameObjectId);
+		GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Remove(componentTypeId); // -> remove exception if doesnt exist
+		GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
 	}
 }
-
-//if (component == null) {
-//	Debug.Log("Can't remove '" + componentType + "' from " + gameObject.name + " because a '" + componentType + "' is'nt attached to the game object!");
-//	return;
-//}

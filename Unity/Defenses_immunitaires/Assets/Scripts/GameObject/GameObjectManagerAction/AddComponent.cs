@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Reflection;
 
-internal class AddComponent<T> : IEntityManagerAction where T : Component {
+internal class AddComponent<T> : IGameObjectManagerAction where T : Component {
 	private readonly GameObject _gameObject;
 	private readonly object _componentValues;
 
@@ -13,12 +13,12 @@ internal class AddComponent<T> : IEntityManagerAction where T : Component {
 		_componentValues = componentValues;
 	}
 
-	void IEntityManagerAction.perform() {
+	void IGameObjectManagerAction.perform() {
 		if (_gameObject == null)
-			throw new MissingReferenceException ();
+			throw new MissingReferenceException();
 
 		int gameObjectId = _gameObject.GetInstanceID();
-		if(EntityManager._gameObjectWrappers.ContainsKey(gameObjectId) == false)
+		if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false)
 			throw new UnityException(); // own exception
 
 		System.Type componentType = typeof(T);
@@ -43,12 +43,12 @@ internal class AddComponent<T> : IEntityManagerAction where T : Component {
 		}
 
 		uint componentTypeId = TypeManager.getTypeId(componentType);
-		EntityManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Add(componentTypeId);
-		EntityManager._modifiedGameObjectIds.Add(gameObjectId);
+		GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Add(componentTypeId);
+		GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
 	}
 }
 
-internal class AddComponent : IEntityManagerAction {
+internal class AddComponent : IGameObjectManagerAction {
 	private readonly GameObject _gameObject;
 	private readonly System.Type _componentType;
 	private readonly object _componentValues;
@@ -62,12 +62,12 @@ internal class AddComponent : IEntityManagerAction {
 		_componentValues = componentValues;
 	}
 
-	void IEntityManagerAction.perform() {
+	void IGameObjectManagerAction.perform() {
 		if (_gameObject == null || _componentType == null)
 			throw new MissingReferenceException();
 		
 		int gameObjectId = _gameObject.GetInstanceID();
-		if(EntityManager._gameObjectWrappers.ContainsKey(gameObjectId) == false)
+		if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false)
 			throw new UnityException(); // own exception
 
 		if (_gameObject.GetComponent(_componentType) != null) {
@@ -91,8 +91,8 @@ internal class AddComponent : IEntityManagerAction {
 		}
 
 		uint componentTypeId = TypeManager.getTypeId(_componentType);
-		EntityManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Add(componentTypeId);
-		EntityManager._modifiedGameObjectIds.Add(gameObjectId);
+		GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Add(componentTypeId);
+		GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
 	}
 }
 

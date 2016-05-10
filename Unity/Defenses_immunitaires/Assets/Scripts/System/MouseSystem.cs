@@ -15,7 +15,7 @@ public class MouseSystem : UECS.System {
 
 	public override void process(int currentFrame) {
 		foreach (GameObject gameObject in _pointedFamily)
-			EntityManager.removeComponent<MousePressedOn>(gameObject);
+			GameObjectManager.removeComponent<MousePressedOn>(gameObject);
 
 		Vector3 mousePosition = Input.mousePosition;
 		Ray ray = Camera.main.ScreenPointToRay(mousePosition);
@@ -29,7 +29,7 @@ public class MouseSystem : UECS.System {
 				return;
 			
 			if (Input.GetMouseButtonDown(0))
-				EntityManager.addComponent<MousePressedOn>(gameObject);
+				GameObjectManager.addComponent<MousePressedOn>(gameObject);
 		}
 	}
 }

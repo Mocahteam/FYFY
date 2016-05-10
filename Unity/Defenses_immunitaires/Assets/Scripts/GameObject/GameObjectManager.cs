@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public static class EntityManager {
+public static class GameObjectManager {
 	internal static readonly Dictionary<string, GameObject> _prefabResources        = new Dictionary<string, GameObject>();
 	internal static readonly Dictionary<int, GameObjectWrapper> _gameObjectWrappers = new Dictionary<int, GameObjectWrapper>(); // indexed by gameobject's id
-	internal static readonly Queue<IEntityManagerAction> _delayedActions            = new Queue<IEntityManagerAction>();
-	internal static readonly HashSet<int> _destroyedGameObjectIds                   = new HashSet<int>(); // destroyEntity
-	internal static readonly HashSet<int> _modifiedGameObjectIds                    = new HashSet<int>(); // createEntity or addComponent or removeComponent
+	internal static readonly Queue<IGameObjectManagerAction> _delayedActions        = new Queue<IGameObjectManagerAction>();
+	internal static readonly HashSet<int> _destroyedGameObjectIds                   = new HashSet<int>(); // destroyGO
+	internal static readonly HashSet<int> _modifiedGameObjectIds                    = new HashSet<int>(); // createGO or addComponent or removeComponent
 
 	public static int Count { get { return _gameObjectWrappers.Count; } }
 
@@ -49,6 +49,20 @@ public static class EntityManager {
 			throw new MissingReferenceException();
 		
 		_delayedActions.Enqueue(new DestroyGameObject(gameObject));
+	}
+
+	public static void enableGameObject(GameObject gameObject){
+		if(gameObject == null)
+			throw new MissingReferenceException();
+
+		_delayedActions.Enqueue(new EnableGameObject(gameObject));
+	}
+
+	public static void disableGameObject(GameObject gameObject){
+		if(gameObject == null)
+			throw new MissingReferenceException();
+		
+		_delayedActions.Enqueue(new DisableGameObject(gameObject));
 	}
 
 	public static void addComponent<T>(GameObject gameObject, object componentValues = null) where T : Component {

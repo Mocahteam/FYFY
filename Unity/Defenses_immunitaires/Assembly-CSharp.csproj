@@ -47,17 +47,19 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\Component\AbleToCatchMouseEvents.cs" />
      <Compile Include="Assets\Scripts\Component\TargetPositionComponent.cs" />
-     <Compile Include="Assets\Scripts\Entity\EntityManager.cs" />
-     <Compile Include="Assets\Scripts\Entity\EntityManagerAction\AddComponent.cs" />
-     <Compile Include="Assets\Scripts\Entity\EntityManagerAction\CreateGameObjectWrapper.cs" />
-     <Compile Include="Assets\Scripts\Entity\EntityManagerAction\DestroyGameObject.cs" />
-     <Compile Include="Assets\Scripts\Entity\EntityManagerAction\IEntityManagerAction.cs" />
-     <Compile Include="Assets\Scripts\Entity\EntityManagerAction\RemoveComponent.cs" />
-     <Compile Include="Assets\Scripts\Entity\GameObjectWrapper.cs" />
-     <Compile Include="Assets\Scripts\Entity\Test.cs" />
      <Compile Include="Assets\Scripts\Family\Family.cs" />
      <Compile Include="Assets\Scripts\Family\FamilyManager.cs" />
      <Compile Include="Assets\Scripts\Family\FamilyManagerAction.cs" />
+     <Compile Include="Assets\Scripts\GameObject\GameObjectManager.cs" />
+     <Compile Include="Assets\Scripts\GameObject\GameObjectManagerAction\AddComponent.cs" />
+     <Compile Include="Assets\Scripts\GameObject\GameObjectManagerAction\CreateGameObjectWrapper.cs" />
+     <Compile Include="Assets\Scripts\GameObject\GameObjectManagerAction\DestroyGameObject.cs" />
+     <Compile Include="Assets\Scripts\GameObject\GameObjectManagerAction\DisableGameObject.cs" />
+     <Compile Include="Assets\Scripts\GameObject\GameObjectManagerAction\EnableGameObject.cs" />
+     <Compile Include="Assets\Scripts\GameObject\GameObjectManagerAction\IGameObjectManagerAction.cs" />
+     <Compile Include="Assets\Scripts\GameObject\GameObjectManagerAction\RemoveComponent.cs" />
+     <Compile Include="Assets\Scripts\GameObject\GameObjectWrapper.cs" />
+     <Compile Include="Assets\Scripts\GameObject\Test.cs" />
      <Compile Include="Assets\Scripts\MainLoop\MainLoop.cs" />
      <Compile Include="Assets\Scripts\MainLoop\MainLoopCreationMenu.cs" />
      <Compile Include="Assets\Scripts\MainLoop\MainLoopInspector.cs" />
