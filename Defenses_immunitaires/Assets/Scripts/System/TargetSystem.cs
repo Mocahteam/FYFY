@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using FYFY;
 
-public class TargetSystem : UECS.System {
+public class TargetSystem : FSystem {
 	private Family family;
 
 	public TargetSystem() {
@@ -12,7 +13,13 @@ public class TargetSystem : UECS.System {
 		GameObjectManager.addComponent<TargetPositionComponent>(go);
 	}
 
-	public override void process(int currentFrame){
+	protected override void onPause(int currentFrame) {
+	}
+
+	protected override void onResume(int currentFrame) {
+	}
+
+	protected override void onProcess(int currentFrame){
 //		foreach(GameObject go in family.entries()) {
 //			Debug.Log ("ENTERED " + go.name);
 //		}

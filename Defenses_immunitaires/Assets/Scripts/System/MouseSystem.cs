@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
+using FYFY;
 
 [AddComponentMenu("")]
 public class MousePressedOn : MonoBehaviour {
 }
 
-public class MouseSystem : UECS.System {
+public class MouseSystem : FSystem {
 	Family _pointableFamily;
 	Family _pointedFamily;
 
@@ -13,7 +14,13 @@ public class MouseSystem : UECS.System {
 		_pointedFamily   = FamilyManager.getFamily(new AllOfTypes(typeof(MousePressedOn)));
 	}
 
-	public override void process(int currentFrame) {
+	protected override void onPause(int currentFrame) {
+	}
+
+	protected override void onResume(int currentFrame) {
+	}
+
+	protected override void onProcess(int currentFrame) {
 		foreach (GameObject gameObject in _pointedFamily)
 			GameObjectManager.removeComponent<MousePressedOn>(gameObject);
 
@@ -25,7 +32,7 @@ public class MouseSystem : UECS.System {
 			GameObject gameObject = hit.transform.gameObject;
 			int gameObjectId = gameObject.GetInstanceID();
 
-			if(_pointableFamily._gameObjectIds.Contains(gameObjectId) == false)
+			if(_pointableFamily.contains(gameObjectId) == false)
 				return;
 			
 			if (Input.GetMouseButtonDown(0))

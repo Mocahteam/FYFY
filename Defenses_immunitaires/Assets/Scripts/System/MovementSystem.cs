@@ -1,17 +1,23 @@
 ﻿using UnityEngine;
+using FYFY;
 
-public class MovementSystem : UECS.System {
+public class MovementSystem : FSystem {
 	private Family family;
 
 	public MovementSystem(){
 		family = FamilyManager.getFamily(
 			new AllOfTypes(typeof(TargetPositionComponent), typeof(MeshFilter)), 
-			new GameObjectStateMatcher(GameObjectStateMatcher.STATE.ACTIVE),
-			new AnyOfTags("Player")
+			new GameObjectStateMatcher(GameObjectStateMatcher.STATE.ACTIVE)
 		);
 	}
 
-	public override void process(int currentFrame){
+	protected override void onPause(int currentFrame) {
+	}
+
+	protected override void onResume(int currentFrame) {
+	}
+
+	protected override void onProcess(int currentFrame){
 		foreach (GameObject go in family) {
 			TargetPositionComponent tpc = go.GetComponent<TargetPositionComponent> ();
 			Vector3 position = go.transform.position;
