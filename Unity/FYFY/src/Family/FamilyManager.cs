@@ -9,12 +9,12 @@ namespace FYFY {
 		public static Family getFamily(params Matcher[] matchers){
 			int mLength = matchers.Length;
 			if (mLength == 0)
-				throw new global::System.ArgumentException();
+				throw new System.ArgumentException();
 			
 			string[] matchersDescriptors = new string[mLength];
 			for (int i = 0; i < mLength; ++i)
 				matchersDescriptors[i] = matchers[i]._descriptor;
-			global::System.Array.Sort(matchersDescriptors);
+			System.Array.Sort(matchersDescriptors);
 
 			string familyDescriptor = string.Join("/", matchersDescriptors);
 

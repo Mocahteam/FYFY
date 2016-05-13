@@ -1,6 +1,6 @@
 ﻿namespace FYFY {
 	public class AnyOfTypes : ComponentTypeMatcher {
-		public AnyOfTypes(params global::System.Type[] componentTypes) : base(componentTypes) {
+		public AnyOfTypes(params System.Type[] componentTypes) : base(componentTypes) {
 		}
 
 		internal override bool matches(GameObjectWrapper gameObjectWrapper){

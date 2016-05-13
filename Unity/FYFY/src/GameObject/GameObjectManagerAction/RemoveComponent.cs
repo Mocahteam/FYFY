@@ -3,9 +3,9 @@
 namespace FYFY {
 	internal class RemoveComponent<T> : IGameObjectManagerAction where T : Component {
 		private readonly GameObject _gameObject;
-		private readonly global::System.Type _componentType;
+		private readonly System.Type _componentType;
 
-		internal RemoveComponent(GameObject gameObject, global::System.Type componentType) {
+		internal RemoveComponent(GameObject gameObject, System.Type componentType) {
 			if (gameObject == null || componentType == null)
 				throw new MissingReferenceException();
 
@@ -37,9 +37,9 @@ namespace FYFY {
 	internal class RemoveComponent : IGameObjectManagerAction {
 		private readonly GameObject _gameObject;
 		private readonly Component _component;
-		private readonly global::System.Type _componentType;
+		private readonly System.Type _componentType;
 
-		internal RemoveComponent(GameObject gameObject, Component component, global::System.Type componentType) {
+		internal RemoveComponent(GameObject gameObject, Component component, System.Type componentType) {
 			if (gameObject == null || component == null || componentType == null)
 				throw new MissingReferenceException();
 

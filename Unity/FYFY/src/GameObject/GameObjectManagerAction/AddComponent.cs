@@ -22,7 +22,7 @@ namespace FYFY {
 			if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false)
 				throw new UnityException(); // own exception
 
-			global::System.Type componentType = typeof(T);
+			System.Type componentType = typeof(T);
 			if (_gameObject.GetComponent<T>() != null) {
 				Debug.LogWarning("Can't add '" + componentType + "' to " + _gameObject.name + " because a '" + componentType + "' is already added to the game object!");
 				return;
@@ -30,16 +30,16 @@ namespace FYFY {
 
 			T component = _gameObject.AddComponent<T>();
 			if (_componentValues != null) {
-				global::System.Type componentValuesType = _componentValues.GetType();
+				System.Type componentValuesType = _componentValues.GetType();
 				foreach (PropertyInfo pi in componentValuesType.GetProperties()) { // in anonymous, all is get property
 					FieldInfo fieldInfo = componentType.GetField(pi.Name);
 					PropertyInfo propertyInfo = componentType.GetProperty(pi.Name);
 					object value = pi.GetValue(_componentValues, null);
 
 					if (fieldInfo != null)
-						fieldInfo.SetValue(component, global::System.Convert.ChangeType(value, fieldInfo.FieldType));
+						fieldInfo.SetValue(component, System.Convert.ChangeType(value, fieldInfo.FieldType));
 					else if (propertyInfo != null)
-						propertyInfo.SetValue(component, global::System.Convert.ChangeType(value, propertyInfo.PropertyType), null);
+						propertyInfo.SetValue(component, System.Convert.ChangeType(value, propertyInfo.PropertyType), null);
 				}
 			}
 
@@ -51,10 +51,10 @@ namespace FYFY {
 
 	internal class AddComponent : IGameObjectManagerAction {
 		private readonly GameObject _gameObject;
-		private readonly global::System.Type _componentType;
+		private readonly System.Type _componentType;
 		private readonly object _componentValues;
 
-		internal AddComponent(GameObject gameObject, global::System.Type componentType, object componentValues) {
+		internal AddComponent(GameObject gameObject, System.Type componentType, object componentValues) {
 			if (gameObject == null || componentType == null)
 				throw new MissingReferenceException();
 
@@ -78,16 +78,16 @@ namespace FYFY {
 
 			Component component = _gameObject.AddComponent(_componentType);
 			if (_componentValues != null) {
-				global::System.Type componentValuesType = _componentValues.GetType();
+				System.Type componentValuesType = _componentValues.GetType();
 				foreach (PropertyInfo pi in componentValuesType.GetProperties()) { // in anonymous, all is get property
 					FieldInfo fieldInfo = _componentType.GetField(pi.Name);
 					PropertyInfo propertyInfo = _componentType.GetProperty(pi.Name);
 					object value = pi.GetValue(_componentValues, null);
 			
 					if (fieldInfo != null)
-						fieldInfo.SetValue(component, global::System.Convert.ChangeType(value, fieldInfo.FieldType));
+						fieldInfo.SetValue(component, System.Convert.ChangeType(value, fieldInfo.FieldType));
 					else if (propertyInfo != null)
-						propertyInfo.SetValue(component, global::System.Convert.ChangeType(value, propertyInfo.PropertyType), null);
+						propertyInfo.SetValue(component, System.Convert.ChangeType(value, propertyInfo.PropertyType), null);
 				}
 			}
 

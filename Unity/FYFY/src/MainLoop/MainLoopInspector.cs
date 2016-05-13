@@ -28,7 +28,7 @@ namespace FYFY {
 		}
 
 		private void onAddCallback(object type) {
-			global::System.Type systemType = (global::System.Type) type;
+			System.Type systemType = (System.Type) type;
 			int index = _systemDescriptions.arraySize;
 			_systemDescriptions.arraySize++;
 
@@ -45,20 +45,20 @@ namespace FYFY {
 			_drawingList = new ReorderableList(serializedObject, _systemDescriptions, true, false, true, true);
 
 			_drawingList.onAddDropdownCallback = delegate(Rect buttonRect, ReorderableList list) {
-				HashSet<string> selectedSystemTypeNames = new HashSet<string>();
+				HashSet<string> selectedSystemTypeNames = new HashSet<string>(); // impossible de le mettre en dehors car quand tu fais reset, OnEnable nest pas rappele !!!!!
 				for(int i = 0; i < _systemDescriptions.arraySize; ++i) {
 					string fullTypeName = _systemDescriptions.GetArrayElementAtIndex(i).FindPropertyRelative("_typeFullName").stringValue;
 					selectedSystemTypeNames.Add(fullTypeName);
 				}
 
-				global::System.Type[] systemTypes = (from assembly in global::System.AppDomain.CurrentDomain.GetAssemblies()
+				System.Type[] systemTypes = (from assembly in System.AppDomain.CurrentDomain.GetAssemblies()
 					from type in assembly.GetExportedTypes()
 					where type.IsSubclassOf(typeof(FSystem)) == true
 					select type).ToArray();
 
 				GenericMenu menu = new GenericMenu();
 				for(int i = 0; i < systemTypes.Length; ++i) {
-					global::System.Type systemType = systemTypes[i];
+					System.Type systemType = systemTypes[i];
 					string typeAssemblyName = systemType.Assembly.GetName().Name;
 					string typeName = systemType.FullName;
 					string buttonText = (typeAssemblyName != "Assembly-CSharp") ? (typeAssemblyName + "/" + typeName) : typeName;

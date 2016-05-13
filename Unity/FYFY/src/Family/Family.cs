@@ -22,7 +22,7 @@ namespace FYFY {
 		public int EntriesCount  { get { return _entries.Count; } }
 		public int ExitsCount    { get { return _exits.Count; } }
 
-		global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator(){
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator(){
 			return this.GetEnumerator();
 		}
 

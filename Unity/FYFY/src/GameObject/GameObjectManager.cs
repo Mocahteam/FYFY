@@ -73,7 +73,7 @@ namespace FYFY {
 			_delayedActions.Enqueue(new AddComponent<T>(gameObject, componentValues));
 		}
 
-		public static void addComponent(GameObject gameObject, global::System.Type componentType, object componentValues = null) {
+		public static void addComponent(GameObject gameObject, System.Type componentType, object componentValues = null) {
 			if(gameObject == null || componentType == null)
 				throw new MissingReferenceException();
 			
@@ -89,7 +89,7 @@ namespace FYFY {
 			if(gameObject == null)
 				throw new MissingReferenceException();
 		
-			global::System.Type componentType = typeof(T);
+			System.Type componentType = typeof(T);
 			if (componentType == typeof(Transform)) {
 				Debug.Log("Removing 'Transform' from " + gameObject.name + " is not allowed!");
 				return;
@@ -103,7 +103,7 @@ namespace FYFY {
 				throw new MissingReferenceException();
 
 			GameObject gameObject = component.gameObject;
-			global::System.Type componentType = component.GetType();
+			System.Type componentType = component.GetType();
 			if (componentType == typeof(Transform)) {
 				Debug.Log("Removing 'Transform' from " + gameObject.name + " is not allowed!");
 				return;

@@ -14,7 +14,7 @@ namespace FYFY {
 			_componentTypeIds = new HashSet<uint>();
 
 			foreach(Component c in gameObject.GetComponents<Component>()) {
-				global::System.Type type = c.GetType();
+				System.Type type = c.GetType();
 				uint typeId = TypeManager.getTypeId(type);
 				_componentTypeIds.Add(typeId);
 			}
