@@ -5,7 +5,7 @@ namespace FYFY {
 		private static uint _typeIdNumber = 0;
 		private static readonly Dictionary<string, uint> _typeToId = new Dictionary<string, uint>();
 
-		internal static uint getTypeId(global::System.Type type){
+		internal static uint getTypeId(System.Type type){
 			uint id;
 			string typeFullName = type.FullName;
 			if (_typeToId.TryGetValue(typeFullName, out id) == false) {

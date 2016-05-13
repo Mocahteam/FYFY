@@ -12,6 +12,9 @@ namespace FYFY {
 		}
 
 		internal override bool matches(GameObjectWrapper gameObjectWrapper){
+			if(gameObjectWrapper == null || gameObjectWrapper._gameObject == null)
+				throw new System.ArgumentNullException();
+
 			return (_state == STATE.ACTIVE) == (gameObjectWrapper._gameObject.activeInHierarchy == true);
 		}
 	}

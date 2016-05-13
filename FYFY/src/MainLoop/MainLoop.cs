@@ -3,7 +3,7 @@ using UnityEditor;
 using System.Collections.Generic;
 
 namespace FYFY {
-	[global::System.Serializable]
+	[System.Serializable]
 	public struct SystemDescription {
 		public string _typeAssemblyQualifiedName;
 		public string _typeFullName;
@@ -28,7 +28,7 @@ namespace FYFY {
 
 				HashSet<uint> componentTypeIds = new HashSet<uint>();
 				foreach(Component c in gameObject.GetComponents<Component>()) {
-					global::System.Type type = c.GetType();
+					System.Type type = c.GetType();
 					uint typeId = TypeManager.getTypeId(type);
 					componentTypeIds.Add(typeId);
 				}
@@ -41,8 +41,8 @@ namespace FYFY {
 		private void Start() {
 			for (int i = 0; i < _systemDescriptions.Length; ++i) {
 				SystemDescription systemDescription = _systemDescriptions[i];
-				global::System.Type type = global::System.Type.GetType(systemDescription._typeAssemblyQualifiedName);
-				FSystem system = (FSystem) global::System.Activator.CreateInstance(type);
+				System.Type type = System.Type.GetType(systemDescription._typeAssemblyQualifiedName);
+				FSystem system = (FSystem) System.Activator.CreateInstance(type);
 				system.Pause = systemDescription._pause;
 				FSystemManager._systems.Add(system);
 			}
