@@ -1,8 +1,8 @@
 ﻿namespace FYFY {
-	public abstract class ComponentTypeMatcher : Matcher {
+	public abstract class ComponentMatcher : Matcher {
 		protected readonly uint[] _componentTypeIds;
 
-		public ComponentTypeMatcher(params System.Type[] componentTypes) { // NE MAITRISE PAS QUEL TYPE DONC
+		public ComponentMatcher(params System.Type[] componentTypes) { // NE MAITRISE PAS QUEL TYPE DONC
 			int ctLength = componentTypes.Length;
 			if (ctLength == 0)
 				throw new System.ArgumentException();
@@ -14,8 +14,8 @@
 
 			System.Text.StringBuilder descriptor = new System.Text.StringBuilder(this.GetType() + ":" + componentTypeIds[0]);
 			for (int i = 1; i < ctLength; ++i)
-				descriptor.AppendFormat("/{0}", componentTypeIds [i]);
-
+				descriptor.AppendFormat("/{0}", componentTypeIds[i]);
+			
 			_descriptor = descriptor.ToString();
 			_componentTypeIds = componentTypeIds;
 		}

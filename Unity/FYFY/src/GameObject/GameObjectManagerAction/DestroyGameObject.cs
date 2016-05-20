@@ -18,10 +18,21 @@ namespace FYFY {
 			int gameObjectId = _gameObject.GetInstanceID();
 			if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false)
 				throw new UnityException(); // own exception
-			
-			Object.DestroyImmediate(_gameObject);
+
 			GameObjectManager._gameObjectWrappers.Remove(gameObjectId);
 			GameObjectManager._destroyedGameObjectIds.Add(gameObjectId);
+
+			foreach(Transform transform in _gameObject.GetComponentsInChildren<Transform>(true)) { // GERER LES ENFANTS CAR ILS VONT AUSSI ETRE DETRUITS !
+				int childId = transform.gameObject.GetInstanceID();
+
+				if(GameObjectManager._gameObjectWrappers.ContainsKey(childId) == false)
+					throw new UnityException(); // own exception
+
+				GameObjectManager._gameObjectWrappers.Remove(childId);
+				GameObjectManager._destroyedGameObjectIds.Add(childId);
+			}
+
+			Object.DestroyImmediate(_gameObject);
 		}
 	}
 }
