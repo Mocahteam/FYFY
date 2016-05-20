@@ -52,18 +52,32 @@ namespace FYFY {
 			_delayedActions.Enqueue(new DestroyGameObject(gameObject));
 		}
 
-		public static void enableGameObject(GameObject gameObject){
+		public static void setGameObjectState(GameObject gameObject, bool enabled){
 			if(gameObject == null)
-				throw new MissingReferenceException();
-
-			_delayedActions.Enqueue(new EnableGameObject(gameObject));
+				throw new System.ArgumentNullException();
+			
+			_delayedActions.Enqueue(new SetGameObjectState(gameObject, enabled));
 		}
 
-		public static void disableGameObject(GameObject gameObject){
+		public static void setGameObjectParent(GameObject gameObject, GameObject parent, bool worldPositionStays){
 			if(gameObject == null)
-				throw new MissingReferenceException();
-			
-			_delayedActions.Enqueue(new DisableGameObject(gameObject));
+				throw new System.ArgumentNullException();
+
+			_delayedActions.Enqueue(new SetGameObjectParent(gameObject, parent, worldPositionStays));
+		}
+
+		public static void setGameObjectLayer(GameObject gameObject, int layer){
+			if(gameObject == null)
+				throw new System.ArgumentNullException();
+
+			_delayedActions.Enqueue(new SetGameObjectLayer(gameObject, layer));
+		}
+
+		public static void setGameObjectTag(GameObject gameObject, string tag){
+			if(gameObject == null || tag == null)
+				throw new System.ArgumentNullException();
+
+			_delayedActions.Enqueue(new SetGameObjectTag(gameObject, tag));
 		}
 
 		public static void addComponent<T>(GameObject gameObject, object componentValues = null) where T : Component {

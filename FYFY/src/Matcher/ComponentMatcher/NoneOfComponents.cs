@@ -1,6 +1,6 @@
 ﻿namespace FYFY {
-	public class NoneOfTypes : ComponentTypeMatcher {
-		public NoneOfTypes(params System.Type[] componentTypes) : base(componentTypes) {
+	public class NoneOfComponents : ComponentMatcher {
+		public NoneOfComponents(params System.Type[] componentTypes) : base(componentTypes) {
 		}
 
 		internal override bool matches(GameObjectWrapper gameObjectWrapper){

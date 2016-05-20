@@ -51,9 +51,10 @@ namespace FYFY {
 					selectedSystemTypeNames.Add(fullTypeName);
 				}
 
+				// On peut pas faire ca autre part ?? -> eviter de recalculer a chaque fois ?? -> NON !!
 				System.Type[] systemTypes = (from assembly in System.AppDomain.CurrentDomain.GetAssemblies()
 					from type in assembly.GetExportedTypes()
-					where type.IsSubclassOf(typeof(FSystem)) == true
+					where (type.IsClass == true && type.IsAbstract == false && type.IsSubclassOf(typeof(FSystem)) == true)
 					select type).ToArray();
 
 				GenericMenu menu = new GenericMenu();
@@ -98,7 +99,7 @@ namespace FYFY {
 				this.OnEnableInEditingMode();
 			
 			_drawingList.drawHeaderCallback = delegate(Rect rect) {
-				EditorGUI.LabelField (rect, "FSystems");
+				EditorGUI.LabelField(rect, "FSystems");
 			};
 		}
 

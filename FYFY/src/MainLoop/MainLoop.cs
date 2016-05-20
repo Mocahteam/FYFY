@@ -64,7 +64,7 @@ namespace FYFY {
 			GameObjectManager._modifiedGameObjectIds.Clear();
 
 			int currentFrame = Time.frameCount;
-			foreach(FSystem system in FSystemManager._systems) {			
+			foreach(FSystem system in FSystemManager._systems) {
 				if(system.Pause == false)
 					system.process(currentFrame);
 			}
