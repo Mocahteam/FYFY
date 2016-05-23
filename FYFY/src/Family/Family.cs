@@ -17,7 +17,6 @@ namespace FYFY {
 			_exits = new List<int>();
 		}
 
-		public string Descriptor { get { return _descriptor; } }
 		public int Count         { get { return _gameObjectIds.Count; } }
 		public int EntriesCount  { get { return _entries.Count; } }
 		public int ExitsCount    { get { return _exits.Count; } }
