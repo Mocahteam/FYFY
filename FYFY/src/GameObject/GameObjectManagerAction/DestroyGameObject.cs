@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Linq;
 
 namespace FYFY {
 	internal class DestroyGameObject : IGameObjectManagerAction {
@@ -14,16 +15,11 @@ namespace FYFY {
 		void IGameObjectManagerAction.perform() {
 			if(_gameObject == null)
 				throw new MissingReferenceException();
-			
-			int gameObjectId = _gameObject.GetInstanceID();
-			if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false)
-				throw new UnityException(); // own exception
 
-			GameObjectManager._gameObjectWrappers.Remove(gameObjectId);
-			GameObjectManager._destroyedGameObjectIds.Add(gameObjectId);
+			Transform[] childTransforms = _gameObject.GetComponentsInChildren<Transform>(true); // self include in getComponentsInChildren (first item of array usually)
 
-			foreach(Transform transform in _gameObject.GetComponentsInChildren<Transform>(true)) { // GERER LES ENFANTS CAR ILS VONT AUSSI ETRE DETRUITS !
-				int childId = transform.gameObject.GetInstanceID();
+			for (int i = 0; i < childTransforms.Length; ++i) { // GERER LE GAMEOBJECT + SES ENFANTS CAR ILS VONT AUSSI ETRE DETRUITS !
+				int childId = childTransforms[i].gameObject.GetInstanceID();
 
 				if(GameObjectManager._gameObjectWrappers.ContainsKey(childId) == false)
 					throw new UnityException(); // own exception

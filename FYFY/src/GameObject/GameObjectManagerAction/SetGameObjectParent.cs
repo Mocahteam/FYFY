@@ -21,15 +21,18 @@ namespace FYFY {
 			
 			Transform lastParentTransform = _gameObject.transform.parent;
 
-			if(lastParentTransform != null && lastParentTransform.childCount == 1) // MAJ DE LANCIEN PARENT (IL AVAIT UN ENFANT -> PLUS MTN)
-				GameObjectManager._modifiedGameObjectIds.Add(lastParentTransform.gameObject.GetInstanceID());
+			if(lastParentTransform != null && _parent == lastParentTransform.gameObject)
+				return;
 
-			if((lastParentTransform == null && _parent != null ) || (lastParentTransform != null && _parent == null)) // MAJ DE MOI (JAVAIS PAS DE PARENT -> MTN SI // JAVAIS UN PARENT -> PLUS MTN)
-				GameObjectManager._modifiedGameObjectIds.Add(_gameObject.GetInstanceID());
+			if (lastParentTransform != null && lastParentTransform.childCount == 1) // MAJ DE LANCIEN PARENT (IL AVAIT UN ENFANT -> PLUS MTN)
+				GameObjectManager._modifiedGameObjectIds.Add (lastParentTransform.gameObject.GetInstanceID ());
+
+			if ((lastParentTransform == null && _parent != null) || (lastParentTransform != null && _parent == null)) // MAJ DE MOI (JAVAIS PAS DE PARENT -> MTN SI // JAVAIS UN PARENT -> PLUS MTN)
+				GameObjectManager._modifiedGameObjectIds.Add (_gameObject.GetInstanceID ());
 
 			if (_parent != null) {
-				if(_parent.transform.childCount == 0) // MAJ DU NOUVEAU PARENT (IL NAVAIT PAS DENFANT -> MTN SI)
-					GameObjectManager._modifiedGameObjectIds.Add(_parent.GetInstanceID());
+				if (_parent.transform.childCount == 0) // MAJ DU NOUVEAU PARENT (IL NAVAIT PAS DENFANT -> MTN SI)
+					GameObjectManager._modifiedGameObjectIds.Add (_parent.GetInstanceID ());
 				
 				_gameObject.transform.SetParent(_parent.transform, _worldPositionStays);
 			} else {
