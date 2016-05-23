@@ -18,10 +18,16 @@ namespace FYFY {
 				throw new System.NullReferenceException();
 			
 			if(_gameObject.activeSelf != _enabled) {
-				bool lastState = _gameObject.activeInHierarchy && _gameObject.activeSelf;
-				bool newState  = _gameObject.activeInHierarchy && _enabled;
+				bool isChild = (_gameObject.transform.parent != null);
+				bool lastState = _gameObject.activeSelf;
+				bool newState  = _enabled;
 
-				if (lastState != newState) {
+				if(isChild){ // quand pas de parent -> activeInHierarchy == activeSelf donc pas bon faire ca tt le tps
+					lastState &= _gameObject.activeInHierarchy;
+					newState &= _gameObject.activeInHierarchy;
+				}
+
+				if(lastState != newState){
 					GameObjectManager._modifiedGameObjectIds.Add(_gameObject.GetInstanceID());
 					this.propagate(_gameObject, newState); // je propage aux enfants car ils peuvent potentiellement changer detat eux aussi !
 				}
