@@ -19,7 +19,7 @@ namespace FYFY {
 			string familyDescriptor = string.Join("/", matchersDescriptors);
 
 			Family family;
-			if (_families.TryGetValue(familyDescriptor, out family) == false) {
+			if(_families.TryGetValue(familyDescriptor, out family) == false) {
 				family = new Family (familyDescriptor, matchers);
 				_families.Add(familyDescriptor, family);
 
