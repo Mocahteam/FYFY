@@ -42,6 +42,7 @@ namespace FYFY {
 			for (int i = 0; i < _systemDescriptions.Length; ++i) {
 				SystemDescription systemDescription = _systemDescriptions[i];
 				System.Type type = System.Type.GetType(systemDescription._typeAssemblyQualifiedName);
+
 				FSystem system = (FSystem) System.Activator.CreateInstance(type);
 				system.Pause = systemDescription._pause;
 				FSystemManager._systems.Add(system);

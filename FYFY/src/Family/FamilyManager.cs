@@ -20,12 +20,10 @@ namespace FYFY {
 
 			Family family;
 			if(_families.TryGetValue(familyDescriptor, out family) == false) {
-				family = new Family (familyDescriptor, matchers);
+				family = new Family(matchers);
 				_families.Add(familyDescriptor, family);
 
 				if(GameObjectManager._gameObjectWrappers.Count > 0) {
-					// UnityEngine.Debug.LogWarning("FAMILY " + family._descriptor);
-
 					foreach (KeyValuePair<int, GameObjectWrapper> valuePair in GameObjectManager._gameObjectWrappers) {
 						int gameObjectId = valuePair.Key;
 						GameObjectWrapper gameObjectWrapper = valuePair.Value;
@@ -47,8 +45,8 @@ namespace FYFY {
 		internal static void updateAfterGameObjectModified(int gameObjectId){
 			GameObjectWrapper gameObjectWrapper = GameObjectManager._gameObjectWrappers[gameObjectId];
 
-			foreach (Family family in FamilyManager._families.Values) {
-				if (family.matches(gameObjectWrapper)) {
+			foreach(Family family in FamilyManager._families.Values) {
+				if(family.matches(gameObjectWrapper)) {
 					if (family._gameObjectIds.Add(gameObjectId))
 						family._entries.Add(gameObjectId);
 				} else if(family._gameObjectIds.Remove(gameObjectId)) {
@@ -58,7 +56,7 @@ namespace FYFY {
 		}
 
 		internal static void updateAfterGameObjectDestroyed(int gameObjectId){
-			foreach (Family family in FamilyManager._families.Values) {
+			foreach(Family family in FamilyManager._families.Values) {
 				if(family._gameObjectIds.Remove(gameObjectId))
 					family._exits.Add(gameObjectId);
 			}

@@ -3,14 +3,12 @@ using System.Collections.Generic;
 
 namespace FYFY {
 	public class Family : IEnumerable<GameObject> {
-		internal readonly string _descriptor;
 		internal readonly HashSet<int> _gameObjectIds;
 		internal readonly Matcher[] _matchers;
 		internal readonly List<int> _entries;
 		internal readonly List<int> _exits;
 
-		internal Family(string descriptor, Matcher[] matchers){
-			_descriptor = descriptor;
+		internal Family(Matcher[] matchers){
 			_gameObjectIds = new HashSet<int>();
 			_matchers = matchers;
 			_entries = new List<int>();
@@ -26,8 +24,8 @@ namespace FYFY {
 		}
 
 		public IEnumerator<GameObject> GetEnumerator(){
-			foreach(int id in _gameObjectIds)
-				yield return GameObjectManager._gameObjectWrappers[id]._gameObject;
+			foreach(int gameObjectId in _gameObjectIds)
+				yield return GameObjectManager._gameObjectWrappers[gameObjectId]._gameObject;
 		}
 
 		public bool contains(int gameObjectId) {
