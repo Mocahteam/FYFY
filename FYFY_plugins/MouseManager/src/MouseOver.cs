@@ -2,6 +2,6 @@
 [UnityEngine.DisallowMultipleComponent]
 [UnityEngine.AddComponentMenu("")]
 public class MouseOver : UnityEngine.MonoBehaviour {
-	uint rank;
+	public uint rank;
 }
 }
