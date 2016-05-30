@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
 
 namespace FYFY {
@@ -24,8 +23,11 @@ namespace FYFY {
 			GameObject[] sceneGameObjects = Resources.FindObjectsOfTypeAll<GameObject>(); // -> find also inactive GO
 			for (int i = 0; i < sceneGameObjects.Length; ++i) {
 				GameObject gameObject = sceneGameObjects[i];
-				int gameObjectId = gameObject.GetInstanceID();
 
+				UnityEditor.PrefabType prefabType = UnityEditor.PrefabUtility.GetPrefabType(gameObject);
+				if((prefabType != UnityEditor.PrefabType.None) && (prefabType != UnityEditor.PrefabType.PrefabInstance)) // Pour ne pas prendre en compte les prefabs (!= prefab instance) etc... WORK ??
+					continue;
+				
 				HashSet<uint> componentTypeIds = new HashSet<uint>();
 				foreach(Component c in gameObject.GetComponents<Component>()) {
 					System.Type type = c.GetType();
@@ -34,7 +36,7 @@ namespace FYFY {
 				}
 
 				GameObjectWrapper gameObjectWrapper = new GameObjectWrapper(gameObject, componentTypeIds);
-				GameObjectManager._gameObjectWrappers.Add(gameObjectId, gameObjectWrapper);
+				GameObjectManager._gameObjectWrappers.Add(gameObject.GetInstanceID(), gameObjectWrapper);
 			}
 		}
 
