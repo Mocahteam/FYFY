@@ -4,7 +4,7 @@
 		}
 
 		internal override bool matches(GameObjectWrapper gameObjectWrapper){
-			if(gameObjectWrapper == null || gameObjectWrapper._gameObject == null)
+			if (gameObjectWrapper == null || gameObjectWrapper._gameObject == null)
 				throw new System.ArgumentNullException();
 			
 			string gameObjectTag = gameObjectWrapper._gameObject.tag;
