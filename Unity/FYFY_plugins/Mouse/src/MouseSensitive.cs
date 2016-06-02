@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace FYFY_plugins.MouseManager {
+namespace FYFY_plugins.Mouse {
 	[DisallowMultipleComponent]
 	public class MouseSensitive : MonoBehaviour {
 		private void OnMouseEnter() {
