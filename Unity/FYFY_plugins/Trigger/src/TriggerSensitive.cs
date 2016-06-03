@@ -7,7 +7,8 @@ using System.Collections.ObjectModel;
 namespace FYFY_plugins.Trigger {
 	public abstract class TriggerSensitive : MonoBehaviour {
 		protected int _gameObjectId;
-		protected List<GameObject> _others;
+
+		internal List<GameObject> _others;
 		internal ReadOnlyCollection<GameObject> _othersReadOnly;
 
 		protected void Awake() {

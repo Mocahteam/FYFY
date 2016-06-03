@@ -13,7 +13,7 @@ namespace FYFY_plugins.Trigger {
 				FYFY.GameObjectManager.addComponent<Triggered2D>(this.gameObject);
 		}
 
-		private void OnTriggerExit2D(Collider2D other) {
+		private void OnTriggerExit2D(Collider2D other) { // not fired when gameObject has been destroyed
 			base._others.Remove(other.gameObject);
 
 			if(_others.Count == 0) // pour gerer les multiples triggers !!
