@@ -16,7 +16,7 @@ namespace FYFY {
 		public SystemDescription[] _updateSystemDescriptions;
 		public SystemDescription[] _lateUpdateSystemDescriptions;
 
-		private int preprocessingFrame = -1;
+		private bool _preprocessingDone = false;
 
 		private void Awake() {
 			if(_fixedUpdateSystemDescriptions == null) { // MainLoop Added in script & not in editor so it can't be kept editor value so not initialized
@@ -95,38 +95,36 @@ namespace FYFY {
 			GameObjectManager._modifiedGameObjectIds.Clear();
 		}
 
+		// FIXEDUPDATE CAN RUN FASTER OR SLOWER THAN UPDATE
+		// BE CAREFULL WITH TIME.FRAMECOUNT (ENTIRE FRAME), so if multiple fixedUpdate call in one frame, framecount not incremented for each fixedupdate
+		// ONE PREPROCESSING PER CYCLE (if more than one fixedUpdate per frame, each fixedUpdate call preprocessing !)
+		// if no fixedUpdate in this frame, update call preprocessing
 		private void FixedUpdate(){
-			int currentFrame = Time.frameCount;
-
 			this.preprocess();
-			preprocessingFrame = currentFrame;
+			_preprocessingDone = true;
 
-			foreach(FSystem system in FSystemManager._fixedUpdateSystems) {
+			foreach(FSystem system in FSystemManager._fixedUpdateSystems)
 				if(system.Pause == false)
-					system.process(currentFrame);
-			}
+					system.process(Time.frameCount);
 		}
 
 		private void Update(){
-			int currentFrame = Time.frameCount;
-
-			if(preprocessingFrame != currentFrame) { // due to order execution in Unity
+			if(_preprocessingDone == false) { // donc que dans cette frame, il ny a pas eu de fixedUpdate !!
 				this.preprocess();
-				preprocessingFrame = currentFrame;
+				_preprocessingDone = true;
 			}
 
-			foreach(FSystem system in FSystemManager._updateSystems) {
+			foreach(FSystem system in FSystemManager._updateSystems)
 				if(system.Pause == false)
-					system.process(currentFrame);
-			}
+					system.process(Time.frameCount);
 		}
 
 		private void LateUpdate(){
-			int currentFrame = Time.frameCount;
-			foreach(FSystem system in FSystemManager._lateUpdateSystems) {
+			foreach(FSystem system in FSystemManager._lateUpdateSystems)
 				if(system.Pause == false)
-					system.process(currentFrame);
-			}
+					system.process(Time.frameCount);
+
+			_preprocessingDone = false;
 		}
 	}
 }

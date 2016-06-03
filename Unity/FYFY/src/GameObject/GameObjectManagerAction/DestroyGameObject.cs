@@ -17,7 +17,6 @@ namespace FYFY {
 				throw new MissingReferenceException();
 
 			Transform[] childTransforms = _gameObject.GetComponentsInChildren<Transform>(true); // self include in getComponentsInChildren (first item of array usually)
-
 			for (int i = 0; i < childTransforms.Length; ++i) { // GERER LE GAMEOBJECT + SES ENFANTS CAR ILS VONT AUSSI ETRE DETRUITS !
 				int childId = childTransforms[i].gameObject.GetInstanceID();
 
