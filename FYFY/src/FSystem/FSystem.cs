@@ -19,10 +19,10 @@
 
 		protected abstract void onPause(int currentFrame);
 		protected abstract void onResume(int currentFrame);
-		protected abstract void onProcess(int currentFrame);
+		protected abstract void onProcess(int familiesUpdateCount);
 
-		internal void process(int currentFrame) {
-			this.onProcess(currentFrame);
+		internal void process(int familiesUpdateCount) {
+			this.onProcess(familiesUpdateCount);
 		}
 	}
 }

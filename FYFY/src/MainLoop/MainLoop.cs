@@ -17,6 +17,7 @@ namespace FYFY {
 		public SystemDescription[] _lateUpdateSystemDescriptions;
 
 		private bool _preprocessingDone = false;
+		private int _familiesUpdateCount = 0;
 
 		private void Awake() {
 			if(_fixedUpdateSystemDescriptions == null) { // MainLoop Added in script & not in editor so it can't be kept editor value so not initialized
@@ -88,6 +89,9 @@ namespace FYFY {
 			foreach(int gameObjectId in GameObjectManager._modifiedGameObjectIds)
 				FamilyManager.updateAfterGameObjectModified(gameObjectId);
 			GameObjectManager._modifiedGameObjectIds.Clear();
+
+			_preprocessingDone = true;
+			++_familiesUpdateCount;
 		}
 
 		// FIXEDUPDATE CAN RUN FASTER OR SLOWER THAN UPDATE
@@ -96,28 +100,26 @@ namespace FYFY {
 		// if no fixedUpdate in this frame, update call preprocessing
 		private void FixedUpdate(){
 			this.preprocess();
-			_preprocessingDone = true;
 
 			foreach(FSystem system in FSystemManager._fixedUpdateSystems)
 				if(system.Pause == false)
-					system.process(Time.frameCount);
+					system.process(_familiesUpdateCount);
 		}
 
 		private void Update(){
 			if(_preprocessingDone == false) { // donc que dans cette frame, il ny a pas eu de fixedUpdate !!
 				this.preprocess();
-				_preprocessingDone = true;
 			}
 
 			foreach(FSystem system in FSystemManager._updateSystems)
 				if(system.Pause == false)
-					system.process(Time.frameCount);
+					system.process(_familiesUpdateCount);
 		}
 
-		private void LateUpdate(){
+		private void LateUpdate(){ // il y a forcement eu un update pour rentrer la
 			foreach(FSystem system in FSystemManager._lateUpdateSystems)
 				if(system.Pause == false)
-					system.process(Time.frameCount);
+					system.process(_familiesUpdateCount);
 
 			_preprocessingDone = false;
 		}
