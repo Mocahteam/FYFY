@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FYFY {
 	public class Family : IEnumerable<GameObject> {
-		public delegate void EntryCallback(GameObject GameObject);
+		public delegate void EntryCallback(GameObject gameObject);
 		public delegate void ExitCallback(int gameObjectId);
 
 		internal readonly HashSet<int> _gameObjectIds;

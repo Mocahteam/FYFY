@@ -43,10 +43,10 @@ namespace FYFY {
 
 			foreach(Family family in FamilyManager._families.Values) {
 				if(family.matches(gameObjectWrapper)) {
-					if(family._gameObjectIds.Add(gameObjectId)) {
+					if(family._gameObjectIds.Add(gameObjectId) && family._entryCallbacks != null) {
 						family._entryCallbacks(gameObject);
 					}
-				} else if(family._gameObjectIds.Remove(gameObjectId)) {
+				} else if(family._gameObjectIds.Remove(gameObjectId) && family._exitCallbacks != null) {
 					family._exitCallbacks(gameObjectId);
 				}
 			}
@@ -54,7 +54,7 @@ namespace FYFY {
 
 		internal static void updateAfterGameObjectDestroyed(int gameObjectId){
 			foreach(Family family in FamilyManager._families.Values) {
-				if (family._gameObjectIds.Remove(gameObjectId)) {
+				if (family._gameObjectIds.Remove(gameObjectId) && family._exitCallbacks != null) {
 					family._exitCallbacks(gameObjectId);
 				}
 			}
