@@ -6,7 +6,9 @@ namespace FYFY_plugins.Trigger {
 	[AddComponentMenu("")]
 	public class Triggered2D : Triggered {
 		private void Awake() {
-			this._others = this.gameObject.GetComponent<TriggerSensitive2D>()._othersReadOnly;
+			TriggerSensitive2D ts2D = this.gameObject.GetComponent<TriggerSensitive2D>();
+			this._others = ts2D._others;
+			this._othersReadOnly = ts2D._othersReadOnly;
 		}
 	}
 }

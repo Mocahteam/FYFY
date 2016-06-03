@@ -6,7 +6,9 @@ namespace FYFY_plugins.Trigger {
 	[AddComponentMenu("")]
 	public class Triggered3D : Triggered {
 		private void Awake() {
-			this._others = this.gameObject.GetComponent<TriggerSensitive3D>()._othersReadOnly;
+			TriggerSensitive3D ts3D = this.gameObject.GetComponent<TriggerSensitive3D>();
+			this._others = ts3D._others;
+			this._othersReadOnly = ts3D._othersReadOnly;
 		}
 	}
 }

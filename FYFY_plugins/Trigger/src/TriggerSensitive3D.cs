@@ -13,7 +13,7 @@ namespace FYFY_plugins.Trigger {
 				FYFY.GameObjectManager.addComponent<Triggered3D>(this.gameObject);
 		}
 
-		private void OnTriggerExit3D(Collider other) {
+		private void OnTriggerExit3D(Collider other) { // not fired when gameObject has been destroyed
 			base._others.Remove(other.gameObject);
 
 			if(_others.Count == 0) // pour gerer les multiples triggers !!
