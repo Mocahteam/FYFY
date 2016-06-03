@@ -1,6 +1,9 @@
-﻿namespace FYFY_plugins.Mouse {
-	[UnityEngine.DisallowMultipleComponent]
-	[UnityEngine.AddComponentMenu("")]
-	public class MouseOver : UnityEngine.MonoBehaviour {
+﻿using UnityEngine;
+
+namespace FYFY_plugins.Mouse {
+	[DisallowMultipleComponent]
+	[RequireComponent(typeof(MouseSensitive))]
+	[AddComponentMenu("")]
+	public class MouseOver : MonoBehaviour {
 	}
 }
