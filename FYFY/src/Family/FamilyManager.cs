@@ -28,13 +28,8 @@ namespace FYFY {
 						int gameObjectId = valuePair.Key;
 						GameObjectWrapper gameObjectWrapper = valuePair.Value;
 
-						if (family.matches (gameObjectWrapper)) {
-							//
-							if(family._gameObjectIds.Contains(gameObjectId))
-								UnityEngine.Debug.LogWarning ("WTFFFFFFFFFFFFF");
-							//
-							family._gameObjectIds.Add(gameObjectId);
-							family._entries.Add (gameObjectId);
+						if (family.matches(gameObjectWrapper)) {
+							family._gameObjectIds.Add(gameObjectId); // pas besoin de declencher les callbacks vu qu'elles nexistent pas !! =)
 						}
 					}
 				}
@@ -44,21 +39,24 @@ namespace FYFY {
 
 		internal static void updateAfterGameObjectModified(int gameObjectId){
 			GameObjectWrapper gameObjectWrapper = GameObjectManager._gameObjectWrappers[gameObjectId];
+			UnityEngine.GameObject gameObject = gameObjectWrapper._gameObject;
 
 			foreach(Family family in FamilyManager._families.Values) {
 				if(family.matches(gameObjectWrapper)) {
-					if (family._gameObjectIds.Add(gameObjectId))
-						family._entries.Add(gameObjectId);
+					if(family._gameObjectIds.Add(gameObjectId)) {
+						family._entryCallbacks(gameObject);
+					}
 				} else if(family._gameObjectIds.Remove(gameObjectId)) {
-						family._exits.Add(gameObjectId);
+					family._exitCallbacks(gameObjectId);
 				}
 			}
 		}
 
 		internal static void updateAfterGameObjectDestroyed(int gameObjectId){
 			foreach(Family family in FamilyManager._families.Values) {
-				if(family._gameObjectIds.Remove(gameObjectId))
-					family._exits.Add(gameObjectId);
+				if (family._gameObjectIds.Remove(gameObjectId)) {
+					family._exitCallbacks(gameObjectId);
+				}
 			}
 		}
 	}

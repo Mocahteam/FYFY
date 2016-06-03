@@ -29,11 +29,11 @@ namespace FYFY {
 				GameObject gameObject = sceneGameObjects[i];
 
 				UnityEditor.PrefabType prefabType = UnityEditor.PrefabUtility.GetPrefabType(gameObject);
-				if((prefabType != UnityEditor.PrefabType.None) && (prefabType != UnityEditor.PrefabType.PrefabInstance)) // Pour ne pas prendre en compte les prefabs (!= prefab instance) etc... WORK ??
+				if((prefabType == UnityEditor.PrefabType.Prefab) || (prefabType == UnityEditor.PrefabType.ModelPrefab)) // Pour ne pas prendre en compte les prefabs (!= prefab instance) etc... WORK ??
 					continue;
-				//
-				// Debug.Log(gameObject.name);
-				//
+				// 
+//				Debug.Log(gameObject.name);
+				// 
 				HashSet<uint> componentTypeIds = new HashSet<uint>();
 				foreach(Component c in gameObject.GetComponents<Component>()) {
 					System.Type type = c.GetType();
@@ -75,11 +75,6 @@ namespace FYFY {
 		}
 
 		private void preprocess(){
-			foreach (Family family in FamilyManager._families.Values) {
-				family._entries.Clear();
-				family._exits.Clear();
-			}
-
 			int count = GameObjectManager._delayedActions.Count;
 			while(count-- > 0)
 				GameObjectManager._delayedActions.Dequeue().perform();
