@@ -3,21 +3,22 @@ using System.Collections.Generic;
 
 namespace FYFY {
 	public class Family : IEnumerable<GameObject> {
+		public delegate void EntryCallback(GameObject GameObject);
+		public delegate void ExitCallback(int gameObjectId);
+
 		internal readonly HashSet<int> _gameObjectIds;
 		internal readonly Matcher[] _matchers;
-		internal readonly List<int> _entries;
-		internal readonly List<int> _exits;
+		internal EntryCallback _entryCallbacks; // callback dissocié des systemes donc execute meme en pause (a mettre dans la doc)
+		internal ExitCallback _exitCallbacks;   // donc a charge du developpeur de tester dans sa callback si le systeme est en pause ou non ;)
 
 		internal Family(Matcher[] matchers){
 			_gameObjectIds = new HashSet<int>();
 			_matchers = matchers;
-			_entries = new List<int>();
-			_exits = new List<int>();
+			_entryCallbacks = null;
+			_exitCallbacks = null;
 		}
 
-		public int Count         { get { return _gameObjectIds.Count; } }
-		public int EntriesCount  { get { return _entries.Count; } }
-		public int ExitsCount    { get { return _exits.Count; } }
+		public int Count { get { return _gameObjectIds.Count; } }
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator(){
 			return this.GetEnumerator();
@@ -32,13 +33,12 @@ namespace FYFY {
 			return _gameObjectIds.Contains(gameObjectId);
 		}
 
-		public IEnumerable<GameObject> entries() {
-			foreach(int gameObjectId in _entries)
-				yield return GameObjectManager._gameObjectWrappers[gameObjectId]._gameObject;
+		public void addEntryCallback(EntryCallback callback) {
+			_entryCallbacks += callback;
 		}
 
-		public IEnumerable<int> exits() {
-			return _exits;
+		public void addExitCallback(ExitCallback callback) {
+			_exitCallbacks += callback;
 		}
 
 		internal bool matches(GameObjectWrapper gameObjectWrapper) {
@@ -49,6 +49,3 @@ namespace FYFY {
 		}
 	}
 }
-
-// property vs autoproperty
-// internal marche vraiment uniquement dans la dll ??
