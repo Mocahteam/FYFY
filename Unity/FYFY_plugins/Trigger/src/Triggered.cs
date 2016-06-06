@@ -7,7 +7,7 @@ namespace FYFY_plugins.Trigger {
 		protected List<GameObject> _others;
 		protected ReadOnlyCollection<GameObject> _othersReadOnly;
 
-		public ReadOnlyCollection<GameObject> Others { 
+		public ReadOnlyCollection<GameObject> Others {
 			get {
 				_others.RemoveAll(gameObject => gameObject == null); // enlever les gameobjects detruits ! (degueu mais pas dautre solution pr que ca soit invisible pour luser)
 				return _othersReadOnly;
