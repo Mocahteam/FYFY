@@ -6,15 +6,16 @@ using System.Collections.ObjectModel;
 // OnTrigger apres le fixedUpdate (apres internal physics update)
 namespace FYFY_plugins.Trigger {
 	public abstract class TriggerSensitive : MonoBehaviour {
-		protected int _gameObjectId;
-
 		internal List<GameObject> _others;
 		internal ReadOnlyCollection<GameObject> _othersReadOnly;
 
+		protected bool _triggeredAdded;
+
 		protected void Awake() {
-			_gameObjectId = this.gameObject.GetInstanceID();
 			_others = new List<GameObject>();
 			_othersReadOnly = new ReadOnlyCollection<GameObject>(_others);
+
+			_triggeredAdded = false;
 		}
 	}
 }
