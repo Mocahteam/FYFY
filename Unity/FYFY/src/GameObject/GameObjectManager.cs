@@ -11,6 +11,13 @@ namespace FYFY {
 
 		public static int Count { get { return _gameObjectWrappers.Count; } }
 
+		public static void loadScene(int sceneBuildIndex) {
+			UnityEngine.SceneManagement.SceneManager.LoadScene(sceneBuildIndex); // done a the beginning of the next frame (before each FixedUpdate)
+		}
+		public static void loadScene(string sceneName) {
+			UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName); // done a the beginning of the next frame (before each FixedUpdate)
+		}
+
 		public static GameObject createGameObject() {
 			GameObject gameObject = new GameObject();
 			_delayedActions.Enqueue(new CreateGameObjectWrapper(gameObject, new HashSet<uint>{ TypeManager.getTypeId (typeof(Transform)) }));

@@ -25,16 +25,13 @@ namespace FYFY {
 				throw new UnityException();
 			}
 
-			GameObject[] sceneGameObjects = Resources.FindObjectsOfTypeAll<GameObject>(); // -> find also inactive GO (&& other shit not wanted -> ghost unity go used in intern)
+			GameObject[] sceneGameObjects = Resources.FindObjectsOfTypeAll<GameObject>(); // -> find also inactive GO (&& other shit not wanted -> ghost unity gameO used in intern)
 			for (int i = 0; i < sceneGameObjects.Length; ++i) {
 				GameObject gameObject = sceneGameObjects[i];
-
 				UnityEditor.PrefabType prefabType = UnityEditor.PrefabUtility.GetPrefabType(gameObject);
-				if((prefabType == UnityEditor.PrefabType.Prefab) || (prefabType == UnityEditor.PrefabType.ModelPrefab)) // Pour ne pas prendre en compte les prefabs (!= prefab instance) etc... WORK ??
-					continue;
-				// 
-//				Debug.Log(gameObject.name);
-				// 
+				if(gameObject.hideFlags != HideFlags.None || prefabType == UnityEditor.PrefabType.Prefab || prefabType == UnityEditor.PrefabType.ModelPrefab)
+					continue; // on veut que les objets de la scene (pas les prefabs, les objets internes a unity etc)
+				
 				HashSet<uint> componentTypeIds = new HashSet<uint>();
 				foreach(Component c in gameObject.GetComponents<Component>()) {
 					System.Type type = c.GetType();
@@ -122,6 +119,19 @@ namespace FYFY {
 					system.process(_familiesUpdateCount);
 
 			_preprocessingDone = false;
+		}
+
+		private void OnDestroy() { // for loadScene mainly
+			FamilyManager._families.Clear();
+
+			FSystemManager._fixedUpdateSystems.Clear();
+			FSystemManager._updateSystems.Clear();
+			FSystemManager._lateUpdateSystems.Clear();
+
+			GameObjectManager._gameObjectWrappers.Clear();
+			GameObjectManager._delayedActions.Clear();
+			GameObjectManager._destroyedGameObjectIds.Clear();
+			GameObjectManager._modifiedGameObjectIds.Clear();
 		}
 	}
 }
