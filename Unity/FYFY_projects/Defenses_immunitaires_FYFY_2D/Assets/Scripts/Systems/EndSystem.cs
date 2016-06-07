@@ -3,13 +3,11 @@
 public class EndSystem : FSystem {
 	private Family _macrophages = FamilyManager.getFamily(
 		new AllOfProperties(PropertyMatcher.PROPERTY.ENABLED),
-		new AllOfComponents(typeof(Macrophage)), 
-		new NoneOfComponents(typeof(Death))
+		new AllOfComponents(typeof(Macrophage))
 	);
 	private Family _bacteries = FamilyManager.getFamily(
 		new AllOfProperties(PropertyMatcher.PROPERTY.ENABLED),
-		new AllOfComponents(typeof(Bactery)),
-		new NoneOfComponents(typeof(Death))
+		new AllOfComponents(typeof(Bactery))
 	);
 
 	protected override void onPause(int currentFrame) {}
@@ -18,8 +16,7 @@ public class EndSystem : FSystem {
 
 	protected override void onProcess(int currentFrame) {
 		if (_macrophages.Count == 0) {
-			// faire la fonction dans le Entitymanager !!!!!
-			// UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+			GameObjectManager.loadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
 		} else if(_bacteries.Count == 0) {
 			UnityEditor.EditorApplication.isPlaying = false;
 		}
