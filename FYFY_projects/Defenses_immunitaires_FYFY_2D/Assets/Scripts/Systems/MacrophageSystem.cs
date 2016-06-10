@@ -21,7 +21,7 @@ public class MacrophageSystem : FSystem {
 		foreach(GameObject gameObject in _gameObjects) {
 			int phagocytoseDamages = gameObject.GetComponent<Macrophage>()._phagocytoseDamages;
 
-			foreach(GameObject other in gameObject.GetComponent<Triggered2D>().Others) { // attention car Triggered2D contient TOUS les GO avec qui tu es en contact (y compris les death etc)
+			foreach(GameObject other in gameObject.GetComponent<Triggered2D>().Targets) { // attention car Triggered2D contient TOUS les GO avec qui tu es en contact (y compris les death etc)
 				if(other.GetComponent<Death>() != null || dead.Contains(other) == true)
 					continue;
 				

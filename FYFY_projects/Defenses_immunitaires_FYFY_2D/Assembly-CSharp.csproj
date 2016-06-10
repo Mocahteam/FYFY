@@ -57,8 +57,6 @@
      <Compile Include="Assets\Scripts\Components\Target.cs" />
      <Compile Include="Assets\Scripts\Components\Toxin.cs" />
      <Compile Include="Assets\Scripts\Components\Virus.cs" />
-     <Compile Include="Assets\Scripts\Mouse\MouseOver.cs" />
-     <Compile Include="Assets\Scripts\Mouse\MouseSensitive.cs" />
      <Compile Include="Assets\Scripts\Systems\BCellSystem.cs" />
      <Compile Include="Assets\Scripts\Systems\BacterySystem.cs" />
      <Compile Include="Assets\Scripts\Systems\DeathSystem.cs" />
@@ -72,53 +70,23 @@
      <Compile Include="Assets\Scripts\Systems\SelectionSystem.cs" />
      <Compile Include="Assets\Scripts\Systems\StuckVirusSystem.cs" />
      <Compile Include="Assets\Scripts\Systems\TCellSystem.cs" />
+     <Compile Include="Assets\Scripts\Systems\Test.cs" />
      <Compile Include="Assets\Scripts\Systems\ToxinSystem.cs" />
      <Compile Include="Assets\Scripts\Systems\VirusSystem.cs" />
-     <Compile Include="Assets\Scripts\Trigger\TriggerSensitive.cs" />
-     <Compile Include="Assets\Scripts\Trigger\TriggerSensitive2D.cs" />
-     <Compile Include="Assets\Scripts\Trigger\TriggerSensitive3D.cs" />
-     <Compile Include="Assets\Scripts\Trigger\Triggered.cs" />
-     <Compile Include="Assets\Scripts\Trigger\Triggered2D.cs" />
-     <Compile Include="Assets\Scripts\Trigger\Triggered3D.cs" />
-     <Compile Include="Assets\src\FSystem\FSystem.cs" />
-     <Compile Include="Assets\src\FSystem\FSystemManager.cs" />
-     <Compile Include="Assets\src\Family\Family.cs" />
-     <Compile Include="Assets\src\Family\FamilyManager.cs" />
-     <Compile Include="Assets\src\GameObject\GameObjectManager.cs" />
-     <Compile Include="Assets\src\GameObject\GameObjectManagerAction\AddComponent.cs" />
-     <Compile Include="Assets\src\GameObject\GameObjectManagerAction\CreateGameObjectWrapper.cs" />
-     <Compile Include="Assets\src\GameObject\GameObjectManagerAction\DestroyGameObject.cs" />
-     <Compile Include="Assets\src\GameObject\GameObjectManagerAction\IGameObjectManagerAction.cs" />
-     <Compile Include="Assets\src\GameObject\GameObjectManagerAction\RemoveComponent.cs" />
-     <Compile Include="Assets\src\GameObject\GameObjectManagerAction\SetGameObjectLayer.cs" />
-     <Compile Include="Assets\src\GameObject\GameObjectManagerAction\SetGameObjectParent.cs" />
-     <Compile Include="Assets\src\GameObject\GameObjectManagerAction\SetGameObjectState.cs" />
-     <Compile Include="Assets\src\GameObject\GameObjectManagerAction\SetGameObjectTag.cs" />
-     <Compile Include="Assets\src\GameObject\GameObjectWrapper.cs" />
-     <Compile Include="Assets\src\MainLoop\MainLoop.cs" />
-     <Compile Include="Assets\src\MainLoop\MainLoopCreationMenu.cs" />
-     <Compile Include="Assets\src\MainLoop\MainLoopInspector.cs" />
-     <Compile Include="Assets\src\Matcher\ComponentMatcher\AllOfComponents.cs" />
-     <Compile Include="Assets\src\Matcher\ComponentMatcher\AnyOfComponents.cs" />
-     <Compile Include="Assets\src\Matcher\ComponentMatcher\ComponentTypeMatcher.cs" />
-     <Compile Include="Assets\src\Matcher\ComponentMatcher\NoneOfComponents.cs" />
-     <Compile Include="Assets\src\Matcher\LayerMatcher\AnyOfLayers.cs" />
-     <Compile Include="Assets\src\Matcher\LayerMatcher\LayerMatcher.cs" />
-     <Compile Include="Assets\src\Matcher\LayerMatcher\NoneOfLayers.cs" />
-     <Compile Include="Assets\src\Matcher\Matcher.cs" />
-     <Compile Include="Assets\src\Matcher\PropertyMatcher\AllOfProperties.cs" />
-     <Compile Include="Assets\src\Matcher\PropertyMatcher\AnyOfProperties.cs" />
-     <Compile Include="Assets\src\Matcher\PropertyMatcher\NoneOfProperties.cs" />
-     <Compile Include="Assets\src\Matcher\PropertyMatcher\PropertyMatcher.cs" />
-     <Compile Include="Assets\src\Matcher\TagMatcher\AnyOfTags.cs" />
-     <Compile Include="Assets\src\Matcher\TagMatcher\NoneOfTags.cs" />
-     <Compile Include="Assets\src\Matcher\TagMatcher\TagMatcher.cs" />
-     <Compile Include="Assets\src\TypeManager.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
+ </Reference>
+ <Reference Include="FYFY">
+ <HintPath>C:/Users/SALVATORE_Thomas/Documents/Unity_local/Defenses_immunitaires_FYFY_2D/Assets/Libraries/FYFY.dll</HintPath>
+ </Reference>
+ <Reference Include="MouseManager">
+ <HintPath>C:/Users/SALVATORE_Thomas/Documents/Unity_local/Defenses_immunitaires_FYFY_2D/Assets/Libraries/MouseManager.dll</HintPath>
+ </Reference>
+ <Reference Include="TriggerManager">
+ <HintPath>C:/Users/SALVATORE_Thomas/Documents/Unity_local/Defenses_immunitaires_FYFY_2D/Assets/Libraries/TriggerManager.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

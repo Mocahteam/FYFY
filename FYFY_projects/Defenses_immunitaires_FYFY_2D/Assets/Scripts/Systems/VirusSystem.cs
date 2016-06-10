@@ -21,7 +21,7 @@ public class VirusSystem : FSystem {
 			Triggered2D t2D = virus.GetComponent<Triggered2D>();
 			VirusProperties virusProperties = virus.GetComponent<Virus>()._properties;
 
-			foreach(GameObject other in t2D.Others) {
+			foreach(GameObject other in t2D.Targets) {
 				bool dead = other.GetComponent<Death>() != null;
 				bool infected = other.GetComponent<Infected>() != null || infectedGameObjects.Contains(other);
 				bool tagIsValid = (other.tag == "StructureCell" || other.tag == "BCell" || other.tag == "TCell" || other.tag == "Macrophage" || other.tag == "Bactery");
