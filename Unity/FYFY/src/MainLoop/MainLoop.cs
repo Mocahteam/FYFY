@@ -16,7 +16,6 @@ namespace FYFY {
 		public SystemDescription[] _updateSystemDescriptions;
 		public SystemDescription[] _lateUpdateSystemDescriptions;
 
-		private bool _preprocessingDone = false;
 		private int _familiesUpdateCount = 0;
 
 		private void Awake() {
@@ -73,8 +72,7 @@ namespace FYFY {
 		}
 
 		private void preprocess(){
-			int count = GameObjectManager._delayedActions.Count;
-			while(count-- > 0)
+			while(GameObjectManager._delayedActions.Count != 0) // allow trick (Add action when inside perform action -> so the new action is added to the queue && will treated during this dequeue loop !!!!)
 				GameObjectManager._delayedActions.Dequeue().perform();
 			
 			foreach(int gameObjectId in GameObjectManager._destroyedGameObjectIds) {
@@ -87,7 +85,6 @@ namespace FYFY {
 				FamilyManager.updateAfterGameObjectModified(gameObjectId);
 			GameObjectManager._modifiedGameObjectIds.Clear();
 
-			_preprocessingDone = true;
 			++_familiesUpdateCount;
 		}
 
@@ -104,21 +101,19 @@ namespace FYFY {
 		}
 
 		private void Update(){
-			if(_preprocessingDone == false) { // donc que dans cette frame, il ny a pas eu de fixedUpdate !!
-				this.preprocess();
-			}
+			this.preprocess();
 
 			foreach(FSystem system in FSystemManager._updateSystems)
 				if(system.Pause == false)
 					system.process(_familiesUpdateCount);
 		}
 
-		private void LateUpdate(){ // il y a forcement eu un update pour rentrer la
+		private void LateUpdate(){
+			this.preprocess();
+
 			foreach(FSystem system in FSystemManager._lateUpdateSystems)
 				if(system.Pause == false)
 					system.process(_familiesUpdateCount);
-
-			_preprocessingDone = false;
 		}
 
 		private void OnDestroy() { // for loadScene mainly
