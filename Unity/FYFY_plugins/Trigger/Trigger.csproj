@@ -5,8 +5,8 @@
   <PropertyGroup>
     <SrcPath>src</SrcPath>
     <OutputPath>bin</OutputPath>
-    <RootNamespace>FYFY.MouseManager</RootNamespace>
-    <AssemblyName>MouseManager</AssemblyName>
+    <RootNamespace>FYFY.TriggerManager</RootNamespace>
+    <AssemblyName>TriggerManager</AssemblyName>
     <UnityEnginePath>C:\Program Files\Unity\Editor\Data\Managed\UnityEngine.dll</UnityEnginePath>
     <FYFYPath>C:\Users\SALVATORE_Thomas\Documents\Unity\FYFY\bin\FYFY.dll</FYFYPath>
   </PropertyGroup>
