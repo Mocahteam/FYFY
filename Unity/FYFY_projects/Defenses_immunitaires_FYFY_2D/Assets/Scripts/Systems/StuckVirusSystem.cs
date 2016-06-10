@@ -23,7 +23,7 @@ public class StuckVirusSystem : FSystem {
 				continue;
 
 			Triggered2D t2d = gameObject.GetComponent<Triggered2D>();
-			foreach(GameObject other in t2d.Others) {
+			foreach(GameObject other in t2d.Targets) {
 				if(other.tag != "StuckVirus" || stuckVirusGroups.Contains(other))
 					continue;
 

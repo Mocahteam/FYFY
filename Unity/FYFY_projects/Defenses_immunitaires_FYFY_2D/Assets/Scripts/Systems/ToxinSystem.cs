@@ -21,7 +21,7 @@ public class ToxinSystem : FSystem {
 			Triggered2D t2D = toxin.GetComponent<Triggered2D>();
 			float damages = toxin.GetComponent<Toxin>()._damages;
 
-			foreach(GameObject other in t2D.Others) {
+			foreach(GameObject other in t2D.Targets) {
 				if((other.tag == "StructureCell" || other.tag == "BCell" || other.tag == "TCell") && (other.GetComponent<Death>() == null && dead.Contains(other) == false)) {
 					if(Health.hit(other, damages))
 						dead.Add(other);

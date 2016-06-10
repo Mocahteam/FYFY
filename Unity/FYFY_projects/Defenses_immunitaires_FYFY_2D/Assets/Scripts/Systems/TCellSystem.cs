@@ -20,7 +20,7 @@ public class TCellSystem : FSystem {
 
 		foreach(GameObject tcell in _tcells) {
 			Triggered2D t2d = tcell.GetComponent<Triggered2D>();
-			foreach(GameObject other in t2d.Others) {
+			foreach(GameObject other in t2d.Targets) {
 				if(other.GetComponent<Death>() != null || dead.Contains(other))
 					continue;
 

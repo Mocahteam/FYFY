@@ -1,29 +1,9 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Trigger\Triggered2D.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Systems\Test.cs">
     <Files>
-      <File FileName="Assets\Scripts\Trigger\TriggerSensitive2D.cs" Line="16" Column="99" />
-      <File FileName="Assets\Scripts\Trigger\Triggered2D.cs" Line="14" Column="2" />
-      <File FileName="Assets\Scripts\Trigger\Triggered.cs" Line="12" Column="1" />
+      <File FileName="Assets\Scripts\Systems\Test.cs" Line="21" Column="3" />
     </Files>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State name="__root__">
-          <Node name="Defenses_immunitaires_FYFY_2D" expanded="True">
-            <Node name="Assembly-CSharp" expanded="True">
-              <Node name="Scripts" expanded="True">
-                <Node name="Trigger" expanded="True">
-                  <Node name="Triggered2D.cs" selected="True" />
-                </Node>
-              </Node>
-              <Node name="src" expanded="True">
-                <Node name="MainLoop" expanded="True" />
-              </Node>
-            </Node>
-          </Node>
-        </State>
-      </Pad>
-    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

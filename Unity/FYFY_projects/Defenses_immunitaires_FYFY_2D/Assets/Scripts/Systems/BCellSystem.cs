@@ -42,7 +42,7 @@ public class BCellSystem : FSystem {
 				Triggered2D rzTriggered = recognitionZone.GetComponent<Triggered2D>();
 
 				if(rzTriggered != null) {
-					foreach (GameObject other in rzTriggered.Others) {
+					foreach (GameObject other in rzTriggered.Targets) {
 						if (other.tag == "Bactery") {
 							bcellC._bacteryRecognitionProgress += Time.deltaTime;
 
@@ -72,7 +72,7 @@ public class BCellSystem : FSystem {
 				Triggered2D azTriggered = actionZone.GetComponent<Triggered2D>();
 
 				if(azTriggered != null) {
-					foreach (GameObject other in azTriggered.Others) {
+					foreach (GameObject other in azTriggered.Targets) {
 						if (bcellC._type == BCell.TYPE.BACTERIAL && other.tag == "Bactery") {
 							Speed speedC = other.GetComponent<Speed>();
 							speedC._speed = speedC._stuckSpeed;
