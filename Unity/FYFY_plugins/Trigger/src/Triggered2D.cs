@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 
 namespace FYFY_plugins.Trigger {
+	[DisallowMultipleComponent]
+	[AddComponentMenu("")]
 	[RequireComponent(typeof(TriggerSensitive2D))]
 	public class Triggered2D : Triggered {
 		private void Awake() {
