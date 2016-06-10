@@ -1,17 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
+
 using System.Collections.ObjectModel;
 
 namespace FYFY_plugins.Trigger {
+	[DisallowMultipleComponent]
+	[AddComponentMenu("")]
 	public abstract class Triggered : MonoBehaviour {
-		protected List<GameObject> _others;
-		protected ReadOnlyCollection<GameObject> _othersReadOnly;
+		internal Dictionary<GameObject, GhostTriggeredTarget> _targets; // pointer to TriggerSensitive._targets
 
-		public ReadOnlyCollection<GameObject> Others {
-			get {
-				_others.RemoveAll(gameObject => gameObject == null); // enlever les gameobjects detruits ! (degueu mais pas dautre solution pr que ca soit invisible pour luser)
-				return _othersReadOnly;
-			}
-		}
+		public GameObject[] Targets { get { return _targets.Keys.ToArray(); } }
 	}
 }
