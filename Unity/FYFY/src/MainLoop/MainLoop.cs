@@ -24,6 +24,18 @@ namespace FYFY {
 				throw new UnityException();
 			}
 
+			// vider toutes les classes static (au cas ou apres un loadscene il y ait tj des trucs dedans)
+			FamilyManager._families.Clear();
+			FSystemManager._fixedUpdateSystems.Clear();
+			FSystemManager._updateSystems.Clear();
+			FSystemManager._lateUpdateSystems.Clear();
+			GameObjectManager._gameObjectWrappers.Clear();
+			GameObjectManager._delayedActions.Clear();
+			GameObjectManager._destroyedGameObjectIds.Clear();
+			GameObjectManager._modifiedGameObjectIds.Clear();
+			GameObjectManager._sceneBuildIndex = -1;
+			GameObjectManager._sceneName = null;
+
 			GameObject[] sceneGameObjects = Resources.FindObjectsOfTypeAll<GameObject>(); // -> find also inactive GO (&& other shit not wanted -> ghost unity gameO used in intern)
 			for (int i = 0; i < sceneGameObjects.Length; ++i) {
 				GameObject gameObject = sceneGameObjects[i];
@@ -72,8 +84,10 @@ namespace FYFY {
 		}
 
 		private void preprocess(){
-			while(GameObjectManager._delayedActions.Count != 0) // allow trick (Add action when inside perform action -> so the new action is added to the queue && will treated during this dequeue loop !!!!)
+			// allow trick (Add action when inside perform action -> so the new action is added to the queue && will treated during this dequeue loop !!!!)
+			while (GameObjectManager._delayedActions.Count != 0) {
 				GameObjectManager._delayedActions.Dequeue().perform();
+			}
 			
 			foreach(int gameObjectId in GameObjectManager._destroyedGameObjectIds) {
 				FamilyManager.updateAfterGameObjectDestroyed(gameObjectId);
@@ -114,19 +128,12 @@ namespace FYFY {
 			foreach(FSystem system in FSystemManager._lateUpdateSystems)
 				if(system.Pause == false)
 					system.process(_familiesUpdateCount);
-		}
 
-		private void OnDestroy() { // for loadScene mainly
-			FamilyManager._families.Clear();
-
-			FSystemManager._fixedUpdateSystems.Clear();
-			FSystemManager._updateSystems.Clear();
-			FSystemManager._lateUpdateSystems.Clear();
-
-			GameObjectManager._gameObjectWrappers.Clear();
-			GameObjectManager._delayedActions.Clear();
-			GameObjectManager._destroyedGameObjectIds.Clear();
-			GameObjectManager._modifiedGameObjectIds.Clear();
+			if(GameObjectManager._sceneBuildIndex != -1) {
+				UnityEngine.SceneManagement.SceneManager.LoadScene(GameObjectManager._sceneBuildIndex); // done at the beginning of the "Unity" next frame
+			} else if(GameObjectManager._sceneName != null) {
+				UnityEngine.SceneManagement.SceneManager.LoadScene(GameObjectManager._sceneName); // done at the beginning of the "Unity" next frame
+			}
 		}
 	}
 }

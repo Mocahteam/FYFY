@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("TriggerManager")] // ugly 
 
 namespace FYFY {
 	public static class GameObjectManager {
@@ -11,11 +14,16 @@ namespace FYFY {
 
 		public static int Count { get { return _gameObjectWrappers.Count; } }
 
+		internal static int _sceneBuildIndex = -1;
+		internal static string _sceneName = null;
+
+		// voir MainLoop lateUpdate pour lutilisation
 		public static void loadScene(int sceneBuildIndex) {
-			UnityEngine.SceneManagement.SceneManager.LoadScene(sceneBuildIndex); // done a the beginning of the next frame (before each FixedUpdate)
+			_sceneBuildIndex = sceneBuildIndex;
 		}
+		// voir MainLoop lateUpdate pour lutilisation
 		public static void loadScene(string sceneName) {
-			UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName); // done a the beginning of the next frame (before each FixedUpdate)
+			_sceneName = sceneName;
 		}
 
 		public static GameObject createGameObject() {
