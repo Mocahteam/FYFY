@@ -21,3 +21,4 @@ C:\Users\SALVATORE_Thomas\Documents\Unity_local\Defenses_immunitaires_FYFY_2D\ob
 C:\Users\SALVATORE_Thomas\Documents\Unity_local\Defenses_immunitaires_FYFY_2D\obj\Debug\Assembly-CSharp.pdb
 C:\Users\SALVATORE_Thomas\Documents\Unity_local\Defenses_immunitaires_FYFY_2D\Temp\bin\Debug\FYFY.dll
 C:\Users\SALVATORE_Thomas\Documents\Unity_local\Defenses_immunitaires_FYFY_2D\Temp\bin\Debug\MouseManager.dll
+C:\Users\SALVATORE_Thomas\Documents\Unity_local\Defenses_immunitaires_FYFY_2D\Temp\bin\Debug\TriggerManager.dll
