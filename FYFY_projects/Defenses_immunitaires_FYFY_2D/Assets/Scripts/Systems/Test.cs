@@ -15,8 +15,15 @@ public class TestSystem : FSystem {
 
 	protected override void onProcess(int currentFrame) {
 		foreach (GameObject go in _gameObjects) {
-			if (go.GetComponent<Triggered2D>().Targets.Length == 0 || go.GetComponent<Triggered2D>().Targets.Contains(null) == true)
-				Debug.Log ("FAIIIIIIIIIIL");
+			if (go.GetComponent<Triggered2D>().Targets.Length == 0) {
+				Debug.Log("111111111 " + go.name + "/"+ Time.frameCount);
+				return;
+			}
+
+			if (go.GetComponent<Triggered2D>().Targets.Contains(null) == true) {
+				Debug.Log ("222222222222");
+				return;
+			}
 		}
 	}
 }
