@@ -6,6 +6,20 @@ namespace FYFY_plugins.Trigger {
 	public class TriggerSensitive2D : TriggerSensitive {
 		internal override void detriggered() {
 			if (_triggered == true) {
+				// Exemple : 2 GO avec TriggerSensitive qui se touchent sont supprimés à la même frame => Présence de 2 Destroy dans la pile.
+				// Lors de la gestion du premier, on rentre dans le onDestroy de son GTT => désinscription de ce GTT du TS du second GO => Si TS vide => Ajout dans la pile de la suppression de T du second GO (*)
+				// Lors de la gestion du second , on fait la même chose
+				// ICI les deux GO sont supprimé
+				// lorsqu'on arrive sur la demande de suppression de T (voir *) => la référence vers le GO est nulle => CRASH !!!
+				// => SOLUTION : Eviter de notifier une suppression de Triggered2D d'un GO lorsque dans la pile ce GO va être supprimé
+				foreach(FYFY.IGameObjectManagerAction action in FYFY.GameObjectManager._delayedActions) {
+					if(action.GetType() == typeof(DestroyGameObject)) {
+						if(((DestroyGameObject)action)._gameObject == this.gameObject)
+							return;
+					}
+				}
+
+				// Ici,  rien dans la pile ne nous empêche d'ajouter à la pile la demande de suppression du trigger
 				GameObjectManager.removeComponent<Triggered2D>(this.gameObject);
 				_triggered = false;
 			} else {
