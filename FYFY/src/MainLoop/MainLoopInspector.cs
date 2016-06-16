@@ -16,15 +16,16 @@ namespace FYFY {
 		private ReorderableList _lateUpdateDrawingList;
 
 		private void playingModeDrawElementCallBack(FSystem system, Rect rect) {
-			string typeFullName = system.GetType().FullName;
-
-			EditorGUI.LabelField(new Rect (rect.x, rect.y, 120, EditorGUIUtility.singleLineHeight), typeFullName);
+			float buttonSize = EditorGUIUtility.singleLineHeight;
 
 			Color baseColor = GUI.color;
 			GUI.color = (system.Pause == true) ? Color.red : Color.green;
-			if(GUI.Button(new Rect(rect.x + rect.width - 60, rect.y, 60, EditorGUIUtility.singleLineHeight), ""))
+			if(GUI.Button(new Rect(rect.x, rect.y + 1.35f, buttonSize, buttonSize), ""))
 				system.Pause = !system.Pause;
 			GUI.color = baseColor;
+
+			string typeFullName = system.GetType().FullName;
+			EditorGUI.LabelField(new Rect(rect.x + buttonSize + 5, rect.y + 1.35f, rect.width - (buttonSize + 5), buttonSize), typeFullName);
 		}
 
 		private void OnEnableInPlayingMode() {
@@ -43,17 +44,30 @@ namespace FYFY {
 			};
 		}
 
-		private void editingModeDrawElementCallBack(SerializedProperty systemDescription, Rect rect) {
+		private void editingModeDrawElementCallBack(SerializedProperty systemDescriptions, int index, Rect rect) {
+			if(index >= systemDescriptions.arraySize) // bug when deleteArrayElementAtIndex -> index passed to the callback (reorderablelist) not update immediatly ??????
+				return; 
+
+			SerializedProperty systemDescription = systemDescriptions.GetArrayElementAtIndex(index);
 			SerializedProperty typeFullName = systemDescription.FindPropertyRelative("_typeFullName");
 			SerializedProperty pause = systemDescription.FindPropertyRelative("_pause");
 	
-			EditorGUI.LabelField (new Rect(rect.x, rect.y, 120, EditorGUIUtility.singleLineHeight), typeFullName.stringValue);
-	
+			float buttonSize = EditorGUIUtility.singleLineHeight;
+
 			Color baseColor = GUI.color;
 			GUI.color = (pause.boolValue == true) ? Color.red : Color.green;
-			if (GUI.Button (new Rect(rect.x + rect.width - 60, rect.y, 60, EditorGUIUtility.singleLineHeight), ""))
+			if(GUI.Button(new Rect(rect.x, rect.y + 1.35f, buttonSize, buttonSize), ""))
 				pause.boolValue = !pause.boolValue;
 			GUI.color = baseColor;
+
+			EditorGUI.LabelField(new Rect(rect.x + buttonSize + 5, rect.y + 1.35f, rect.width - (buttonSize + 5), buttonSize), typeFullName.stringValue);
+
+			GUIStyle buttonStyle = new GUIStyle();
+			buttonStyle.alignment = TextAnchor.MiddleCenter;
+			if(GUI.Button(new Rect (rect.x + rect.width - 25, rect.y + 1.35f, 30 /* largeur du bouton add par defaut*/, buttonSize), "\u2718", buttonStyle)){ // bold cross unicode
+				systemDescriptions.DeleteArrayElementAtIndex(index);
+				serializedObject.ApplyModifiedProperties();
+			}
 		}
 
 		private void createMenu(Rect buttonRect, ReorderableList list) {
@@ -113,18 +127,18 @@ namespace FYFY {
 			_updateSystemDescriptions = serializedObject.FindProperty("_updateSystemDescriptions");
 			_lateUpdateSystemDescriptions = serializedObject.FindProperty("_lateUpdateSystemDescriptions");
 
-			_fixedUpdateDrawingList = new ReorderableList(serializedObject, _fixedUpdateSystemDescriptions, true, false, true, true);
-			_updateDrawingList  = new ReorderableList(serializedObject, _updateSystemDescriptions, true, false, true, true);
-			_lateUpdateDrawingList = new ReorderableList(serializedObject, _lateUpdateSystemDescriptions, true, false, true, true);
+			_fixedUpdateDrawingList = new ReorderableList(serializedObject, _fixedUpdateSystemDescriptions, true, false, true, false);
+			_updateDrawingList  = new ReorderableList(serializedObject, _updateSystemDescriptions, true, false, true, false);
+			_lateUpdateDrawingList = new ReorderableList(serializedObject, _lateUpdateSystemDescriptions, true, false, true, false);
 
 			_fixedUpdateDrawingList.drawElementCallback = delegate(Rect rect, int index, bool isActive, bool isFocused) {
-				this.editingModeDrawElementCallBack(_fixedUpdateSystemDescriptions.GetArrayElementAtIndex(index), rect);
+				this.editingModeDrawElementCallBack(_fixedUpdateSystemDescriptions, index, rect);
 			};
 			_updateDrawingList.drawElementCallback = delegate(Rect rect, int index, bool isActive, bool isFocused) {
-				this.editingModeDrawElementCallBack(_updateSystemDescriptions.GetArrayElementAtIndex(index), rect);
+				this.editingModeDrawElementCallBack(_updateSystemDescriptions, index, rect);
 			};
 			_lateUpdateDrawingList.drawElementCallback = delegate(Rect rect, int index, bool isActive, bool isFocused) {
-				this.editingModeDrawElementCallBack(_lateUpdateSystemDescriptions.GetArrayElementAtIndex(index), rect);
+				this.editingModeDrawElementCallBack(_lateUpdateSystemDescriptions, index, rect);
 			};
 
 			_fixedUpdateDrawingList.onAddDropdownCallback = createMenu;
