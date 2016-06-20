@@ -1,4 +1,0 @@
-sceneSetups:
-- path: Assets/Scenes/Defenses_immunitaires.unity
-  isLoaded: 1
-  isActive: 1
