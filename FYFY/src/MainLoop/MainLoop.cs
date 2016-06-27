@@ -62,6 +62,10 @@ namespace FYFY {
 		private FSystem createSystemInstance(SystemDescription systemDescription){
 			System.Type type = System.Type.GetType(systemDescription._typeAssemblyQualifiedName);
 
+			if(type == null) { // modification done between time when you set the system in the mainloop && when you run -> class deleted or renamed ?? // When inspector doesnt work and you set manually
+				return null;
+			}
+
 			FSystem system = (FSystem) System.Activator.CreateInstance(type);
 			system.Pause = systemDescription._pause;
 
@@ -70,16 +74,34 @@ namespace FYFY {
 
 		private void Start() {
 			for (int i = 0; i < _fixedUpdateSystemDescriptions.Length; ++i) {
-				FSystem system = this.createSystemInstance(_fixedUpdateSystemDescriptions[i]);
-				FSystemManager._fixedUpdateSystems.Add(system);
+				SystemDescription systemDescription = _fixedUpdateSystemDescriptions[i];
+				FSystem system = this.createSystemInstance(systemDescription);
+
+				if(system != null) {
+					FSystemManager._fixedUpdateSystems.Add(system);	
+				} else {
+					Debug.LogError("FSystems in FixedUpdate : " + systemDescription._typeFullName + " class doesnt exist.");
+				}
 			}
 			for (int i = 0; i < _updateSystemDescriptions.Length; ++i) {
-				FSystem system = this.createSystemInstance(_updateSystemDescriptions[i]);
-				FSystemManager._updateSystems.Add(system);
+				SystemDescription systemDescription = _updateSystemDescriptions[i];
+				FSystem system = this.createSystemInstance(systemDescription);
+
+				if(system != null) {
+					FSystemManager._updateSystems.Add(system);
+				} else {
+					Debug.LogError("FSystems in Update : " + systemDescription._typeFullName + " class doesnt exist.");
+				}
 			}
 			for (int i = 0; i < _lateUpdateSystemDescriptions.Length; ++i) {
-				FSystem system = this.createSystemInstance(_lateUpdateSystemDescriptions[i]);
-				FSystemManager._lateUpdateSystems.Add(system);
+				SystemDescription systemDescription = _lateUpdateSystemDescriptions[i];
+				FSystem system = this.createSystemInstance(systemDescription);
+				
+				if(system != null) {
+					FSystemManager._lateUpdateSystems.Add(system);
+				} else {
+					Debug.LogError("FSystems in LateUpdate : " + systemDescription._typeFullName + " class doesnt exist.");
+				}
 			}
 		}
 
