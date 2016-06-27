@@ -9,6 +9,7 @@
     <AssemblyName>FYFY</AssemblyName>
     <UnityEnginePath>C:\Program Files\Unity\Editor\Data\Managed\UnityEngine.dll</UnityEnginePath>
     <UnityEditorPath>C:\Program Files\Unity\Editor\Data\Managed\UnityEditor.dll</UnityEditorPath>
+    <DocumentationFile>doc\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup>
