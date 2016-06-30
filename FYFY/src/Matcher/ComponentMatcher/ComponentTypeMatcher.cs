@@ -4,12 +4,19 @@
 
 		public ComponentMatcher(params System.Type[] componentTypes) { // NE MAITRISE PAS QUEL TYPE DONC
 			int ctLength = componentTypes.Length;
-			if (ctLength == 0)
+			if (ctLength == 0) {
 				throw new System.ArgumentException();
+			}
 
 			uint[] componentTypeIds = new uint[ctLength];
-			for(int i = 0; i < ctLength; ++i)
-				componentTypeIds[i] = TypeManager.getTypeId(componentTypes[i]);
+			for (int i = 0; i < ctLength; ++i) {
+				System.Type componentType = componentTypes[i];
+				if(componentType == null) {
+					throw new System.ArgumentNullException();
+				}
+
+				componentTypeIds[i] = TypeManager.getTypeId(componentType);
+			}
 			System.Array.Sort(componentTypeIds);
 
 			System.Text.StringBuilder descriptor = new System.Text.StringBuilder(this.GetType() + ":" + componentTypeIds[0]);

@@ -4,18 +4,23 @@ namespace FYFY {
 	internal class SetGameObjectState : IGameObjectManagerAction {
 		private readonly GameObject _gameObject;
 		private readonly bool _enabled;
+		private readonly string _exceptionStackTrace;
 
-		internal SetGameObjectState(GameObject gameObject, bool enabled) {
-			if (gameObject == null)
-				throw new System.ArgumentNullException();
-
+		internal SetGameObjectState(GameObject gameObject, bool enabled, string exceptionStackTrace) {
 			_gameObject = gameObject;
 			_enabled = enabled;
+			_exceptionStackTrace = exceptionStackTrace;
 		}
 
 		void IGameObjectManagerAction.perform() {
-			if(_gameObject == null)
-				throw new System.NullReferenceException();
+			if(_gameObject == null) {
+				throw new DestroyedGameObjectException(_exceptionStackTrace);
+			}
+
+			int gameObjectId = _gameObject.GetInstanceID();
+			if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false){
+				throw new UnknownGameObjectException(_exceptionStackTrace);
+			}
 			
 			if(_gameObject.activeSelf != _enabled) {
 				bool isChild = (_gameObject.transform.parent != null);
@@ -28,7 +33,7 @@ namespace FYFY {
 				}
 
 				if(lastState != newState){
-					GameObjectManager._modifiedGameObjectIds.Add(_gameObject.GetInstanceID());
+					GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
 					this.propagate(_gameObject, newState); // je propage aux enfants car ils peuvent potentiellement changer detat eux aussi !
 				}
 

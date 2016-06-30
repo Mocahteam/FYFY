@@ -27,22 +27,35 @@ namespace FYFY {
 		}
 
 		public static GameObject createGameObject() {
+			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
+			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
+
 			GameObject gameObject = new GameObject();
-			_delayedActions.Enqueue(new CreateGameObjectWrapper(gameObject, new HashSet<uint>{ TypeManager.getTypeId (typeof(Transform)) }));
+			_delayedActions.Enqueue(new CreateGameObjectWrapper(
+				gameObject, 
+				new HashSet<uint>{ TypeManager.getTypeId (typeof(Transform)) }, 
+				exceptionStackTrace)
+			);
 
 			return gameObject;
 		}
 
-		public static GameObject createPrimitive(PrimitiveType type) {
+		public static GameObject createPrimitive(PrimitiveType type) {System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
+			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
+
 			GameObject gameObject = GameObject.CreatePrimitive(type);
-			_delayedActions.Enqueue(new CreateGameObjectWrapper(gameObject));
+			_delayedActions.Enqueue(new CreateGameObjectWrapper(gameObject, exceptionStackTrace));
 
 			return gameObject;
 		}
 
 		public static GameObject instantiatePrefab(string prefabName) {
-			if(prefabName == null)
-				throw new MissingReferenceException();
+			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
+			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
+
+			if(prefabName == null) {
+				throw new ArgumentNullException(exceptionStackTrace);
+			}
 
 			GameObject prefabResource;
 			if (_prefabResources.TryGetValue(prefabName, out prefabResource) == false) {
@@ -55,68 +68,100 @@ namespace FYFY {
 			}
 
 			GameObject gameObject = GameObject.Instantiate<GameObject>(prefabResource);
-			_delayedActions.Enqueue(new CreateGameObjectWrapper(gameObject));
+			_delayedActions.Enqueue(new CreateGameObjectWrapper(gameObject, exceptionStackTrace));
 
 			return gameObject;
 		}
 
 		public static void destroyGameObject(GameObject gameObject){
-			if(gameObject == null)
-				throw new MissingReferenceException();
-			
-			_delayedActions.Enqueue(new DestroyGameObject(gameObject));
+			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
+			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
+
+			if(gameObject == null) {
+				throw new ArgumentNullException(exceptionStackTrace);
+			}
+
+			_delayedActions.Enqueue(new DestroyGameObject(gameObject, exceptionStackTrace));
 		}
 
 		public static void setGameObjectState(GameObject gameObject, bool enabled){
-			if(gameObject == null)
-				throw new System.ArgumentNullException();
+			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
+			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
+
+			if(gameObject == null) {
+				throw new ArgumentNullException(exceptionStackTrace);
+			}
 			
-			_delayedActions.Enqueue(new SetGameObjectState(gameObject, enabled));
+			_delayedActions.Enqueue(new SetGameObjectState(gameObject, enabled, exceptionStackTrace));
 		}
 
 		public static void setGameObjectParent(GameObject gameObject, GameObject parent, bool worldPositionStays){
-			if(gameObject == null)
-				throw new System.ArgumentNullException();
+			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
+			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
 
-			_delayedActions.Enqueue(new SetGameObjectParent(gameObject, parent, worldPositionStays));
+			if(gameObject == null) {
+				throw new ArgumentNullException(exceptionStackTrace);
+			}
+
+			_delayedActions.Enqueue(new SetGameObjectParent(gameObject, parent, worldPositionStays, exceptionStackTrace));
 		}
 
 		public static void setGameObjectLayer(GameObject gameObject, int layer){
-			if(gameObject == null)
-				throw new System.ArgumentNullException();
+			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
+			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
 
-			_delayedActions.Enqueue(new SetGameObjectLayer(gameObject, layer));
+			if(gameObject == null) {
+				throw new ArgumentNullException(exceptionStackTrace);
+			}
+
+			_delayedActions.Enqueue(new SetGameObjectLayer(gameObject, layer, exceptionStackTrace));
 		}
 
 		public static void setGameObjectTag(GameObject gameObject, string tag){
-			if(gameObject == null || tag == null)
-				throw new System.ArgumentNullException();
+			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
+			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
 
-			_delayedActions.Enqueue(new SetGameObjectTag(gameObject, tag));
+			if(gameObject == null || tag == null){
+				throw new ArgumentNullException(exceptionStackTrace);
+			}
+
+			_delayedActions.Enqueue(new SetGameObjectTag(gameObject, tag, exceptionStackTrace));
 		}
 
 		public static void addComponent<T>(GameObject gameObject, object componentValues = null) where T : Component {
-			if(gameObject == null)
-				throw new MissingReferenceException();
-		
-			_delayedActions.Enqueue(new AddComponent<T>(gameObject, componentValues));
+			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
+			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
+
+			if(gameObject == null) {
+				throw new ArgumentNullException(exceptionStackTrace);
+			}
+
+			_delayedActions.Enqueue(new AddComponent<T>(gameObject, componentValues, exceptionStackTrace));
 		}
 
 		public static void addComponent(GameObject gameObject, System.Type componentType, object componentValues = null) {
-			if(gameObject == null || componentType == null)
-				throw new MissingReferenceException();
-			
+			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
+			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
+
+			if(gameObject == null || componentType == null) {
+				throw new ArgumentNullException(exceptionStackTrace);
+			}
+
 			if (componentType.IsSubclassOf(typeof(Component)) == false) {
 				Debug.LogWarning("Can't add '" + componentType + "' to " + gameObject.name + " because a '" + componentType + "' isn't a Component!");
 				return;
 			}
 
-			_delayedActions.Enqueue(new AddComponent(gameObject, componentType, componentValues));
+			_delayedActions.Enqueue(new AddComponent(gameObject, componentType, componentValues, exceptionStackTrace));
 		}
 
 		public static void removeComponent<T>(GameObject gameObject) where T : Component {
-			if(gameObject == null)
-				throw new MissingReferenceException();
+			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
+			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
+
+			if(gameObject == null) {
+				throw new ArgumentNullException(exceptionStackTrace);
+			}
 		
 			System.Type componentType = typeof(T);
 			if (componentType == typeof(Transform)) {
@@ -124,12 +169,16 @@ namespace FYFY {
 				return;
 			}
 
-			_delayedActions.Enqueue(new RemoveComponent<T>(gameObject, componentType));
+			_delayedActions.Enqueue(new RemoveComponent<T>(gameObject, exceptionStackTrace));
 		}
 
 		public static void removeComponent(Component component) {
-			if(component == null)
-				throw new MissingReferenceException();
+			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
+			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
+
+			if(component == null) {
+				throw new ArgumentNullException(exceptionStackTrace);
+			}
 
 			GameObject gameObject = component.gameObject;
 			System.Type componentType = component.GetType();
@@ -138,7 +187,7 @@ namespace FYFY {
 				return;
 			}
 
-			_delayedActions.Enqueue(new RemoveComponent(gameObject, component, componentType));
+			_delayedActions.Enqueue(new RemoveComponent(gameObject, component, exceptionStackTrace));
 		}
 	}
 }

@@ -1,6 +1,6 @@
 ﻿namespace FYFY {
 	public abstract class FSystem {
-		private bool? _pause; // null for initialization because bool default == 0 -> donc sinon le setter n'est appele a linit quand de la cas on set a true (true != false)
+		private bool? _pause; // null for initialization because bool default == 0 -> donc sinon le setter n'est appele a linit que de la cas on set a true (true != false)
 
 		public bool Pause {
 			get {
