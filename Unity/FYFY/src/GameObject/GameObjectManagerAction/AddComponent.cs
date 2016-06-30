@@ -5,25 +5,26 @@ namespace FYFY {
 	internal class AddComponent<T> : IGameObjectManagerAction where T : Component {
 		private readonly GameObject _gameObject;
 		private readonly object _componentValues;
+		private readonly string _exceptionStackTrace;
 
-		internal AddComponent(GameObject gameObject, object componentValues) {
-			if (gameObject == null)
-				throw new MissingReferenceException();
-
+		internal AddComponent(GameObject gameObject, object componentValues, string exceptionStackTrace) {
 			_gameObject = gameObject;
 			_componentValues = componentValues;
+			_exceptionStackTrace = exceptionStackTrace;
 		}
 
 		void IGameObjectManagerAction.perform() {
-			if (_gameObject == null)
-				throw new MissingReferenceException();
+			if(_gameObject == null) {
+				throw new DestroyedGameObjectException(_exceptionStackTrace);
+			}
 
 			int gameObjectId = _gameObject.GetInstanceID();
-			if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false)
-				throw new UnityException(); // own exception
+			if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false){ // FAIRE ICI car si Create puis Add au sein dune m frame, le GO nest vraiment dans le systeme quen N+1
+				throw new UnknownGameObjectException(_exceptionStackTrace);
+			}
 
 			System.Type componentType = typeof(T);
-			if (_gameObject.GetComponent<T>() != null) {
+			if(_gameObject.GetComponent<T>() != null){
 				Debug.LogWarning("Can't add '" + componentType + "' to " + _gameObject.name + " because a '" + componentType + "' is already added to the game object!");
 				return;
 			}
@@ -53,23 +54,24 @@ namespace FYFY {
 		private readonly GameObject _gameObject;
 		private readonly System.Type _componentType;
 		private readonly object _componentValues;
+		private readonly string _exceptionStackTrace;
 
-		internal AddComponent(GameObject gameObject, System.Type componentType, object componentValues) {
-			if (gameObject == null || componentType == null)
-				throw new MissingReferenceException();
-
+		internal AddComponent(GameObject gameObject, System.Type componentType, object componentValues, string exceptionStackTrace) {
 			_gameObject = gameObject;
 			_componentType = componentType;
 			_componentValues = componentValues;
+			_exceptionStackTrace = exceptionStackTrace;
 		}
 
 		void IGameObjectManagerAction.perform() {
-			if (_gameObject == null || _componentType == null)
-				throw new MissingReferenceException();
-			
+			if(_gameObject == null) {
+				throw new DestroyedGameObjectException(_exceptionStackTrace);
+			}
+
 			int gameObjectId = _gameObject.GetInstanceID();
-			if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false)
-				throw new UnityException(); // own exception
+			if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false){ // FAIRE ICI car si Create puis Add au sein dune m frame, le GO nest vraiment dans le systeme quen N+1
+				throw new UnknownGameObjectException(_exceptionStackTrace);
+			}
 
 			if (_gameObject.GetComponent(_componentType) != null) {
 				Debug.LogWarning("Can't add '" + _componentType + "' to " + _gameObject.name + " because a '" + _componentType + "' is already added to the game object!");

@@ -21,7 +21,7 @@ namespace FYFY {
 		private void Awake() {
 			if(_fixedUpdateSystemDescriptions == null) { // MainLoop Added in script & not in editor so it can't be kept editor value so not initialized
 				DestroyImmediate(this);
-				throw new UnityException();
+				throw new System.Exception("MainLoop component mustn't be added by yourself inside code.");
 			}
 
 			// vider toutes les classes static (au cas ou apres un loadscene il y ait tj des trucs dedans)
@@ -48,8 +48,9 @@ namespace FYFY {
 					System.Type type = c.GetType();
 					uint typeId = TypeManager.getTypeId(type);
 
-					if(componentTypeIds.Contains(typeId)) // avoid two components of same type in a gameobject
-						throw new System.Exception();
+					if(componentTypeIds.Contains (typeId)) { // avoid two components of same type in a gameobject
+						throw new System.Exception("FYFY doesn't support GameObject with more than one component attached of the same type.");
+					}
 
 					componentTypeIds.Add(typeId);
 				}

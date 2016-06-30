@@ -3,33 +3,38 @@
 namespace FYFY {
 	internal class RemoveComponent<T> : IGameObjectManagerAction where T : Component {
 		private readonly GameObject _gameObject;
-		private readonly System.Type _componentType;
+		private readonly string _exceptionStackTrace;
 
-		internal RemoveComponent(GameObject gameObject, System.Type componentType) {
-			if (gameObject == null || componentType == null)
-				throw new MissingReferenceException();
-
+		internal RemoveComponent(GameObject gameObject, string exceptionStackTrace) {
 			_gameObject = gameObject;
-			_componentType = componentType;
+			_exceptionStackTrace = exceptionStackTrace;
 		}
 
 		void IGameObjectManagerAction.perform() {
-			if (_gameObject == null || _componentType == null)
-				throw new MissingReferenceException();
+			if(_gameObject == null) {
+				throw new DestroyedGameObjectException(_exceptionStackTrace);
+			}
 
 			int gameObjectId = _gameObject.GetInstanceID();
-			if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false)
-				throw new UnityException(); // own exception
+			if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false){
+				throw new UnknownGameObjectException(_exceptionStackTrace);
+			}
 
 			T component = _gameObject.GetComponent<T>();
+			System.Type componentType = typeof(T);
 			if (component == null) {
-				Debug.LogWarning("Can't remove '" + _componentType + "' from " + _gameObject.name + " because a '" + _componentType + "' is'nt attached to the game object!");
+				Debug.LogWarning("Can't remove '" + componentType + "' from " + _gameObject.name + " because a '" + componentType + "' is'nt attached to the game object!");
 				return;
 			}
+
+			uint componentTypeId = TypeManager.getTypeId(componentType);
+			if(GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Contains(componentTypeId) == false) {
+				throw new UnknownComponentException();
+			}
+
 			Object.DestroyImmediate(component);
 
-			uint componentTypeId = TypeManager.getTypeId(_componentType);
-			GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Remove(componentTypeId); // -> remove exception if doesnt exist
+			GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Remove(componentTypeId);
 			GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
 		}
 	}
@@ -37,29 +42,36 @@ namespace FYFY {
 	internal class RemoveComponent : IGameObjectManagerAction {
 		private readonly GameObject _gameObject;
 		private readonly Component _component;
-		private readonly System.Type _componentType;
+		private readonly string _exceptionStackTrace;
 
-		internal RemoveComponent(GameObject gameObject, Component component, System.Type componentType) {
-			if (gameObject == null || component == null || componentType == null)
-				throw new MissingReferenceException();
-
+		internal RemoveComponent(GameObject gameObject, Component component, string exceptionStackTrace) {
 			_gameObject = gameObject;
 			_component = component;
-			_componentType = componentType;
+			_exceptionStackTrace = exceptionStackTrace;
 		}
 
 		void IGameObjectManagerAction.perform() {
-			if (_gameObject == null || _component == null || _componentType == null)
-				throw new MissingReferenceException();
+			if(_gameObject == null) {
+				throw new DestroyedGameObjectException(_exceptionStackTrace);
+			}
 
 			int gameObjectId = _gameObject.GetInstanceID();
-			if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false)
-				throw new UnityException(); // own exception
+			if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false){
+				throw new UnknownGameObjectException(_exceptionStackTrace);
+			}
+
+			if(_component == null) {
+				throw new DestroyedComponentException(_exceptionStackTrace);
+			}
+
+			uint componentTypeId = TypeManager.getTypeId(_component.GetType());
+			if(GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Contains(componentTypeId) == false) {
+				throw new UnknownComponentException();
+			}
 
 			Object.DestroyImmediate(_component);
 
-			uint componentTypeId = TypeManager.getTypeId(_componentType);
-			GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Remove(componentTypeId); // -> remove exception if doesnt exist
+			GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Remove(componentTypeId);
 			GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
 		}
 	}

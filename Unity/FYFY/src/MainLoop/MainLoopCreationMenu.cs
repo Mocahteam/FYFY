@@ -8,7 +8,7 @@ namespace FYFY {
 			string name = "Main_Loop";
 			GameObject mainLoop = GameObject.Find(name);
 			if(mainLoop == null) {
-				mainLoop = new GameObject (name);
+				mainLoop = new GameObject(name);
 				mainLoop.isStatic = true;
 			}
 			

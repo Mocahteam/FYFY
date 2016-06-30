@@ -8,12 +8,18 @@ namespace FYFY {
 
 		public static Family getFamily(params Matcher[] matchers){
 			int mLength = matchers.Length;
-			if (mLength == 0)
-				throw new System.ArgumentException();
+			if (mLength == 0) {
+				throw new System.ArgumentException("It is not allowed to get family without at least one matcher.");
+			}
 			
 			string[] matchersDescriptors = new string[mLength];
-			for (int i = 0; i < mLength; ++i)
-				matchersDescriptors[i] = matchers[i]._descriptor;
+			for (int i = 0; i < mLength; ++i) {
+				Matcher matcher = matchers[i];
+				if(matcher == null) {
+					throw new System.ArgumentNullException();
+				}
+				matchersDescriptors[i] = matcher._descriptor;
+			}
 			System.Array.Sort(matchersDescriptors);
 
 			string familyDescriptor = string.Join("/", matchersDescriptors);

@@ -5,14 +5,14 @@
 		protected readonly PROPERTY[] _properties;
 
 		public PropertyMatcher(params PROPERTY[] properties) {
-			int pLength = properties.Length;
-			if (pLength == 0)
+			if (properties.Length == 0) {
 				throw new System.ArgumentException();
-			
+			}
+
 			System.Array.Sort(properties);
 
 			System.Text.StringBuilder descriptor = new System.Text.StringBuilder(this.GetType() + ":" + properties[0].ToString("d"));
-			for (int i = 1; i < pLength; ++i)
+			for (int i = 1; i < properties.Length; ++i)
 				descriptor.AppendFormat("/{0}", properties[i].ToString("d"));
 
 			_descriptor = descriptor.ToString();
