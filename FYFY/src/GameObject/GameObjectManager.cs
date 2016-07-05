@@ -40,7 +40,8 @@ namespace FYFY {
 			return gameObject;
 		}
 
-		public static GameObject createPrimitive(PrimitiveType type) {System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
+		public static GameObject createPrimitive(PrimitiveType type) {
+			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
 
 			GameObject gameObject = GameObject.CreatePrimitive(type);

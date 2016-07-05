@@ -12,6 +12,3 @@ namespace FYFY {
 		}
 	}
 }
-
-// Attention car en choppant un composant, ils peuvent chopper le gameobject et le modifer (donc ils cassent l'entité !!) 
-// pareil, il ne faut pas faire de destroy(go) ou destroy(c) !!
