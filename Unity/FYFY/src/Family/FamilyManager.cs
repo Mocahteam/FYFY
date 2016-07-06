@@ -5,7 +5,7 @@ namespace FYFY {
 	/// 	Manager of <see cref="FYFY.Family"/>.
 	/// </summary>
 	public static class FamilyManager {
-		internal static readonly Dictionary<string, Family> _families = new Dictionary<string, Family>();
+		internal static readonly Dictionary<string, Family> _families = new Dictionary<string, Family>(); // key is familyDescriptor ie the ordered aggregation of the descriptions of its matchers
 
 		/// <summary>
 		/// 	Gets the number of families created.
@@ -55,7 +55,7 @@ namespace FYFY {
 			string familyDescriptor = string.Join("/", matchersDescriptors);
 
 			Family family;
-			if(_families.TryGetValue(familyDescriptor, out family) == false) {
+			if(_families.TryGetValue(familyDescriptor, out family) == false) { // if its doesn't exist, create it and add it in the dict
 				family = new Family(matchers);
 				_families.Add(familyDescriptor, family);
 
