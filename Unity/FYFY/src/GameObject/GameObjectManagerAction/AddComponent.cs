@@ -99,7 +99,3 @@ namespace FYFY {
 		}
 	}
 }
-
-// equal overload so to check if a gameobject has been destroyed :
-// _gameObject == null && !ReferenceEquals(_gameObject, null)
-// Note: GO get destroyed at the end of the current frame. Therefore, checks against null in the same frame will not work

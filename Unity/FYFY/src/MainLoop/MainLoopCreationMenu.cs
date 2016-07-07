@@ -2,7 +2,7 @@
 using UnityEditor;
 
 namespace FYFY {
-	public static class MainLoopCreationMenu {
+	public static class MainLoopCreationMenu { // cree le menu "FYFY/Create Main Loop" et l'active si possible
 		[MenuItem("FYFY/Create Main Loop %m")]
 		private static void createMainLoop() {
 			string name = "Main_Loop";

@@ -59,7 +59,7 @@ namespace FYFY {
 				family = new Family(matchers);
 				_families.Add(familyDescriptor, family);
 
-				if(GameObjectManager._gameObjectWrappers.Count > 0) { // FYFY knows some GameObjects
+				if(GameObjectManager._gameObjectWrappers.Count > 0) { // FYFY knows some GameObjects, so adding gameobject if respecting conditions
 					foreach (KeyValuePair<int, GameObjectWrapper> valuePair in GameObjectManager._gameObjectWrappers) {
 						int gameObjectId = valuePair.Key;
 						GameObjectWrapper gameObjectWrapper = valuePair.Value;
