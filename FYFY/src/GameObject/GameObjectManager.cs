@@ -62,10 +62,10 @@ namespace FYFY {
 		}
 
 		/// <summary>
-		/// 	Creates a game object and register it to FYFY at the beginning of the next update block.
+		/// 	Creates a game object and returns it. The game object will be registered by FYFY at the beginning of the next update block.
 		/// </summary>
 		/// <remarks>
-		/// 	You can use it in other <see cref="FYFY.GameObjectManager">functions</see> in the same frame.
+		/// 	Even if the game object is not registered, you can use it in other <see cref="FYFY.GameObjectManager">functions</see> in current frame.
 		/// </remarks>
 		/// <returns>
 		/// 	The game object created but not yet registered.
@@ -85,10 +85,10 @@ namespace FYFY {
 		}
 
 		/// <summary>
-		/// 	Creates a game object with a primitive mesh renderer and appropriate collider, then register it to FYFY at the beginning of the next update block.
+		/// 	Creates a game object with a primitive mesh renderer and appropriate collider and returns it. The game object will be registered by FYFY at the beginning of the next update block.
 		/// </summary>
 		/// <remarks>
-		/// 	You can use it in other <see cref="FYFY.GameObjectManager">functions</see> in the same frame.
+		/// 	Even if the game object is not registered, you can use it in other <see cref="FYFY.GameObjectManager">functions</see> in current frame.
 		/// </remarks>
 		/// <returns>
 		/// 	The game object created but not yet registered.
@@ -107,10 +107,10 @@ namespace FYFY {
 		}
 
 		/// <summary>
-		/// 	Creates a game object as a copy of the prefab and register it to FYFY at the beginning of the next update block.
+		/// 	Creates a game object as a copy of the prefab and returns it. The game object will be registered by FYFY at the beginning of the next update block.
 		/// </summary>
 		/// <remarks>
-		/// 	You can use it in other <see cref="FYFY.GameObjectManager">functions</see> in the same frame.
+		/// 	Even if the game object is not registered, you can use it in other <see cref="FYFY.GameObjectManager">functions</see> in current frame.
 		/// </remarks>
 		/// <returns>
 		/// 	The game object created but not yet registered.
@@ -157,7 +157,7 @@ namespace FYFY {
 		}
 
 		/// <summary>
-		/// 	Sets the state of the game object at the beginning of the next update block.
+		/// 	Sets the state (enable/disable) of the game object at the beginning of the next update block.
 		/// </summary>
 		public static void setGameObjectState(GameObject gameObject, bool enabled){
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
@@ -228,7 +228,7 @@ namespace FYFY {
 		/// 	The game object to change.
 		/// </param>
 		/// <param name="componentValues">
-		/// 	The component values to affect. It must be a anonymous type object.
+		/// 	The component values to affect. It must be an anonymous type object.
 		/// </param>
 		/// <typeparam name="T">
 		/// 	The component type to add.
@@ -254,7 +254,7 @@ namespace FYFY {
 		/// 	The component type to add.
 		/// </param>
 		/// <param name="componentValues">
-		/// 	The component values to affect. It must be a anonymous type object.
+		/// 	The component values to affect. It must be an anonymous type object.
 		/// </param>
 		public static void addComponent(GameObject gameObject, System.Type componentType, object componentValues = null) {
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
