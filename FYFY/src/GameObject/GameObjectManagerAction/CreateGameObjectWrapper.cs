@@ -26,7 +26,7 @@ namespace FYFY {
 			_exceptionStackTrace = exceptionStackTrace;
 		}
 
-		void IGameObjectManagerAction.perform(){
+		void IGameObjectManagerAction.perform(){ // avant lentite sera comme un "fantome" (pas traité dans les familles mais present dans la scene car gameObject deja construit)
 			if(_gameObject == null) {
 				throw new DestroyedGameObjectException(_exceptionStackTrace);
 			}
@@ -38,5 +38,3 @@ namespace FYFY {
 		}
 	}
 }
-
-// avant lentite sera comme un "fantome" (pas traité dans les familles mais dans la scene car gameObject deja construit)

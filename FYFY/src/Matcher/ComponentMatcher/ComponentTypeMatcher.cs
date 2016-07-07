@@ -12,7 +12,7 @@
 			}
 
 			uint[] componentTypeIds = new uint[ctLength];
-			fo (int i = 0; i < ctLength; ++i) {
+			for(int i = 0; i < ctLength; ++i) {
 				System.Type componentType = componentTypes[i];
 				if(componentType == null) {
 					throw new System.ArgumentNullException();

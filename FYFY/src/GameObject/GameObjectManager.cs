@@ -5,27 +5,71 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("TriggerManager")] // ugly 
 
 namespace FYFY {
+	/// <summary>
+	/// 	Manager of GameObject.
+	/// </summary>
+	/// <remarks>
+	/// 	<para>
+	/// 		You must use the <see cref="FYFY.GameObjectManager"/> functions when you deal with FYFY otherwise, FYFY can't retrieve information to maintain
+	/// 		uptodate families. 
+	/// 	</para>
+	/// 	<para>
+	/// 		When you call a <see cref="FYFY.GameObjectManager"/> function, the real action is done at the beginning of the next update block.
+	/// 		This has the effect to maintain a consistent state inside a update block.
+	/// 		For example, in a <c>Update block</c>, if you call the remove function on a component inside a system, the component is really removed in the 
+	/// 		<c>Late update block</c>. For all the system in the <c>Update block</c>, the component is yet present.
+	/// 	</para>
+	/// </remarks>
 	public static class GameObjectManager {
-		internal static readonly Dictionary<string, GameObject> _prefabResources        = new Dictionary<string, GameObject>();
+		internal static readonly Dictionary<string, GameObject> _prefabResources        = new Dictionary<string, GameObject>();     // indexed by prefab name
 		internal static readonly Dictionary<int, GameObjectWrapper> _gameObjectWrappers = new Dictionary<int, GameObjectWrapper>(); // indexed by gameobject's id
 		internal static readonly Queue<IGameObjectManagerAction> _delayedActions        = new Queue<IGameObjectManagerAction>();
-		internal static readonly HashSet<int> _destroyedGameObjectIds                   = new HashSet<int>(); // destroyGO
-		internal static readonly HashSet<int> _modifiedGameObjectIds                    = new HashSet<int>(); // createGO or addComponent or removeComponent
+		internal static readonly HashSet<int> _destroyedGameObjectIds                   = new HashSet<int>();                       // destroyGO
+		internal static readonly HashSet<int> _modifiedGameObjectIds                    = new HashSet<int>();                       // createGO or addComponent or removeComponent
 
+		/// <summary>
+		/// 	Gets the number of <c>GameObjects</c> of the scene known by FYFY.
+		/// </summary>
 		public static int Count { get { return _gameObjectWrappers.Count; } }
 
-		internal static int _sceneBuildIndex = -1;
-		internal static string _sceneName = null;
+		internal static int _sceneBuildIndex = -1; // used in MainLoop LateUpdate
+		internal static string _sceneName = null;  // used in MainLoop LateUpdate
 
-		// voir MainLoop lateUpdate pour lutilisation
+		/// <summary>
+		/// 	Loads the specified scene at the beginning of the next update block.
+		/// </summary>
+		/// <remarks>
+		/// 	The scene is always loaded after closing the current scene.
+		/// </remarks>
+		/// <param name="sceneBuildIndex">
+		/// 	Index of the scene in the Build Settings to load.
+		/// </param>
 		public static void loadScene(int sceneBuildIndex) {
 			_sceneBuildIndex = sceneBuildIndex;
 		}
-		// voir MainLoop lateUpdate pour lutilisation
+
+		/// <summary>
+		/// 	Loads the scene at the beginning of the next update block.
+		/// </summary>
+		/// <remarks>
+		/// 	The scene is always loaded after closing the current scene.
+		/// </remarks>
+		/// <param name="sceneName">
+		/// 	Name of the scene to load.
+		/// </param>
 		public static void loadScene(string sceneName) {
 			_sceneName = sceneName;
 		}
 
+		/// <summary>
+		/// 	Creates a game object and register it to FYFY at the beginning of the next update block.
+		/// </summary>
+		/// <remarks>
+		/// 	You can use it in other <see cref="FYFY.GameObjectManager">functions</see> in the same frame.
+		/// </remarks>
+		/// <returns>
+		/// 	The game object created but not yet registered.
+		/// </returns>
 		public static GameObject createGameObject() {
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
@@ -40,6 +84,18 @@ namespace FYFY {
 			return gameObject;
 		}
 
+		/// <summary>
+		/// 	Creates a game object with a primitive mesh renderer and appropriate collider, then register it to FYFY at the beginning of the next update block.
+		/// </summary>
+		/// <remarks>
+		/// 	You can use it in other <see cref="FYFY.GameObjectManager">functions</see> in the same frame.
+		/// </remarks>
+		/// <returns>
+		/// 	The game object created but not yet registered.
+		/// </returns>
+		/// <param name="type">
+		/// 	The type of primitive object to create.
+		/// </param>
 		public static GameObject createPrimitive(PrimitiveType type) {
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
@@ -50,6 +106,18 @@ namespace FYFY {
 			return gameObject;
 		}
 
+		/// <summary>
+		/// 	Creates a game object as a copy of the prefab and register it to FYFY at the beginning of the next update block.
+		/// </summary>
+		/// <remarks>
+		/// 	You can use it in other <see cref="FYFY.GameObjectManager">functions</see> in the same frame.
+		/// </remarks>
+		/// <returns>
+		/// 	The game object created but not yet registered.
+		/// </returns>
+		/// <param name="prefabName">
+		/// 	The pathname of the target.
+		/// </param>
 		public static GameObject instantiatePrefab(string prefabName) {
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
@@ -74,6 +142,9 @@ namespace FYFY {
 			return gameObject;
 		}
 
+		/// <summary>
+		/// 	Destroies the game object at the beginning of the next update block.
+		/// </summary>
 		public static void destroyGameObject(GameObject gameObject){
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
@@ -85,6 +156,9 @@ namespace FYFY {
 			_delayedActions.Enqueue(new DestroyGameObject(gameObject, exceptionStackTrace));
 		}
 
+		/// <summary>
+		/// 	Sets the state of the game object at the beginning of the next update block.
+		/// </summary>
 		public static void setGameObjectState(GameObject gameObject, bool enabled){
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
@@ -96,6 +170,18 @@ namespace FYFY {
 			_delayedActions.Enqueue(new SetGameObjectState(gameObject, enabled, exceptionStackTrace));
 		}
 
+		/// <summary>
+		/// 	Sets the game object parent at the beginning of the next update block.
+		/// </summary>
+		/// <param name="gameObject">
+		/// 	The game object to change.
+		/// </param>
+		/// <param name="parent">
+		/// 	The game object which become the new parent. This parameter can be null to reset the parent of <paramref name="gameObject"/>.
+		/// </param>
+		/// <param name="worldPositionStays">
+		/// 	If true, the parent-relative position, scale and rotation is modified such that the object keeps the same world space position, rotation and scale as before.
+		/// </param>
 		public static void setGameObjectParent(GameObject gameObject, GameObject parent, bool worldPositionStays){
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
@@ -107,6 +193,9 @@ namespace FYFY {
 			_delayedActions.Enqueue(new SetGameObjectParent(gameObject, parent, worldPositionStays, exceptionStackTrace));
 		}
 
+		/// <summary>
+		/// 	Sets the game object layer at the beginning of the next update block.
+		/// </summary>
 		public static void setGameObjectLayer(GameObject gameObject, int layer){
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
@@ -118,6 +207,9 @@ namespace FYFY {
 			_delayedActions.Enqueue(new SetGameObjectLayer(gameObject, layer, exceptionStackTrace));
 		}
 
+		/// <summary>
+		/// 	Sets the game object tag at the beginning of the next update block.
+		/// </summary>
 		public static void setGameObjectTag(GameObject gameObject, string tag){
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
@@ -129,6 +221,18 @@ namespace FYFY {
 			_delayedActions.Enqueue(new SetGameObjectTag(gameObject, tag, exceptionStackTrace));
 		}
 
+		/// <summary>
+		/// 	Adds a component to the game object at the beginning of the next update block.
+		/// </summary>
+		/// <param name="gameObject">
+		/// 	The game object to change.
+		/// </param>
+		/// <param name="componentValues">
+		/// 	The component values to affect. It must be a anonymous type object.
+		/// </param>
+		/// <typeparam name="T">
+		/// 	The component type to add.
+		/// </typeparam>
 		public static void addComponent<T>(GameObject gameObject, object componentValues = null) where T : Component {
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
@@ -140,6 +244,18 @@ namespace FYFY {
 			_delayedActions.Enqueue(new AddComponent<T>(gameObject, componentValues, exceptionStackTrace));
 		}
 
+		/// <summary>
+		/// 	Adds a component to the game object at the beginning of the next update block.
+		/// </summary>
+		/// <param name="gameObject">
+		/// 	The game object to change.
+		/// </param>
+		/// <param name="componentType">
+		/// 	The component type to add.
+		/// </param>
+		/// <param name="componentValues">
+		/// 	The component values to affect. It must be a anonymous type object.
+		/// </param>
 		public static void addComponent(GameObject gameObject, System.Type componentType, object componentValues = null) {
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
@@ -156,6 +272,15 @@ namespace FYFY {
 			_delayedActions.Enqueue(new AddComponent(gameObject, componentType, componentValues, exceptionStackTrace));
 		}
 
+		/// <summary>
+		/// 	Removes a component of a game object at the beginning of the next update block.
+		/// </summary>
+		/// <param name="gameObject">
+		/// 	The game object to change.
+		/// </param>
+		/// <typeparam name="T">
+		/// 	The component type to remove.
+		/// </typeparam>
 		public static void removeComponent<T>(GameObject gameObject) where T : Component {
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
@@ -173,6 +298,9 @@ namespace FYFY {
 			_delayedActions.Enqueue(new RemoveComponent<T>(gameObject, exceptionStackTrace));
 		}
 
+		/// <summary>
+		/// 	Removes the component from its game object at the beginning of the next update block.
+		/// </summary>
 		public static void removeComponent(Component component) {
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
@@ -192,6 +320,3 @@ namespace FYFY {
 		}
 	}
 }
-
-// Charger un xml ou json ou whatever
-// Load next_scene + garder les managers etc du coup ??

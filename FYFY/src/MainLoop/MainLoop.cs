@@ -12,13 +12,13 @@ namespace FYFY {
 	[DisallowMultipleComponent]
 	[AddComponentMenu("")]
 	public class MainLoop : MonoBehaviour {
-		public SystemDescription[] _fixedUpdateSystemDescriptions;
-		public SystemDescription[] _updateSystemDescriptions;
-		public SystemDescription[] _lateUpdateSystemDescriptions;
+		public SystemDescription[] _fixedUpdateSystemDescriptions; // initialized in inspector, otherwise == null
+		public SystemDescription[] _updateSystemDescriptions;      // initialized in inspector, otherwise == null
+		public SystemDescription[] _lateUpdateSystemDescriptions;  // initialized in inspector, otherwise == null
 
 		private int _familiesUpdateCount = 0;
 
-		private void Awake() {
+		private void Awake() { // parser la scene pour recuperer toutes les entites
 			if(_fixedUpdateSystemDescriptions == null) { // MainLoop Added in script & not in editor so it can't be kept editor value so not initialized
 				DestroyImmediate(this);
 				throw new System.Exception("MainLoop component mustn't be added by yourself inside code.");
@@ -73,7 +73,7 @@ namespace FYFY {
 			return system;
 		}
 
-		private void Start() {
+		private void Start() { // creer tous les systemes
 			for (int i = 0; i < _fixedUpdateSystemDescriptions.Length; ++i) {
 				SystemDescription systemDescription = _fixedUpdateSystemDescriptions[i];
 				FSystem system = this.createSystemInstance(systemDescription);
@@ -106,7 +106,7 @@ namespace FYFY {
 			}
 		}
 
-		private void preprocess(){
+		private void preprocess(){ // do action && update families
 			// allow trick (Add action when inside perform action -> so the new action is added to the queue && will treated during this dequeue loop !!!!)
 			while (GameObjectManager._delayedActions.Count != 0) {
 				GameObjectManager._delayedActions.Dequeue().perform();
@@ -129,7 +129,7 @@ namespace FYFY {
 		// BE CAREFULL WITH TIME.FRAMECOUNT (ENTIRE FRAME), so if multiple fixedUpdate call in one frame, framecount not incremented for each fixedupdate
 		// ONE PREPROCESSING PER CYCLE (if more than one fixedUpdate per frame, each fixedUpdate call preprocessing !)
 		// if no fixedUpdate in this frame, update call preprocessing
-		private void FixedUpdate(){
+		private void FixedUpdate(){ // process systems
 			this.preprocess();
 
 			foreach(FSystem system in FSystemManager._fixedUpdateSystems)
@@ -137,7 +137,7 @@ namespace FYFY {
 					system.process(_familiesUpdateCount);
 		}
 
-		private void Update(){
+		private void Update(){ // process systems
 			this.preprocess();
 
 			foreach(FSystem system in FSystemManager._updateSystems)
@@ -145,17 +145,17 @@ namespace FYFY {
 					system.process(_familiesUpdateCount);
 		}
 
-		private void LateUpdate(){
+		private void LateUpdate(){ // process systems
 			this.preprocess();
 
 			foreach(FSystem system in FSystemManager._lateUpdateSystems)
 				if(system.Pause == false)
 					system.process(_familiesUpdateCount);
 
-			if(GameObjectManager._sceneBuildIndex != -1) {
+			if(GameObjectManager._sceneBuildIndex != -1) { // load scene if it's desired
 				UnityEngine.SceneManagement.SceneManager.LoadScene(GameObjectManager._sceneBuildIndex); // done at the beginning of the "Unity" next frame
 			} else if(GameObjectManager._sceneName != null) {
-				UnityEngine.SceneManagement.SceneManager.LoadScene(GameObjectManager._sceneName); // done at the beginning of the "Unity" next frame
+				UnityEngine.SceneManagement.SceneManager.LoadScene(GameObjectManager._sceneName);       // done at the beginning of the "Unity" next frame
 			}
 		}
 	}
