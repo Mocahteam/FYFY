@@ -4,6 +4,9 @@
 	///		one of tags of a specific list of tags.
 	/// </summary>
 	public class AnyOfTags : TagMatcher {
+		/// <summary>
+		/// 	Initializes a new instance of the <see cref="FYFY.AnyOfTags"/> class.
+		/// </summary>
 		public AnyOfTags(params string[] tags) : base(tags) {
 		}
 

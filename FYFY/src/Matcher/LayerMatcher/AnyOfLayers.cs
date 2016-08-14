@@ -4,6 +4,9 @@
 	///		one of layers of a specific list of layers.
 	/// </summary>
 	public class AnyOfLayers : LayerMatcher {
+		/// <summary>
+		/// 	Initializes a new instance of the <see cref="FYFY.AnyOfLayers"/> class.
+		/// </summary>
 		public AnyOfLayers(params int[] layers) : base(layers) {
 		}
 

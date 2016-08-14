@@ -4,6 +4,9 @@
 	///		a specific list of components.
 	/// </summary>
 	public class AllOfComponents : ComponentMatcher {
+		/// <summary>
+		/// 	Initializes a new instance of the <see cref="FYFY.AllOfComponents"/> class.
+		/// </summary>
 		public AllOfComponents(params System.Type[] componentTypes) : base(componentTypes) {
 		}
 

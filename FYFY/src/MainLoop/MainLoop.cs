@@ -2,18 +2,26 @@
 using System.Collections.Generic;
 
 namespace FYFY {
+	/// <summary></summary>
 	[System.Serializable]
 	public struct SystemDescription {
+		/// <summary></summary>
 		public string _typeAssemblyQualifiedName;
+		/// <summary></summary>
 		public string _typeFullName;
+		/// <summary></summary>
 		public bool _pause;
 	}
 
+	/// <summary></summary>
 	[DisallowMultipleComponent]
 	[AddComponentMenu("")]
 	public class MainLoop : MonoBehaviour {
+		/// <summary></summary>
 		public SystemDescription[] _fixedUpdateSystemDescriptions; // initialized in inspector, otherwise == null
+		/// <summary></summary>
 		public SystemDescription[] _updateSystemDescriptions;      // initialized in inspector, otherwise == null
+		/// <summary></summary>
 		public SystemDescription[] _lateUpdateSystemDescriptions;  // initialized in inspector, otherwise == null
 
 		private int _familiesUpdateCount = 0;

@@ -4,6 +4,9 @@
 	///		a specific list of properties.
 	/// </summary>
 	public class AllOfProperties : PropertyMatcher {
+		/// <summary>
+		/// 	Initializes a new instance of the <see cref="FYFY.AllOfProperties"/> class.
+		/// </summary>
 		public AllOfProperties(params PROPERTY[] properties) : base(properties) {
 		}
 

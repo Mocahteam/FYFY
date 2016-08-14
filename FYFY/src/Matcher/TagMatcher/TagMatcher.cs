@@ -5,9 +5,12 @@ namespace FYFY {
 	/// 	Base class every matcher working on <c>Tag</c> derives from.
 	/// </summary>
 	public abstract class TagMatcher : Matcher {
-		protected readonly string[] _tags; // targets used to match
+		/// <summary>
+		/// 	Targets used to match.
+		/// </summary>
+		protected readonly string[] _tags;
 
-		public TagMatcher(params string[] tags) {
+		internal TagMatcher(params string[] tags) {
 			if(tags.Length == 0) {
 				throw new System.ArgumentNullException();
 			}

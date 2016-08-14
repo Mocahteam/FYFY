@@ -8,14 +8,23 @@
 	public abstract class ExceptionWithCustomStackTrace : System.Exception {
 		private readonly string _stackTrace;
 
+		/// <summary>
+		/// 	Initializes a new instance of the <see cref="FYFY.ExceptionWithCustomStackTrace"/> class.
+		/// </summary>
 		public ExceptionWithCustomStackTrace(string stackTrace) : base() {
 			_stackTrace = stackTrace;
 		}
 
+		/// <summary>
+		/// 	Initializes a new instance of the <see cref="FYFY.ExceptionWithCustomStackTrace"/> class.
+		/// </summary>
 		public ExceptionWithCustomStackTrace(string message, string stackTrace) : base(message) {
 			_stackTrace = stackTrace;
 		}
 
+		/// <summary>
+		/// 	Initializes a new instance of the <see cref="FYFY.ExceptionWithCustomStackTrace"/> class.
+		/// </summary>
 		public ExceptionWithCustomStackTrace(string message, System.Exception inner, string stackTrace) : base(message, inner) {
 			_stackTrace = stackTrace;
 		}

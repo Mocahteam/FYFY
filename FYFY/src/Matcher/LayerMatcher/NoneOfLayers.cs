@@ -4,6 +4,9 @@
 	///		one of layers of a specific list of layers.
 	/// </summary>
 	public class NoneOfLayers : LayerMatcher {
+		/// <summary>
+		/// 	Initializes a new instance of the <see cref="FYFY.NoneOfLayers"/> class.
+		/// </summary>
 		public NoneOfLayers(params int[] layers) : base(layers) {
 		}
 

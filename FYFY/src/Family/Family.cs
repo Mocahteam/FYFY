@@ -14,7 +14,13 @@ namespace FYFY {
 	/// 	</para>
 	/// </remarks>
 	public class Family : IEnumerable<GameObject> {
+		/// <summary>
+		/// 	Type of the entry callbacks.
+		/// </summary>
 		public delegate void EntryCallback(GameObject gameObject);
+		/// <summary>
+		/// 	Type of the exit callbacks.
+		/// </summary>
 		public delegate void ExitCallback(int gameObjectId);
 
 		internal readonly HashSet<int> _gameObjectIds;
@@ -38,6 +44,12 @@ namespace FYFY {
 			return this.GetEnumerator();
 		}
 
+		/// <summary>
+		/// 	Gets the enumerator over this <see cref="FYFY.Family"/>.
+		/// </summary>
+		/// <returns>
+		/// 	The enumerator.
+		/// </returns>
 		public IEnumerator<GameObject> GetEnumerator(){
 			foreach(int gameObjectId in _gameObjectIds)
 				yield return GameObjectManager._gameObjectWrappers[gameObjectId]._gameObject;

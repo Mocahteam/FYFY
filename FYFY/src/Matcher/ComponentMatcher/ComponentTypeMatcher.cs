@@ -3,9 +3,12 @@
 	/// 	Base class every matcher working on <c>Component</c> derives from.
 	/// </summary>
 	public abstract class ComponentMatcher : Matcher {
-		protected readonly uint[] _componentTypeIds; // targets used to match
+		/// <summary>
+		/// 	Targets used to match.
+		/// </summary>
+		protected readonly uint[] _componentTypeIds;
 
-		public ComponentMatcher(params System.Type[] componentTypes) {
+		internal ComponentMatcher(params System.Type[] componentTypes) {
 			int ctLength = componentTypes.Length;
 			if(ctLength == 0) {
 				throw new System.ArgumentException();

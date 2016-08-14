@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace FYFY {
+	/// <summary>
+	/// 	Custom inspector automatically used by Unity Editor when a <see cref="FYFY.MainLoop"/> is find in inspector view.
+	/// </summary>
 	[CustomEditor(typeof(MainLoop))]
 	public class MainLoopInspector : Editor {
 		private SerializedProperty _fixedUpdateSystemDescriptions;
@@ -168,6 +171,7 @@ namespace FYFY {
 			};
 		}
 
+		/// <summary></summary>
 		public override void OnInspectorGUI(){
 			serializedObject.Update();
 
