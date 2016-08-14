@@ -11,31 +11,20 @@ namespace FYFY_plugins.Mouse {
 	///			and which have a collider marked as Trigger (with <c>Physics.queriesHitTriggers</c> true).
 	///		</para>
 	/// </remarks>
-	//* <remarks>
-	//* 	<para>Overlay of the <c>Unity Mouse System</c>.</para>
-	//* 	<para>It's a tricky component with non FYFY conventional design.</para>
-	//* 	<para>It uses Unity logic inside so it can't be considered like a real FYFY component.</para>
-	//* </remarks>
+
+	// Overlay of the Unity Mouse System.
+	// It's a tricky component with non FYFY conventional design.
+	// It uses Unity logic inside so it can't be considered like a real FYFY component.
 	[DisallowMultipleComponent]
 	public class MouseSensitive : MonoBehaviour {
-		//* <summary>
-		//* 	Called when the mouse enters the <c>GameObject</c>.
-		//* </summary>
-		//* <remarks>
-		//* 	<para>Callback automatically called by Unity.</para>
-		//* 	<para>Add a <see cref="FYFY_plugins.Mouse.MouseOver">component</see> to the <c>GameObject</c>.</para>
-		//* </remarks>
+		// Called when the mouse enters the GameObject.
+		// Callback automatically called by Unity.
 		private void OnMouseEnter() {
 			FYFY.GameObjectManager.addComponent<MouseOver>(this.gameObject);
 		}
 
-		//* <summary>
-		//* 	Called when the mouse is not any longer over the <c>GameObject</c>.
-		//* </summary>
-		//* <remarks>
-		//* 	<para>Callback automatically called by Unity.</para>
-		//* 	<para>Remove the <see cref="FYFY_plugins.Mouse.MouseOver">component</see> attached to the <c>GameObject</c>.</para>
-		//* </remarks>
+		// Called when the mouse is not any longer over the GameObject.
+		// Callback automatically called by Unity.
 		private void OnMouseExit() {
 			FYFY.GameObjectManager.removeComponent<MouseOver>(this.gameObject);
 		}
