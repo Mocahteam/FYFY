@@ -2,6 +2,9 @@
 using FYFY;
 
 namespace FYFY_plugins.Trigger {
+	/// <summary>
+	/// 	<see cref="FYFY_plugins.Trigger.TriggerSensitive">component</see> for 2D <c>GameObjet</c>.
+	/// </summary>
 	[DisallowMultipleComponent]
 	public class TriggerSensitive2D : TriggerSensitive {
 		internal override void detriggered() {

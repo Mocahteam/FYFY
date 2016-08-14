@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-// Ecrire dans la doc : composant ajoute et supprime automatiquement. NE PAS Y TOUCHER MANUELLEMENT SINON ON PEUT PAS GARANTIR LES COMPORTEMENTS!!!!!!!!!
-// OnTrigger apres le fixedUpdate (apres internal physics update)
 namespace FYFY_plugins.Trigger {
+	/// <summary>
+	/// 	Component allowing <c>GameObject</c> to know when it is in contact with another <c>GameObject</c> by managing
+	/// 	automatically a <see cref="FYFY_plugins.Trigger.Triggered">component</see>.
+	/// </summary>
 	public abstract class TriggerSensitive : MonoBehaviour {
 		internal Dictionary<GameObject, GhostTriggeredTarget> _targets = new Dictionary<GameObject, GhostTriggeredTarget>(); // contains target GameObject and the corresponding target's GhostTT
 		internal bool _triggered = false;
