@@ -4,6 +4,9 @@
 	///		at least one property among a specific list of properties.
 	/// </summary>
 	public class NoneOfProperties : PropertyMatcher {
+		/// <summary>
+		/// 	Initializes a new instance of the <see cref="FYFY.NoneOfProperties"/> class.
+		/// </summary>
 		public NoneOfProperties(params PROPERTY[] properties) : base(properties) {
 		}
 

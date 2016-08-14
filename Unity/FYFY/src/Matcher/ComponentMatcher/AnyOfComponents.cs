@@ -4,6 +4,9 @@
 	///		at least one component among a specific list of components.
 	/// </summary>
 	public class AnyOfComponents: ComponentMatcher {
+		/// <summary>
+		/// 	Initializes a new instance of the <see cref="FYFY.AnyOfComponents"/> class.
+		/// </summary>
 		public AnyOfComponents(params System.Type[] componentTypes) : base(componentTypes) {
 		}
 

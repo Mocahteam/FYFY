@@ -4,6 +4,9 @@
 	///		one of tags of a specific list of tags.
 	/// </summary>
 	public class NoneOfTags : TagMatcher {
+		/// <summary>
+		/// 	Initializes a new instance of the <see cref="FYFY.NoneOfTags"/> class.
+		/// </summary>
 		public NoneOfTags(params string[] tags) : base(tags) {
 		}
 

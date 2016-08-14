@@ -4,6 +4,9 @@
 	///		at least one component among a specific list of components.
 	/// </summary>
 	public class NoneOfComponents : ComponentMatcher {
+		/// <summary>
+		/// 	Initializes a new instance of the <see cref="FYFY.NoneOfComponents"/> class.
+		/// </summary>
 		public NoneOfComponents(params System.Type[] componentTypes) : base(componentTypes) {
 		}
 

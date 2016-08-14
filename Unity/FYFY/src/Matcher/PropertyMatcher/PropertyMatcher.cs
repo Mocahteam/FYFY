@@ -6,11 +6,34 @@
 	///		Matcher can filter on parentality and activation.
 	/// </remarks>
 	public abstract class PropertyMatcher : Matcher {
-		public enum PROPERTY { ENABLED, DISABLED, HAS_PARENT, HAS_CHILD };
+		/// <summary>
+		/// 	List of properties of GameObject which can be used by the PropertyMatcher.
+		/// </summary>
+		public enum PROPERTY {
+			/// <summary>
+			/// 	The GameObject has the variables <c>activeInHierarchy</c> and <c>activeSelf</c> true.
+			/// </summary>
+			ENABLED,
+			/// <summary>
+			/// 	The GameObject has at least one of the variables <c>activeInHierarchy</c> or <c>activeSelf</c> false.
+			/// </summary>
+			DISABLED,
+			/// <summary>
+			/// 	The GameObject has one direct parent.
+			/// </summary>
+			HAS_PARENT, 
+			/// <summary>
+			/// 	The GameObject has at least one direct child.
+			/// </summary>
+			HAS_CHILD 
+		};
 
-		protected readonly PROPERTY[] _properties; // targets used to match
+		/// <summary>
+		/// 	Targets used to match.
+		/// </summary>
+		protected readonly PROPERTY[] _properties;
 
-		public PropertyMatcher(params PROPERTY[] properties) {
+		internal PropertyMatcher(params PROPERTY[] properties) {
 			if(properties.Length == 0) {
 				throw new System.ArgumentException();
 			}
@@ -26,6 +49,9 @@
 			_properties = properties;
 		}
 
+		/// <summary>
+		/// 	Checks if gameobject has a certain property.
+		/// </summary>
 		protected bool hasProperty(UnityEngine.GameObject gameObject, PROPERTY property) {
 			switch(property) {
 				case PROPERTY.ENABLED:

@@ -24,7 +24,7 @@ namespace FYFY {
 		/// 	<para>
 		/// 		To be known by <c>FYFY</c>, a <c>GameObject</c> must be created in editor outside runtime
 		/// 		or in code with <see cref="FYFY.GameObjectManager">functions</see>.
-		/// 	<para>
+		/// 	</para>
 		/// 	<para>
 		/// 		This is the only way to get family reference. 
 		/// 		You cannot create a <see cref="FYFY.Family"/> object by yourself.

@@ -4,6 +4,9 @@
 	///		at least one property among a specific list of properties.
 	/// </summary>
 	public class AnyOfProperties : PropertyMatcher {
+		/// <summary>
+		/// 	Initializes a new instance of the <see cref="FYFY.AnyOfProperties"/> class.
+		/// </summary>
 		public AnyOfProperties(params PROPERTY[] properties) : base(properties) {
 		}
 
