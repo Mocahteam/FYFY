@@ -1,23 +1,21 @@
 ﻿using UnityEngine;
 
 namespace FYFY_plugins.Trigger {
-	//* <summary>
-	//* 	Ghost triggered target.
-	//* </summary>
+	/// <summary></summary>
 
-	// TESTER EN LA METTANT INTERNAL ????????????????
+	// Component automatically added or removed.
+	// INVISIBLE FOR USERS IN INSPECTOR BUT ACCESSIBLE VIA SOURCE CODE (BUT THEY CANT HAVE TO USE IT)
 
+	// Allow to set a gameObject as a target of a collision in order to solve a Unity problem:
+	//		When a gameobject was deleted as it was a target of a collision (so register in the source TriggerSensitive._targets dictionnary),
+	// 		the triggered exit event is not fired in the gameobject source, so we can't	unregister it of the source.
+	//		This component solves the problem by implementing an OnDestroy callback (called by Unity) to unregister it when it was destroyed.
 	[AddComponentMenu("")]
 	[HideInInspector]
 	public class GhostTriggeredTarget : MonoBehaviour {
-		/// <summary>
-		/// The trigger sensitive source.
-		/// </summary>
-		public TriggerSensitive _triggerSensitiveSource;
+		/// <summary></summary>
+		public TriggerSensitive _triggerSensitiveSource; // collision source
 
-		/// <summary>
-		/// Raises the destroy event.
-		/// </summary>
 		private void OnDestroy(){ // check if you have to destroy the corresponding Triggered2D or Triggered3D
 			Debug.Log("YEAH");
 

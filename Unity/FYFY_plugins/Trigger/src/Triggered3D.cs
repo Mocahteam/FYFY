@@ -12,12 +12,8 @@ namespace FYFY_plugins.Trigger {
 	[AddComponentMenu("")]
 	[RequireComponent(typeof(TriggerSensitive3D))]
 	public class Triggered3D : Triggered {
-		//* <summary>
-		//* 	Called after the <c>component</c> was created to initialized the pointer on the relative <see cref="FYFY_plugins.Trigger.TriggerSensitive3D._targets"/>.
-		//* </summary>
-		//* <remarks>
-		//* 	<para>Callback automatically called by Unity.</para>
-		//* </remarks>
+		// Called after the component was created, to initialized its variable to the relative TriggerSensitive3D._targets.
+		// Callback automatically called by Unity.
 		private void Awake() {
 			TriggerSensitive3D ts3D = this.gameObject.GetComponent<TriggerSensitive3D>();
 			_targets = ts3D._targets;
