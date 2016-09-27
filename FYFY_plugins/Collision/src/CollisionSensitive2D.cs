@@ -4,7 +4,7 @@ using FYFY;
 
 namespace FYFY_plugins.CollisionDetection {
 	[DisallowMultipleComponent]
-	public abstract class CollisionSensitive2D : MonoBehaviour {
+	public class CollisionSensitive2D : MonoBehaviour {
 		internal Dictionary<GameObject, Collision2D> _collisions = new Dictionary<GameObject, Collision2D>();
 		internal Dictionary<GameObject, CollisionSensitive2DTarget> _components = new Dictionary<GameObject, CollisionSensitive2DTarget>();
 
@@ -28,15 +28,8 @@ namespace FYFY_plugins.CollisionDetection {
 		private void OnCollisionExit2D(Collision2D coll) {
 			GameObject target = coll.gameObject;
 			CollisionSensitive2DTarget cst = _components[target];
-			Component.Destroy(cst);
 
-			_collisions.Remove(target);
-			_components.Remove(target);
-
-			if(_collisions.Count == 0) {
-				GameObjectManager.removeComponent<InCollision2D>(this.gameObject);
-				_inCollision = false;
-			}
+			Component.Destroy(cst); // side effect in cst.OnDestroy
 		}
 
 		private void OnDestroy() {

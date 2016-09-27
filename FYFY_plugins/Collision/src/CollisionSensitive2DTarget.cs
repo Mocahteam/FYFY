@@ -3,7 +3,7 @@ using FYFY;
 
 namespace FYFY_plugins.CollisionDetection {
 	[AddComponentMenu("")]
-	[HideInInspector]
+	//[HideInInspector]
 	public class CollisionSensitive2DTarget : MonoBehaviour { // one by collision so multiple possible
 		public CollisionSensitive2D _source;
 
@@ -15,7 +15,7 @@ namespace FYFY_plugins.CollisionDetection {
 			_source._collisions.Remove(this.gameObject);
 			_source._components.Remove(this.gameObject);
 
-			if (_source._collisions.Count == 0) {
+			if(_source._collisions.Count == 0) {
 //				foreach(FYFY.IGameObjectManagerAction action in FYFY.GameObjectManager._delayedActions) {
 //					if(action.GetType() == typeof(DestroyGameObject)) {
 //						if(((DestroyGameObject)action)._gameObject == _source.gameObject)
