@@ -17,8 +17,7 @@ namespace FYFY_plugins.Trigger {
 		public TriggerSensitive _triggerSensitiveSource; // collision source
 
 		private void OnDestroy(){ // check if you have to destroy the corresponding Triggered2D or Triggered3D
-			Debug.Log("YEAH");
-
+			
 			if(_triggerSensitiveSource == null || _triggerSensitiveSource._destroying == true) { // triggerSensitive destroyed before gtt
 				return;
 			}
