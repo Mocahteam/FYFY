@@ -47,7 +47,7 @@ namespace FYFY_plugins.Trigger {
 			}
 		}
 
-		internal void OnTriggerExit2D(Collider2D other) { // not fired when gameObject has been destroyed
+		internal void OnTriggerExit2D(Collider2D other) { // not fired when gameObject has been destroyed, see GhostTriggeredTarget for details
 			GameObject target = other.gameObject;
 
 			GhostTriggeredTarget gtt;
