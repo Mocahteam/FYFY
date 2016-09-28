@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("TriggerManager")] // ugly 
+[assembly: InternalsVisibleTo("TriggerManager")]   // ugly
+[assembly: InternalsVisibleTo("CollisionManager")] // ugly
 
 namespace FYFY {
 	/// <summary>
