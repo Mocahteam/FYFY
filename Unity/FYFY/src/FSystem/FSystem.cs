@@ -32,7 +32,7 @@
 		/// <param name="currentFrame">
 		/// 	The <c>Unity</c> frame number when this function is called.
 		/// </param>
-		protected void onPause(int currentFrame){
+		protected virtual void onPause(int currentFrame){
 		}
 		/// <summary>
 		/// 	Function called when this <see cref="FYFY.FSystem"/> resumed.
@@ -40,7 +40,7 @@
 		/// <param name="currentFrame">
 		/// 	The <c>Unity</c> frame number when this function is called.
 		/// </param>
-		protected void onResume(int currentFrame){
+		protected virtual void onResume(int currentFrame){
 		}
 		/// <summary>
 		/// 	Function called each time when FYFY enter in the update block where this <see cref="FYFY.FSystem"/> is.
@@ -51,7 +51,7 @@
 		/// <param name="familiesUpdateCount">
 		/// 	Number of times the families have been updated.
 		/// </param>
-		protected void onProcess(int familiesUpdateCount){
+		protected virtual void onProcess(int familiesUpdateCount){
 		}
 
 		internal void process(int familiesUpdateCount) {
