@@ -16,12 +16,13 @@ namespace FYFY_plugins.CollisionManager {
 			_source._components.Remove(this.gameObject);
 
 			if(_source._collisions.Count == 0) {
-//				foreach(FYFY.IGameObjectManagerAction action in FYFY.GameObjectManager._delayedActions) {
-//					if(action.GetType() == typeof(DestroyGameObject)) {
-//						if(((DestroyGameObject)action)._gameObject == _source.gameObject)
-//							return;
-//					}
-//				}
+				foreach(FYFY.IGameObjectManagerAction action in FYFY.GameObjectManager._delayedActions) {
+					if(action.GetType() == typeof(DestroyGameObject)) {
+						if(((DestroyGameObject)action)._gameObject == _source.gameObject) {
+							return;
+						}
+					}
+				}
 
 				GameObjectManager.removeComponent<InCollision2D>(_source.gameObject);
 				_source._inCollision = false;
