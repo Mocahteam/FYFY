@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using FYFY;
 
-namespace FYFY_plugins.Trigger {
+namespace FYFY_plugins.TriggerManager {
 	/// <summary>
-	/// 	<see cref="FYFY_plugins.Trigger.TriggerSensitive">component</see> for 3D <c>GameObjet</c>.
+	/// 	<see cref="FYFY_plugins.TriggerManager.TriggerSensitive">component</see> for 3D <c>GameObjet</c>.
 	/// </summary>
 	[DisallowMultipleComponent]
 	public class TriggerSensitive3D : TriggerSensitive {
