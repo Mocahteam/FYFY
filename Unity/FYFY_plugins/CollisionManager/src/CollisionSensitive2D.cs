@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using FYFY;
 
-namespace FYFY_plugins.CollisionDetection {
+namespace FYFY_plugins.CollisionManager {
 	[DisallowMultipleComponent]
 	public class CollisionSensitive2D : MonoBehaviour {
 		internal Dictionary<GameObject, Collision2D> _collisions = new Dictionary<GameObject, Collision2D>();

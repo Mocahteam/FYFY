@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Linq;
 
-namespace FYFY_plugins.CollisionDetection {
+namespace FYFY_plugins.CollisionManager {
 	[DisallowMultipleComponent]
 	[AddComponentMenu("")]
 	[RequireComponent(typeof(CollisionSensitive2D))]

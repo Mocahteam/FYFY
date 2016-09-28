@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using FYFY;
 
-namespace FYFY_plugins.Trigger {
+namespace FYFY_plugins.TriggerManager {
 	/// <summary>
-	/// 	<see cref="FYFY_plugins.Trigger.TriggerSensitive">component</see> for 2D <c>GameObjet</c>.
+	/// 	<see cref="FYFY_plugins.TriggerManager.TriggerSensitive">component</see> for 2D <c>GameObjet</c>.
 	/// </summary>
 	[DisallowMultipleComponent]
 	public class TriggerSensitive2D : TriggerSensitive {
@@ -47,7 +47,7 @@ namespace FYFY_plugins.Trigger {
 			}
 		}
 
-		internal void OnTriggerExit2D(Collider2D other) { // not fired when gameObject has been destroyed, see GhostTriggeredTarget for details
+		internal void OnTriggerExit2D(Collider2D other) { // not fired when gameObject has been destroyed
 			GameObject target = other.gameObject;
 
 			GhostTriggeredTarget gtt;

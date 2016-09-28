@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 
-namespace FYFY_plugins.Trigger {
+namespace FYFY_plugins.TriggerManager {
 	/// <summary>
 	/// 	Component specifying that the <c>GameObject</c>(the source) is in contact with at least one other <c>GameObject</c>(the target).
 	/// </summary>
 	/// <remarks>
-	/// 	<para>Automatically added, updated or removed by the relative <see cref="FYFY_plugins.Trigger.TriggerSensitive2D">component</see>.</para>
+	/// 	<para>Automatically added, updated or removed by the relative <see cref="FYFY_plugins.TriggerManager.TriggerSensitive2D">component</see>.</para>
 	/// 	<para>DO NOT TOUCH MANUALLY OTHERWISE WE CAN'T GUARANTEE THE COMPORTMENT.</para>
 	/// </remarks>
 	[DisallowMultipleComponent]

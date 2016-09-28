@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using FYFY;
 
-namespace FYFY_plugins.CollisionDetection {
+namespace FYFY_plugins.CollisionManager {
 	[AddComponentMenu("")]
 	//[HideInInspector]
 	public class CollisionSensitive2DTarget : MonoBehaviour { // one by collision so multiple possible

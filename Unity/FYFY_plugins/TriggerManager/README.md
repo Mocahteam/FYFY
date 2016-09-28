@@ -1,5 +1,5 @@
-Mouse
-=====
+TriggerManager
+==============
 
 Build requirements
 ------------------
@@ -14,10 +14,10 @@ Build
 Once the requirements have been installed, use the following command in order
 to compile the library:
 
-	<path-to-msbuild>\MSBuild.exe Mouse.csproj
+	<path-to-msbuild>\MSBuild.exe TriggerManager.csproj
 
 If Unity3D is not installed in a standard location, you have to define the
-`UnityEnginePath` and `UnityEditorPath` properties inside the `Mouse.csproj`
+`UnityEnginePath` and `UnityEditorPath` properties inside the `TriggerManager.csproj`
 file. Similarly, you have to define the `FYFYPath` property if FYFY is not
 build in its common directory.
 

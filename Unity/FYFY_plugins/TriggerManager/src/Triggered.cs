@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace FYFY_plugins.Trigger {
+namespace FYFY_plugins.TriggerManager {
 	/// <summary>
 	/// 	Component specifying that the <c>GameObject</c>(the source) is in contact with at least one other <c>GameObject</c>(the target).
 	/// </summary>

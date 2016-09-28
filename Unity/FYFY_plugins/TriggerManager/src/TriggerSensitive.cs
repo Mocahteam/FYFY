@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-namespace FYFY_plugins.Trigger {
+namespace FYFY_plugins.TriggerManager {
 	/// <summary>
 	/// 	Component allowing <c>GameObject</c> to know when it is in contact with another <c>GameObject</c> by managing
-	/// 	automatically a <see cref="FYFY_plugins.Trigger.Triggered">component</see>.
+	/// 	automatically a <see cref="FYFY_plugins.TriggerManager.Triggered">component</see>.
 	/// </summary>
 	public abstract class TriggerSensitive : MonoBehaviour {
 		internal Dictionary<GameObject, GhostTriggeredTarget> _targets = new Dictionary<GameObject, GhostTriggeredTarget>(); // contains target GameObject and the corresponding target's GhostTT

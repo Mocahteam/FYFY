@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 
-namespace FYFY_plugins.Mouse {
+namespace FYFY_plugins.MouseManager {
 	/// <summary>
 	/// 	Component allowing <c>GameObject</c> to be sensitive to the mouse.
-	/// 	Add automatically a <see cref="FYFY_plugins.Mouse.MouseOver">component</see> when the mouse points the <c>GameObject</c>.
+	/// 	Add automatically a <see cref="FYFY_plugins.MouseManager.MouseOver">component</see> when the mouse points the <c>GameObject</c>.
 	/// </summary>
 	/// <remarks>
 	/// 	<para>

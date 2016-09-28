@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
+  <?xml version="1.0" encoding="utf-8"?>
 
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
     <SrcPath>src</SrcPath>
     <OutputPath>bin</OutputPath>
-    <RootNamespace>FYFY.MouseManager</RootNamespace>
-    <AssemblyName>MouseManager</AssemblyName>
+    <RootNamespace>FYFY_plugins.TriggerManager</RootNamespace>
+    <AssemblyName>TriggerManager</AssemblyName>
     <UnityEnginePath>C:\Program Files\Unity\Editor\Data\Managed\UnityEngine.dll</UnityEnginePath>
     <FYFYPath>..\..\FYFY\bin\FYFY.dll</FYFYPath>
     <DocumentationFile>doc\$(AssemblyName).xml</DocumentationFile>
@@ -36,5 +36,5 @@
   </ItemGroup>
 
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  
+
 </Project>
