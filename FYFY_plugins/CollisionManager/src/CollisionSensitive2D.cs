@@ -20,9 +20,14 @@ namespace FYFY_plugins.CollisionManager {
 			_components.Add(target, cst);
 
 			if(_inCollision == false) {
-				GameObjectManager.addComponent<InCollision2D>(this.gameObject);
+				GameObjectManager.addComponent<InCollision2D>(this.gameObject); // add at next preprocess so immediatly after ! (on aurait pu lajouter direct mais on doit signaler a FYFY lajout pr les familles)
 				_inCollision = true;
 			}
+		}
+
+		private void OnCollisionStay2D(Collision2D coll) {
+			GameObject target = coll.gameObject;
+			_collisions[target] = coll;
 		}
 
 		private void OnCollisionExit2D(Collision2D coll) {
