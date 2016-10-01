@@ -8,7 +8,6 @@ namespace FYFY_plugins.CollisionManager {
 		internal Dictionary<GameObject, Collision2D> _collisions = new Dictionary<GameObject, Collision2D>();
 		internal Dictionary<GameObject, CollisionSensitive2DTarget> _components = new Dictionary<GameObject, CollisionSensitive2DTarget>();
 
-		internal bool _destroying = false;
 		internal bool _inCollision = false;
 
 		private void OnCollisionEnter2D(Collision2D coll) {
@@ -34,12 +33,10 @@ namespace FYFY_plugins.CollisionManager {
 			GameObject target = coll.gameObject;
 			CollisionSensitive2DTarget cst = _components[target];
 
-			Component.Destroy(cst); // side effect in cst.OnDestroy
+			Object.Destroy(cst); // Effect in CollisionSensitive2DTarget.OnDestroy
 		}
 
 		private void OnDestroy() {
-			_destroying = true;
-
 			foreach(CollisionSensitive2DTarget cst in _components.Values) {
 				Object.Destroy(cst);
 			}
