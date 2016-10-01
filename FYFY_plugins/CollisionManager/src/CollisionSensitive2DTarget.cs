@@ -30,13 +30,13 @@ namespace FYFY_plugins.CollisionManager {
 			// Remove source InCollision2D component if necessary.
 			if(_source._collisions.Count == 0) {
 				// If there is a DestroyGameObject action on the source, nothing to do.
-//				foreach(FYFY.IGameObjectManagerAction action in FYFY.GameObjectManager._delayedActions) {
-//					if(action.GetType() == typeof(DestroyGameObject)) {
-//						if(((DestroyGameObject)action)._gameObject == _source.gameObject) {
-//							return;
-//						}
-//					}
-//				}
+				foreach(FYFY.IGameObjectManagerAction action in FYFY.GameObjectManager._delayedActions) {
+					if(action.GetType() == typeof(DestroyGameObject)) {
+						if(((DestroyGameObject)action)._gameObject == _source.gameObject) {
+							return;
+						}
+					}
+				}
 
 				//
 				// Two important origins of this OnDestroy calling:
