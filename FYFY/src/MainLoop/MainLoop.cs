@@ -115,7 +115,15 @@ namespace FYFY {
 		}
 
 		private void preprocess(){ // do action && update families
-			// allow trick (Add action when inside perform action -> so the new action is added to the queue && will treated during this dequeue loop !!!!)
+			//
+			// The way we are dequeuing the actions allows trick with On**** unity callback
+			// and Actions.perform function.
+			// ->
+			// If we add an action with FYFY functions in OnDestroy unity callback, this new
+			// action is added to the queue and will be treated during the same dequeue loop 
+			// of the remove action at the origin of the OnDestroy calling.
+			// Same principle inside Actions.perform function.
+			//
 			while (GameObjectManager._delayedActions.Count != 0) {
 				GameObjectManager._delayedActions.Dequeue().perform();
 			}
