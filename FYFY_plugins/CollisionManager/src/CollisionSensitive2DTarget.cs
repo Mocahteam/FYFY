@@ -7,12 +7,16 @@ namespace FYFY_plugins.CollisionManager {
 	// One by collision so multiple possible
 
 	[AddComponentMenu("")]
-	[HideInInspector]
 	public class CollisionSensitive2DTarget : MonoBehaviour {
 		/// <summary></summary>
 
-		// Sets in the source CollisionSensitive2D.OnCollisionEnter.
+		// Setted in the source CollisionSensitive2D.OnCollisionEnter.
 		public CollisionSensitive2D _source;
+
+		// Hides the component in inspector.
+		private void Awake() {
+			this.hideFlags = HideFlags.HideInInspector;
+		}
 
 		// Unsubscribes the target (GameObject relatives to this component) from the source if necessary.
 		private void OnDestroy(){
