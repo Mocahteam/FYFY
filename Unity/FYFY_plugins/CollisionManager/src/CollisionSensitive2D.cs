@@ -33,7 +33,8 @@ namespace FYFY_plugins.CollisionManager {
 			GameObject target = coll.gameObject;
 			CollisionSensitive2DTarget cst = _components[target];
 
-			Object.Destroy(cst); // Effect in CollisionSensitive2DTarget.OnDestroy
+			// Effects in CollisionSensitive2DTarget.OnDestroy
+			Object.Destroy(cst);
 		}
 
 		private void OnDestroy() {
