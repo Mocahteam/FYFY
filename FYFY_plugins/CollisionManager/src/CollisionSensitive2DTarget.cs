@@ -4,8 +4,20 @@ using FYFY;
 namespace FYFY_plugins.CollisionManager {
 	/// <summary></summary>
 
-	// One by collision so multiple possible
+	// ! INVISIBLE FOR USERS IN INSPECTOR !
 
+	// Component automatically added or removed.
+	// A GameObject can have multiple components of this type: one for each GameObject touched
+	// which has a CollisionSensitive2D component.
+
+	//
+	// Allow to set a gameObject as a target of a collision in order to solve a Unity problem:
+	//		When a gameobject was deleted as it was a target of a collision (registered in the 
+	// 		source), the collision exit event is not fired in the gameobject source, so we can't
+	//		unregister it of the source.
+	//		This component solves the problem by implementing an OnDestroy callback (called by
+	//		Unity) to unregister it when it was destroyed.
+	//
 	[AddComponentMenu("")]
 	public class CollisionSensitive2DTarget : MonoBehaviour {
 		/// <summary></summary>
@@ -18,7 +30,7 @@ namespace FYFY_plugins.CollisionManager {
 			this.hideFlags = HideFlags.HideInInspector;
 		}
 
-		// Unsubscribes the target (GameObject relatives to this component) from the source if necessary.
+		// Unsubscribes the target (GameObject relative to this component) from the source if necessary.
 		private void OnDestroy(){
 			if(_source == null) {
 				return;
@@ -38,13 +50,8 @@ namespace FYFY_plugins.CollisionManager {
 					}
 				}
 
-				//
-				// Two important origins of this OnDestroy calling:
-				// 		- The source CollisionSensitive2D.OnCollisionExit2D,
-				// 		- GameObjectManager.Destroy with the relative GameObject to this component.
-				// ->
-				// ... ???
-				//
+				// This action will be added and treated in the current preprocess operation.
+				// See MainLoop.preprocess for details.
 				GameObjectManager.removeComponent<InCollision2D>(_source.gameObject);
 				_source._inCollision = false;
 			}

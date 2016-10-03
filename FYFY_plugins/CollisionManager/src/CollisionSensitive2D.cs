@@ -6,6 +6,9 @@ namespace FYFY_plugins.CollisionManager {
 	/// <summary>
 	/// 	Component allowing GameObject to be noticed when it is in contact with another GameObject.
 	/// </summary>
+	/// <remarks>
+	/// 	! DO NOT REMOVE IN-GAME !
+	/// </remarks>
 	[DisallowMultipleComponent]
 	public class CollisionSensitive2D : MonoBehaviour {
 		// Target / Collision informations
@@ -50,6 +53,13 @@ namespace FYFY_plugins.CollisionManager {
 			foreach(CollisionSensitive2DTarget cst in _components.Values) {
 				Object.Destroy(cst);
 			}
+			//
+			// We can't delete here InCollision2D with FYFY function because
+			// we can't know if the current action was a DestroyGameObject action.
+			// Remove a component of an destroyed GameObject is not allowed !
+			// ->
+			// CollisionSensitive2D component has not to be removed in-game.
+			//
 		}
 	}
 }
