@@ -5,7 +5,8 @@ namespace FYFY {
 	/// 	Manager of <see cref="FYFY.Family"/>.
 	/// </summary>
 	public static class FamilyManager {
-		internal static readonly Dictionary<string, Family> _families = new Dictionary<string, Family>(); // key is familyDescriptor ie the ordered aggregation of the descriptions of its matchers
+		// FamilyDescriptor (ie the ordered aggregation of the descriptions of family's matchers) / Family corresponding
+		internal static readonly Dictionary<string, Family> _families = new Dictionary<string, Family>(); 
 
 		/// <summary>
 		/// 	Gets the number of families created.
@@ -55,18 +56,18 @@ namespace FYFY {
 			string familyDescriptor = string.Join("/", matchersDescriptors);
 
 			Family family;
-			if(_families.TryGetValue(familyDescriptor, out family) == false) { // if its doesn't exist, create it and add it in the dict
+			// If it doesn't exist yet, create it and add it in the families dictionnary.
+			if(_families.TryGetValue(familyDescriptor, out family) == false) { 
 				family = new Family(matchers);
 				_families.Add(familyDescriptor, family);
 
-				if(GameObjectManager._gameObjectWrappers.Count > 0) { // FYFY knows some GameObjects, so adding gameobject if respecting conditions
-					foreach (KeyValuePair<int, GameObjectWrapper> valuePair in GameObjectManager._gameObjectWrappers) {
-						int gameObjectId = valuePair.Key;
-						GameObjectWrapper gameObjectWrapper = valuePair.Value;
+				// Initialize with known GameObjects if they respect conditions.
+				foreach(KeyValuePair<int, GameObjectWrapper> valuePair in GameObjectManager._gameObjectWrappers) {
+					int gameObjectId = valuePair.Key;
+					GameObjectWrapper gameObjectWrapper = valuePair.Value;
 
-						if(family.matches(gameObjectWrapper)) {
-							family._gameObjectIds.Add(gameObjectId);  // not need to execute callbacks because they don't exist yet
-						}
+					if(family.matches(gameObjectWrapper)) {
+						family._gameObjectIds.Add(gameObjectId);
 					}
 				}
 			}
@@ -80,10 +81,12 @@ namespace FYFY {
 			foreach(Family family in FamilyManager._families.Values) {
 				if(family.matches(gameObjectWrapper)) {
 					if(family._gameObjectIds.Add(gameObjectId) && family._entryCallbacks != null) {
-						family._entryCallbacks(gameObject); // execute family's entry callbacks on the GameObject if added
+						// execute family's entry callbacks on the GameObject if added
+						family._entryCallbacks(gameObject);
 					}
 				} else if(family._gameObjectIds.Remove(gameObjectId) && family._exitCallbacks != null) {
-					family._exitCallbacks(gameObjectId);    // execute family's exit callbacks on the GameObject if removed
+					// execute family's exit callbacks on the GameObject if removed
+					family._exitCallbacks(gameObjectId);
 				}
 			}
 		}
@@ -91,7 +94,8 @@ namespace FYFY {
 		internal static void updateAfterGameObjectDestroyed(int gameObjectId){
 			foreach(Family family in FamilyManager._families.Values) {
 				if (family._gameObjectIds.Remove(gameObjectId) && family._exitCallbacks != null) {
-					family._exitCallbacks(gameObjectId);    // execute family's exit callbacks on the GameObject if removed
+					// execute family's exit callbacks on the GameObject if removed
+					family._exitCallbacks(gameObjectId);
 				}
 			}
 		}
