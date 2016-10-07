@@ -6,9 +6,6 @@ namespace FYFY_plugins.CollisionManager {
 	/// <summary>
 	/// 	Component allowing GameObject to be noticed when it is in contact with another GameObject.
 	/// </summary>
-	/// <remarks>
-	/// 	! DO NOT REMOVE IN-GAME !
-	/// </remarks>
 	[DisallowMultipleComponent]
 	public class CollisionSensitive3D : MonoBehaviour {
 		// Target / Collision informations
@@ -53,13 +50,21 @@ namespace FYFY_plugins.CollisionManager {
 			foreach(CollisionSensitive3DTarget cst in _components.Values) {
 				Object.Destroy(cst);
 			}
-			//
-			// We can't delete here InCollision3D with FYFY function because
-			// we can't know if the current action was a DestroyGameObject action.
-			// Remove a component of an destroyed GameObject is not allowed !
-			// ->
-			// CollisionSensitive3D component has not to be removed in-game.
-			//
+
+			// Remove InCollision3D component if necessary.
+			if(_inCollision == false) {
+				return;
+			}
+
+			// If the current action is a DestroyGameObject, nothing to do.
+			IGameObjectManagerAction cu = GameObjectManager._currentAction;
+			if(cu.GetType() == typeof(DestroyGameObject) && (cu as DestroyGameObject)._gameObject == this.gameObject) {
+				return;
+			}
+
+			// This action will be added and treated in the current preprocess operation.
+			// See MainLoop.preprocess for details.
+			GameObjectManager.removeComponent<InCollision3D>(this.gameObject);
 		}
 	}
 }

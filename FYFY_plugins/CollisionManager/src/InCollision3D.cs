@@ -11,7 +11,6 @@ namespace FYFY_plugins.CollisionManager {
 	/// </remarks>
 	[DisallowMultipleComponent]
 	[AddComponentMenu("")]
-	[RequireComponent(typeof(CollisionSensitive3D))]
 	public class InCollision3D : MonoBehaviour {
 		private CollisionSensitive3D _collisionSensitive;
 

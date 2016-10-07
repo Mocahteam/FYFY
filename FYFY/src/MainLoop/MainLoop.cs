@@ -125,7 +125,8 @@ namespace FYFY {
 			// Same principle inside Actions.perform function.
 			//
 			while (GameObjectManager._delayedActions.Count != 0) {
-				GameObjectManager._delayedActions.Dequeue().perform();
+				GameObjectManager._currentAction = GameObjectManager._delayedActions.Dequeue();
+				GameObjectManager._currentAction.perform();
 			}
 			
 			foreach(int gameObjectId in GameObjectManager._destroyedGameObjectIds) {

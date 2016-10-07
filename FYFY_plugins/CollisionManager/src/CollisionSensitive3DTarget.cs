@@ -39,22 +39,24 @@ namespace FYFY_plugins.CollisionManager {
 			_source._collisions.Remove(this.gameObject);
 			_source._components.Remove(this.gameObject);
 
-			// Remove source InCollision3D component if necessary.
-			if(_source._collisions.Count == 0) {
-				// If there is a DestroyGameObject action on the source, nothing to do.
-				foreach(FYFY.IGameObjectManagerAction action in FYFY.GameObjectManager._delayedActions) {
-					if(action.GetType() == typeof(DestroyGameObject)) {
-						if(((DestroyGameObject)action)._gameObject == _source.gameObject) {
-							return;
-						}
+			// Remove InCollision3D component of the source gameobject if necessary.
+			if(_source._collisions.Count != 0) {
+				return;
+			}
+
+			// If there is a DestroyGameObject action on the source gameobject, nothing to do.
+			foreach(IGameObjectManagerAction action in GameObjectManager._delayedActions) {
+				if(action.GetType() == typeof(DestroyGameObject)) {
+					if((action as DestroyGameObject)._gameObject == _source.gameObject){
+						return;
 					}
 				}
-
-				// This action will be added and treated in the current preprocess operation.
-				// See MainLoop.preprocess for details.
-				GameObjectManager.removeComponent<InCollision3D>(_source.gameObject);
-				_source._inCollision = false;
 			}
+
+			// This action will be added and treated in the current preprocess operation.
+			// See MainLoop.preprocess for details.
+			GameObjectManager.removeComponent<InCollision3D>(_source.gameObject);
+			_source._inCollision = false;
 		}
 	}
 }

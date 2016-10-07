@@ -28,13 +28,14 @@ namespace FYFY {
 		internal static readonly HashSet<int> _destroyedGameObjectIds                   = new HashSet<int>();                       // destroyGO
 		internal static readonly HashSet<int> _modifiedGameObjectIds                    = new HashSet<int>();                       // createGO or addComponent or removeComponent
 
+		internal static IGameObjectManagerAction _currentAction = null; // used in CollisionManager and TriggerManager dlls
+		internal static int _sceneBuildIndex = -1; // used in MainLoop LateUpdate
+		internal static string _sceneName = null;  // used in MainLoop LateUpdate
+
 		/// <summary>
 		/// 	Gets the number of <c>GameObjects</c> of the scene known by FYFY.
 		/// </summary>
 		public static int Count { get { return _gameObjectWrappers.Count; } }
-
-		internal static int _sceneBuildIndex = -1; // used in MainLoop LateUpdate
-		internal static string _sceneName = null;  // used in MainLoop LateUpdate
 
 		/// <summary>
 		/// 	Loads the specified scene at the beginning of the next update block.
