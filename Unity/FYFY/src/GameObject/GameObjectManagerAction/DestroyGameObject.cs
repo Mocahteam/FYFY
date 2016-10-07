@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace FYFY {
 	internal class DestroyGameObject : IGameObjectManagerAction {
-		internal readonly GameObject _gameObject; // internal to be accessed in TriggerManager.dll
+		internal readonly GameObject _gameObject; // internal to be accessed in TriggerManager && CollisionManager dlls
 		private  readonly string _exceptionStackTrace;
 
 		internal DestroyGameObject(GameObject gameObject, string exceptionStrackTrace) {
