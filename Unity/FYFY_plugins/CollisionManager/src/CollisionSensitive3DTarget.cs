@@ -44,11 +44,16 @@ namespace FYFY_plugins.CollisionManager {
 				return;
 			}
 
-			// If there is a DestroyGameObject action on the source gameobject, nothing to do.
+			Transform[] parents = _source.GetComponentsInParent<Transform>(true); // _source.transform is include
+
+			// If there is a DestroyGameObject action on the source gameobject or on its parents, nothing to do.
 			foreach(IGameObjectManagerAction action in GameObjectManager._delayedActions) {
 				if(action.GetType() == typeof(DestroyGameObject)) {
-					if((action as DestroyGameObject)._gameObject == _source.gameObject){
-						return;
+					GameObject go = (action as DestroyGameObject)._gameObject;
+					foreach(Transform t in parents) {
+						if(t.gameObject == go) {
+							return;
+						}
 					}
 				}
 			}

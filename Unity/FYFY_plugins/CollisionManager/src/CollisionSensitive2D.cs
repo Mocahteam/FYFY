@@ -56,10 +56,18 @@ namespace FYFY_plugins.CollisionManager {
 				return;
 			}
 
-			// If the current action is a DestroyGameObject, nothing to do.
-			IGameObjectManagerAction cu = GameObjectManager._currentAction;
-			if(cu.GetType() == typeof(DestroyGameObject) && (cu as DestroyGameObject)._gameObject == this.gameObject) {
-				return;
+			Transform[] parents = this.gameObject.GetComponentsInParent<Transform>(true); // this.gameobject.transform is include
+
+			// If there is a DestroyGameObject action on my gameobject or on my parents, nothing to do.
+			foreach(IGameObjectManagerAction action in GameObjectManager._delayedActions) {
+				if(action.GetType() == typeof(DestroyGameObject)) {
+					GameObject go = (action as DestroyGameObject)._gameObject;
+					foreach(Transform t in parents) {
+						if(t.gameObject == go) {
+							return;
+						}
+					}
+				}
 			}
 
 			// This action will be added and treated in the current preprocess operation.
