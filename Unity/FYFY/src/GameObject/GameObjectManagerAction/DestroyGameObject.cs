@@ -16,9 +16,9 @@ namespace FYFY {
 				throw new DestroyedGameObjectException(_exceptionStackTrace);
 			}
 
-			Transform[] childTransforms = _gameObject.GetComponentsInChildren<Transform>(true); // self include in getComponentsInChildren (first item of array usually)
-			for (int i = 0; i < childTransforms.Length; ++i) {                                  // GERER LE GAMEOBJECT + SES ENFANTS CAR ILS VONT AUSSI ETRE DETRUITS !
-				int childId = childTransforms[i].gameObject.GetInstanceID();
+			// Unregister the gameobject and all its children.
+			foreach(Transform t in _gameObject.GetComponentsInChildren<Transform>(true)) { // gameobject.transform is include
+				int childId = t.gameObject.GetInstanceID();
 
 				if(GameObjectManager._gameObjectWrappers.ContainsKey(childId) == false){
 					throw new UnknownGameObjectException(_exceptionStackTrace);
@@ -28,6 +28,7 @@ namespace FYFY {
 				GameObjectManager._destroyedGameObjectIds.Add(childId);
 			}
 
+			// Destroy the gameobject and all its children.
 			Object.DestroyImmediate(_gameObject);
 		}
 	}
