@@ -139,7 +139,11 @@ namespace FYFY {
 			}
 
 			GameObject gameObject = GameObject.Instantiate<GameObject>(prefabResource);
-			_delayedActions.Enqueue(new CreateGameObjectWrapper(gameObject, exceptionStackTrace));
+
+			// Register the gameobject and all its children.
+			foreach(Transform t in gameObject.GetComponentsInChildren<Transform>(true)) { // gameobject.transform is include
+				_delayedActions.Enqueue(new CreateGameObjectWrapper(t.gameObject, exceptionStackTrace));
+			}
 
 			return gameObject;
 		}
