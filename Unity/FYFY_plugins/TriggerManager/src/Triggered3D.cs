@@ -1,22 +1,30 @@
 ﻿using UnityEngine;
+using System.Linq;
 
 namespace FYFY_plugins.TriggerManager {
 	/// <summary>
-	/// 	Component specifying that the <c>GameObject</c>(the source) is in contact with at least one other <c>GameObject</c>(the target).
+	/// 	Component specifying that the GameObject is in contact with at least one other GameObject.
 	/// </summary>
 	/// <remarks>
-	/// 	<para>Automatically added, updated or removed by the relative <see cref="FYFY_plugins.TriggerManager.TriggerSensitive3D">component</see>.</para>
-	/// 	<para>DO NOT TOUCH MANUALLY OTHERWISE WE CAN'T GUARANTEE THE COMPORTMENT.</para>
+	/// 	<para>! AUTOMATICALLY ADDED, UPDATED OR REMOVED !</para>
+	/// 	<para>! DO NOT TOUCH MANUALLY OTHERWISE WE CAN'T GUARANTEE THE COMPORTMENT !</para>
 	/// </remarks>
 	[DisallowMultipleComponent]
 	[AddComponentMenu("")]
-	[RequireComponent(typeof(TriggerSensitive3D))]
-	public class Triggered3D : Triggered {
-		// Called after the component was created, to initialized its variable to the relative TriggerSensitive3D._targets.
-		// Callback automatically called by Unity.
+	public class Triggered3D : MonoBehaviour {
+		private TriggerSensitive3D _triggerSensitive;
+
 		private void Awake() {
-			TriggerSensitive3D ts3D = this.gameObject.GetComponent<TriggerSensitive3D>();
-			_targets = ts3D._targets;
+			_triggerSensitive = this.gameObject.GetComponent<TriggerSensitive3D>();
+		}
+
+		/// <summary>
+		/// 	Gets all the GameObjects in contact with this GameObject.
+		/// </summary>
+		public GameObject[] Targets {
+			get {
+				return _triggerSensitive._components.Keys.ToArray();
+			}
 		}
 	}
 }
