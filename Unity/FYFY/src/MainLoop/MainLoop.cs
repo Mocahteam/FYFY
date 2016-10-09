@@ -125,8 +125,10 @@ namespace FYFY {
 			// Same principle inside Actions.perform function.
 			//
 			while (GameObjectManager._delayedActions.Count != 0) {
-				GameObjectManager._currentAction = GameObjectManager._delayedActions.Dequeue();
-				GameObjectManager._currentAction.perform();
+				// During the action perform (and so the Unity callbacks), the current action is always present on the queue top.
+				// This is used in TriggerManager && CollisionManager dlls.
+				GameObjectManager._delayedActions.Peek().perform();
+				GameObjectManager._delayedActions.Dequeue();
 			}
 			
 			foreach(int gameObjectId in GameObjectManager._destroyedGameObjectIds) {
