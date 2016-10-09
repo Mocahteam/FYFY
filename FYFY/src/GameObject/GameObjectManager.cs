@@ -28,7 +28,6 @@ namespace FYFY {
 		internal static readonly HashSet<int> _destroyedGameObjectIds                   = new HashSet<int>();                       // destroyGO
 		internal static readonly HashSet<int> _modifiedGameObjectIds                    = new HashSet<int>();                       // createGO or addComponent or removeComponent
 
-		internal static IGameObjectManagerAction _currentAction = null; // used in CollisionManager and TriggerManager dlls
 		internal static int _sceneBuildIndex = -1; // used in MainLoop LateUpdate
 		internal static string _sceneName = null;  // used in MainLoop LateUpdate
 
