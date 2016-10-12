@@ -14,9 +14,12 @@ namespace FYFY {
 	}
 
 	/// <summary></summary>
+	[ExecuteInEditMode]
 	[DisallowMultipleComponent]
 	[AddComponentMenu("")]
 	public class MainLoop : MonoBehaviour {
+		private static MainLoop _mainLoop;
+
 		/// <summary></summary>
 		public SystemDescription[] _fixedUpdateSystemDescriptions; // initialized in inspector, otherwise == null
 		/// <summary></summary>
@@ -26,10 +29,18 @@ namespace FYFY {
 
 		private int _familiesUpdateCount = 0;
 
-		private void Awake() { // parser la scene pour recuperer toutes les entites
-			if(_fixedUpdateSystemDescriptions == null) { // MainLoop Added in script & not in editor so it can't be kept editor value so not initialized
+		// Parse scene to get all entities.
+		private void Awake() {
+			// Severals instances of MainLoop are not allowed.
+			if(_mainLoop != null) {
 				DestroyImmediate(this);
-				throw new System.Exception("MainLoop component mustn't be added by yourself inside code.");
+				return;
+			}
+
+			_mainLoop = this;
+
+			if(Application.isPlaying == false){
+				return;
 			}
 
 			// vider toutes les classes static (au cas ou apres un loadscene il y ait tj des trucs dedans)
@@ -68,6 +79,12 @@ namespace FYFY {
 			}
 		}
 
+		private void OnDestroy(){
+			if(_mainLoop == this) {
+				_mainLoop = null;
+			}
+		}
+
 		private FSystem createSystemInstance(SystemDescription systemDescription){
 			System.Type type = System.Type.GetType(systemDescription._typeAssemblyQualifiedName);
 
@@ -82,6 +99,10 @@ namespace FYFY {
 		}
 
 		private void Start() { // creer tous les systemes
+			if(Application.isPlaying == false){
+				return;
+			}
+
 			for (int i = 0; i < _fixedUpdateSystemDescriptions.Length; ++i) {
 				SystemDescription systemDescription = _fixedUpdateSystemDescriptions[i];
 				FSystem system = this.createSystemInstance(systemDescription);
@@ -149,6 +170,10 @@ namespace FYFY {
 		// ONE PREPROCESSING PER CYCLE (if more than one fixedUpdate per frame, each fixedUpdate call preprocessing !)
 		// if no fixedUpdate in this frame, update call preprocessing
 		private void FixedUpdate(){ // process systems
+			if(Application.isPlaying == false){
+				return;
+			}
+
 			this.preprocess();
 
 			foreach(FSystem system in FSystemManager._fixedUpdateSystems)
@@ -157,6 +182,10 @@ namespace FYFY {
 		}
 
 		private void Update(){ // process systems
+			if(Application.isPlaying == false){
+				return;
+			}
+
 			this.preprocess();
 
 			foreach(FSystem system in FSystemManager._updateSystems)
@@ -165,6 +194,10 @@ namespace FYFY {
 		}
 
 		private void LateUpdate(){ // process systems
+			if(Application.isPlaying == false){
+				return;
+			}
+
 			this.preprocess();
 
 			foreach(FSystem system in FSystemManager._lateUpdateSystems)

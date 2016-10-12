@@ -10,6 +10,8 @@ namespace FYFY {
 	/// </summary>
 	[CustomEditor(typeof(MainLoop))]
 	public class MainLoopInspector : Editor {
+		internal static MainLoopInspector _mainLoopInspector;
+
 		private SerializedProperty _fixedUpdateSystemDescriptions;
 		private SerializedProperty _updateSystemDescriptions;
 		private SerializedProperty _lateUpdateSystemDescriptions;
@@ -17,6 +19,16 @@ namespace FYFY {
 		private ReorderableList _fixedUpdateDrawingList;
 		private ReorderableList _updateDrawingList;
 		private ReorderableList _lateUpdateDrawingList;
+
+		// Called in Edit and Game mode by default.
+		private void Awake(){
+			_mainLoopInspector = this;
+		}
+
+		// Called in Edit and Game mode by default.
+		private void OnDestroy(){
+			_mainLoopInspector = null;
+		}				
 
 		private void playingModeDrawElementCallBack(FSystem system, Rect rect) {
 			float buttonSize = EditorGUIUtility.singleLineHeight;
@@ -150,15 +162,11 @@ namespace FYFY {
 		}
 
 		private void OnEnable(){
-			if (Object.FindObjectsOfType<MainLoop>().Length > 1) { // due to duplicate hotkeys & option on GO
-				DestroyImmediate(this.target);
-				return;
-			}
-
-			if (Application.isPlaying)
+			if(Application.isPlaying) {
 				this.OnEnableInPlayingMode();
-			else
+			} else {
 				this.OnEnableInEditingMode();
+			}
 
 			_fixedUpdateDrawingList.drawHeaderCallback = delegate(Rect rect) {
 				EditorGUI.LabelField(rect, "FSystems in FixedUpdate");
