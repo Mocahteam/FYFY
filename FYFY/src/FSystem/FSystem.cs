@@ -18,10 +18,16 @@
 			set {
 				if(value != _pause) {
 					_pause = value;
-					if(value == false)
+
+					if (value == false) {
 						this.onResume(UnityEngine.Time.frameCount);
-					else
+					} else {
 						this.onPause(UnityEngine.Time.frameCount);
+					}
+
+					if(MainLoopInspector._mainLoopInspector != null) {
+						MainLoopInspector._mainLoopInspector.Repaint();
+					}
 				}
 			}
 		}
