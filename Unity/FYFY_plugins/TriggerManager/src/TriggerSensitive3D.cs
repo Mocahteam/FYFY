@@ -15,6 +15,8 @@ namespace FYFY_plugins.TriggerManager {
 
 		private void OnTriggerEnter(Collider other){
 			GameObject target = other.gameObject;
+			if (_components.ContainsKey(target))
+				return;
 			// We don't want that FYFY treates TriggerSensitive3DTarget component.
 			TriggerSensitive3DTarget tst = target.gameObject.AddComponent<TriggerSensitive3DTarget>();
 			tst._source = this;

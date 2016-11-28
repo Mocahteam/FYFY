@@ -17,6 +17,8 @@ namespace FYFY_plugins.CollisionManager {
 
 		private void OnCollisionEnter2D(Collision2D coll) {
 			GameObject target = coll.gameObject;
+			if (_components.ContainsKey(target))
+				return;
 			// We don't want that FYFY treates CollisionSensitive2DTarget component.
 			CollisionSensitive2DTarget cst = target.gameObject.AddComponent<CollisionSensitive2DTarget>();
 			cst._source = this;
