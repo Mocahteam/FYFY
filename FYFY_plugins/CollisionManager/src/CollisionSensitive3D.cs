@@ -17,6 +17,8 @@ namespace FYFY_plugins.CollisionManager {
 
 		private void OnCollisionEnter(Collision coll) {
 			GameObject target = coll.gameObject;
+			if (_components.ContainsKey(target))
+				return;
 			// We don't want that FYFY treates CollisionSensitive3DTarget component.
 			CollisionSensitive3DTarget cst = target.gameObject.AddComponent<CollisionSensitive3DTarget>();
 			cst._source = this;
