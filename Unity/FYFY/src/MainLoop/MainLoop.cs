@@ -11,10 +11,11 @@ namespace FYFY {
 		public string _typeFullName;
 		/// <summary></summary>
 		public bool _pause;
+		/// <summary></summary>
+		public string _context;
 	}
 
 	/// <summary></summary>
-	[ExecuteInEditMode]
 	[DisallowMultipleComponent]
 	[AddComponentMenu("")]
 	public class MainLoop : MonoBehaviour {
@@ -59,11 +60,11 @@ namespace FYFY {
 			for (int i = 0; i < sceneGameObjects.Length; ++i) {
 				GameObject gameObject = sceneGameObjects[i];
 				
-#if UNITY_EDITOR
-				UnityEditor.PrefabType prefabType = UnityEditor.PrefabUtility.GetPrefabType(gameObject);
-				if(gameObject.hideFlags != HideFlags.None || prefabType == UnityEditor.PrefabType.Prefab || prefabType == UnityEditor.PrefabType.ModelPrefab)
-					continue; // on veut que les objets de la scene (pas les prefabs, les objets internes a unity etc)
-#endif
+				if (Application.isEditor){
+					UnityEditor.PrefabType prefabType = UnityEditor.PrefabUtility.GetPrefabType(gameObject);
+					if(gameObject.hideFlags != HideFlags.None || prefabType == UnityEditor.PrefabType.Prefab || prefabType == UnityEditor.PrefabType.ModelPrefab)
+						continue; // on veut que les objets de la scene (pas les prefabs, les objets internes a unity etc)
+				}
 				
 				HashSet<uint> componentTypeIds = new HashSet<uint>();
 				foreach(Component c in gameObject.GetComponents<Component>()) {
