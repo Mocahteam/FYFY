@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+
+#if UNITY_EDITOR
+
 using UnityEditor;
 using UnityEditorInternal;
 using System.Collections.Generic;
@@ -191,3 +194,5 @@ namespace FYFY {
 		}
 	}
 }
+
+#endif

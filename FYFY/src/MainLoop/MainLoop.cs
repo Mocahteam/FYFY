@@ -58,9 +58,12 @@ namespace FYFY {
 			GameObject[] sceneGameObjects = Resources.FindObjectsOfTypeAll<GameObject>(); // -> find also inactive GO (&& other shit not wanted -> ghost unity gameO used in intern)
 			for (int i = 0; i < sceneGameObjects.Length; ++i) {
 				GameObject gameObject = sceneGameObjects[i];
+				
+#if UNITY_EDITOR
 				UnityEditor.PrefabType prefabType = UnityEditor.PrefabUtility.GetPrefabType(gameObject);
 				if(gameObject.hideFlags != HideFlags.None || prefabType == UnityEditor.PrefabType.Prefab || prefabType == UnityEditor.PrefabType.ModelPrefab)
 					continue; // on veut que les objets de la scene (pas les prefabs, les objets internes a unity etc)
+#endif
 				
 				HashSet<uint> componentTypeIds = new HashSet<uint>();
 				foreach(Component c in gameObject.GetComponents<Component>()) {

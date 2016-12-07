@@ -13,7 +13,8 @@ Build
 Once the requirements have been installed, use the following command in order
 to compile the library:
 
-	<path-to-msbuild>\MSBuild.exe FYFY.csproj
+	<path-to-msbuild>\MSBuild.exe /property:buildmode=Standalone FYFY.csproj
+	<path-to-msbuild>\MSBuild.exe /property:buildmode=Editor FYFY.csproj
 
 If Unity3D is not installed in a standard location, you have to define the
 `UnityEnginePath` and `UnityEditorPath` properties inside the `FYFY.csproj`

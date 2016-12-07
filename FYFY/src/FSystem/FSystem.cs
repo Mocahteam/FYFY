@@ -25,9 +25,11 @@
 						this.onPause(UnityEngine.Time.frameCount);
 					}
 
+#if UNITY_EDITOR
 					if(MainLoopInspector._mainLoopInspector != null) {
 						MainLoopInspector._mainLoopInspector.Repaint();
 					}
+#endif
 				}
 			}
 		}
