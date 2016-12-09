@@ -11,15 +11,13 @@ namespace FYFY {
 		public string _typeFullName;
 		/// <summary></summary>
 		public bool _pause;
-		/// <summary></summary>
-		public string _context;
 	}
 
 	/// <summary></summary>
 	[DisallowMultipleComponent]
 	[AddComponentMenu("")]
 	public class MainLoop : MonoBehaviour {
-		private static MainLoop _mainLoop;
+		internal static MainLoop _mainLoop;
 
 		/// <summary></summary>
 		public SystemDescription[] _fixedUpdateSystemDescriptions; // initialized in inspector, otherwise == null
@@ -27,6 +25,9 @@ namespace FYFY {
 		public SystemDescription[] _updateSystemDescriptions;      // initialized in inspector, otherwise == null
 		/// <summary></summary>
 		public SystemDescription[] _lateUpdateSystemDescriptions;  // initialized in inspector, otherwise == null
+		
+		// force update Inspector
+		public int _forceUpdateInspector;		
 
 		private int _familiesUpdateCount = 0;
 
