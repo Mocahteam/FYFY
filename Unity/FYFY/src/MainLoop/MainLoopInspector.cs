@@ -130,7 +130,6 @@ namespace FYFY {
 							systemDescription.FindPropertyRelative ("_typeAssemblyQualifiedName").stringValue = systemType.AssemblyQualifiedName;
 							systemDescription.FindPropertyRelative ("_typeFullName").stringValue = systemType.FullName;
 							systemDescription.FindPropertyRelative ("_pause").boolValue = false;
-							systemDescription.FindPropertyRelative ("_context").stringValue = list;
 
 							serializedObject.ApplyModifiedProperties ();
 						}
