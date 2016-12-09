@@ -88,7 +88,7 @@ namespace FYFY {
 			List<GameObject> sceneGameObjects = new List<GameObject>();
 
 			foreach (GameObject root in roots) {
-				foreach(Transform childTransform in root.GetComponentsInChildren<Transform>()) { // include root transform
+				foreach(Transform childTransform in root.GetComponentsInChildren<Transform>(true)) { // include root transform
 					sceneGameObjects.Add(childTransform.gameObject);
 				}
 			}
