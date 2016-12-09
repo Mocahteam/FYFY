@@ -1,31 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
     <SrcPath>src</SrcPath>
+    <OutputPath>bin</OutputPath>
     <RootNamespace>FYFY</RootNamespace>
+    <AssemblyName>FYFY</AssemblyName>
     <UnityEnginePath>C:\Program Files\Unity\Editor\Data\Managed\UnityEngine.dll</UnityEnginePath>
     <UnityEditorPath>C:\Program Files\Unity\Editor\Data\Managed\UnityEditor.dll</UnityEditorPath>
+    <DocumentationFile>doc\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Configuration>Release</Configuration>
     <OutputType>Library</OutputType>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
     <StopOnFirstFailure>true</StopOnFirstFailure>
   </PropertyGroup>
-  
-  <PropertyGroup Condition="'$(buildmode)' == 'Standalone'">
-    <OutputPath>bin/standalone</OutputPath>
-    <AssemblyName>FYFY-Standalone</AssemblyName>
-  </PropertyGroup>
 
-  <PropertyGroup Condition="'$(buildmode)' == 'Editor'">
-    <OutputPath>bin/editor</OutputPath>
-    <AssemblyName>FYFY-Editor</AssemblyName>
-	<DocumentationFile>doc\$(AssemblyName).xml</DocumentationFile>
-	<DefineConstants>UNITY_EDITOR</DefineConstants>
-  </PropertyGroup>
-  
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="UnityEngine">

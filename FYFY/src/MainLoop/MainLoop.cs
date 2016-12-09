@@ -14,10 +14,11 @@ namespace FYFY {
 	}
 
 	/// <summary></summary>
+	[ExecuteInEditMode] // permet dexecuter awake et start etc aussi en mode edition
 	[DisallowMultipleComponent]
 	[AddComponentMenu("")]
 	public class MainLoop : MonoBehaviour {
-		internal static MainLoop _mainLoop;
+		internal static MainLoop _mainLoop; // eviter davoir plusieurs composants MainLoop dans toute la scene (cf Awake)
 
 		/// <summary></summary>
 		public SystemDescription[] _fixedUpdateSystemDescriptions; // initialized in inspector, otherwise == null
@@ -26,6 +27,7 @@ namespace FYFY {
 		/// <summary></summary>
 		public SystemDescription[] _lateUpdateSystemDescriptions;  // initialized in inspector, otherwise == null
 		
+		/// <summary></summary>
 		// force update Inspector
 		public int _forceUpdateInspector;		
 
@@ -56,32 +58,6 @@ namespace FYFY {
 			GameObjectManager._modifiedGameObjectIds.Clear();
 			GameObjectManager._sceneBuildIndex = -1;
 			GameObjectManager._sceneName = null;
-
-			GameObject[] sceneGameObjects = Resources.FindObjectsOfTypeAll<GameObject>(); // -> find also inactive GO (&& other shit not wanted -> ghost unity gameO used in intern)
-			for (int i = 0; i < sceneGameObjects.Length; ++i) {
-				GameObject gameObject = sceneGameObjects[i];
-				
-				if (Application.isEditor){
-					UnityEditor.PrefabType prefabType = UnityEditor.PrefabUtility.GetPrefabType(gameObject);
-					if(gameObject.hideFlags != HideFlags.None || prefabType == UnityEditor.PrefabType.Prefab || prefabType == UnityEditor.PrefabType.ModelPrefab)
-						continue; // on veut que les objets de la scene (pas les prefabs, les objets internes a unity etc)
-				}
-				
-				HashSet<uint> componentTypeIds = new HashSet<uint>();
-				foreach(Component c in gameObject.GetComponents<Component>()) {
-					System.Type type = c.GetType();
-					uint typeId = TypeManager.getTypeId(type);
-
-					if(componentTypeIds.Contains (typeId)) { // avoid two components of same type in a gameobject
-						throw new System.Exception("FYFY doesn't support GameObject with more than one component attached of the same type.");
-					}
-
-					componentTypeIds.Add(typeId);
-				}
-
-				GameObjectWrapper gameObjectWrapper = new GameObjectWrapper(gameObject, componentTypeIds);
-				GameObjectManager._gameObjectWrappers.Add(gameObject.GetInstanceID(), gameObjectWrapper);
-			}
 		}
 
 		private void OnDestroy(){
@@ -106,6 +82,32 @@ namespace FYFY {
 		private void Start() { // creer tous les systemes
 			if(Application.isPlaying == false){
 				return;
+			}
+
+			GameObject[] roots = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
+			List<GameObject> sceneGameObjects = new List<GameObject>();
+
+			foreach (GameObject root in roots) {
+				foreach(Transform childTransform in root.GetComponentsInChildren<Transform>()) { // include root transform
+					sceneGameObjects.Add(childTransform.gameObject);
+				}
+			}
+
+			foreach(GameObject gameObject in sceneGameObjects) {
+				HashSet<uint> componentTypeIds = new HashSet<uint>();
+				foreach(Component c in gameObject.GetComponents<Component>()) {
+					System.Type type = c.GetType();
+					uint typeId = TypeManager.getTypeId(type);
+
+					if(componentTypeIds.Contains (typeId)) { // avoid two components of same type in a gameobject
+						throw new System.Exception("FYFY doesn't support GameObject with more than one component attached of the same type.");
+					}
+
+					componentTypeIds.Add(typeId);
+				}
+
+				GameObjectWrapper gameObjectWrapper = new GameObjectWrapper(gameObject, componentTypeIds);
+				GameObjectManager._gameObjectWrappers.Add(gameObject.GetInstanceID(), gameObjectWrapper);
 			}
 
 			for (int i = 0; i < _fixedUpdateSystemDescriptions.Length; ++i) {
