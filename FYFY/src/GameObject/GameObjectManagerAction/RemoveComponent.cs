@@ -33,9 +33,12 @@ namespace FYFY {
 			}
 
 			Object.DestroyImmediate(component);
-
-			GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Remove(componentTypeId);
-			GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
+			
+			// Check if an other component of this type is already included into the GO => if no, update wrapper
+			if (_gameObject.GetComponent<T>() == null){
+				GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Remove(componentTypeId);
+				GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
+			}
 		}
 	}
 
@@ -63,16 +66,20 @@ namespace FYFY {
 			if(_component == null) {
 				throw new DestroyedComponentException(_exceptionStackTrace);
 			}
-
-			uint componentTypeId = TypeManager.getTypeId(_component.GetType());
+			
+			System.Type componentType = _component.GetType();
+			uint componentTypeId = TypeManager.getTypeId(componentType);
 			if(GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Contains(componentTypeId) == false) {
 				throw new UnknownComponentException();
 			}
 
 			Object.DestroyImmediate(_component);
-
-			GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Remove(componentTypeId);
-			GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
+			
+			// Check if an other component of this type is already included into the GO => if no, update wrapper
+			if (_gameObject.GetComponent(componentType) == null){
+				GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Remove(componentTypeId);
+				GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
+			}
 		}
 	}
 }
