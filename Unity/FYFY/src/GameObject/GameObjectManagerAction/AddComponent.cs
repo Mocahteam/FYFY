@@ -24,9 +24,11 @@ namespace FYFY {
 			}
 
 			System.Type componentType = typeof(T);
-			if(_gameObject.GetComponent<T>() != null){
-				Debug.LogWarning("Can't add '" + componentType + "' to " + _gameObject.name + " because a '" + componentType + "' is already added to the game object!");
-				return;
+			// Check if the component added is the first one in the GO of this type, if true update wrapper
+			if (_gameObject.GetComponent<T>() == null) {
+				uint componentTypeId = TypeManager.getTypeId(componentType);
+				GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Add(componentTypeId);
+				GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
 			}
 
 			T component = _gameObject.AddComponent<T>();
@@ -43,10 +45,6 @@ namespace FYFY {
 						propertyInfo.SetValue(component, System.Convert.ChangeType(value, propertyInfo.PropertyType), null);
 				}
 			}
-
-			uint componentTypeId = TypeManager.getTypeId(componentType);
-			GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Add(componentTypeId);
-			GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
 		}
 	}
 
@@ -73,9 +71,11 @@ namespace FYFY {
 				throw new UnknownGameObjectException(_exceptionStackTrace);
 			}
 
-			if (_gameObject.GetComponent(_componentType) != null) {
-				Debug.LogWarning("Can't add '" + _componentType + "' to " + _gameObject.name + " because a '" + _componentType + "' is already added to the game object!");
-				return;
+			// Check if the component added is the first one in the GO of this type, if true update wrapper
+			if (_gameObject.GetComponent(_componentType) == null) {
+				uint componentTypeId = TypeManager.getTypeId(_componentType);
+				GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Add(componentTypeId);
+				GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
 			}
 
 			Component component = _gameObject.AddComponent(_componentType);
@@ -92,10 +92,6 @@ namespace FYFY {
 						propertyInfo.SetValue(component, System.Convert.ChangeType(value, propertyInfo.PropertyType), null);
 				}
 			}
-
-			uint componentTypeId = TypeManager.getTypeId(_componentType);
-			GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Add(componentTypeId);
-			GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
 		}
 	}
 }

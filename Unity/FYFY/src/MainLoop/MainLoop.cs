@@ -98,12 +98,9 @@ namespace FYFY {
 				foreach(Component c in gameObject.GetComponents<Component>()) {
 					System.Type type = c.GetType();
 					uint typeId = TypeManager.getTypeId(type);
-
-					if(componentTypeIds.Contains (typeId)) { // avoid two components of same type in a gameobject
-						throw new System.Exception("FYFY doesn't support GameObject with more than one component attached of the same type.");
-					}
-
-					componentTypeIds.Add(typeId);
+					// Add this component type if it's the first found for this GO
+					if(!componentTypeIds.Contains (typeId))
+						componentTypeIds.Add(typeId);
 				}
 
 				GameObjectWrapper gameObjectWrapper = new GameObjectWrapper(gameObject, componentTypeIds);
