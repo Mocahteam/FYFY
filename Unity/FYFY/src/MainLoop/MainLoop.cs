@@ -98,9 +98,7 @@ namespace FYFY {
 				foreach(Component c in gameObject.GetComponents<Component>()) {
 					System.Type type = c.GetType();
 					uint typeId = TypeManager.getTypeId(type);
-					// Add this component type if it's the first found for this GO
-					if(!componentTypeIds.Contains (typeId))
-						componentTypeIds.Add(typeId);
+					componentTypeIds.Add(typeId);
 				}
 
 				GameObjectWrapper gameObjectWrapper = new GameObjectWrapper(gameObject, componentTypeIds);
