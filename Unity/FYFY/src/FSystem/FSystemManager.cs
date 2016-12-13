@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("MLI")] // ugly
+[assembly: InternalsVisibleTo("FYFY_Inspector")] // ugly
 
 namespace FYFY {
 	/// <summary>
