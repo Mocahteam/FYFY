@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FYFY;
 
-namespace FYFY_plugins.MLI {
+namespace FYFY_Inspector {
 	/// <summary>
 	/// 	Custom inspector automatically used by Unity Editor when a <see cref="FYFY.MainLoop"/> is find in inspector view.
 	/// </summary>

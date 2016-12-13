@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-namespace FYFY_plugins.MLI {
+namespace FYFY_Inspector {
 	/// <summary>
 	/// 	Class automatically loaded by Unity Editor to create the FYFY menu.
 	/// </summary>
