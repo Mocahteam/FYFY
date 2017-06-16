@@ -32,36 +32,8 @@ namespace FYFY_plugins.CollisionManager {
 
 		// Unsubscribes the target (GameObject relative to this component) from the source if necessary.
 		private void OnDestroy(){
-			if(_source == null) {
-				return;
-			}
-			
-			_source._collisions.Remove(this.gameObject);
-			_source._components.Remove(this.gameObject);
-
-			// Remove InCollision2D component of the source gameobject if necessary.
-			if(_source._collisions.Count != 0) {
-				return;
-			}
-
-			Transform[] parents = _source.GetComponentsInParent<Transform>(true); // _source.transform is include
-
-			// If there is a DestroyGameObject action on the source gameobject or on its parents, nothing to do.
-			foreach(IGameObjectManagerAction action in GameObjectManager._delayedActions) {
-				if(action.GetType() == typeof(DestroyGameObject)) {
-					GameObject go = (action as DestroyGameObject)._gameObject;
-					foreach(Transform t in parents) {
-						if(t.gameObject == go) {
-							return;
-						}
-					}
-				}
-			}
-
-			// This action will be added and treated in the current preprocess operation.
-			// See MainLoop.preprocess for details.
-			GameObjectManager.removeComponent<InCollision2D>(_source.gameObject);
-			_source._inCollision = false;
+			if(_source != null)
+				_source.unregisterTarget(this.gameObject);
 		}
 	}
 }

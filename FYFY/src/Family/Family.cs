@@ -51,8 +51,17 @@ namespace FYFY {
 		/// 	The enumerator.
 		/// </returns>
 		public IEnumerator<GameObject> GetEnumerator(){
-			foreach(int gameObjectId in _gameObjectIds)
-				yield return GameObjectManager._gameObjectWrappers[gameObjectId]._gameObject;
+			foreach(int gameObjectId in _gameObjectIds){
+				GameObject go = GameObjectManager._gameObjectWrappers[gameObjectId]._gameObject;
+				if (go == null){
+					System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(2, true);                                  // get caller stackFrame with informations
+					string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
+					Debug.LogWarning("Game Object with id " + gameObjectId + " is already binded to FYFY but it has been destroyed. Be careful to unbind game object before destroying it.");
+					GameObjectManager._delayedActions.Enqueue(new UnbindGameObject(go, exceptionStackTrace));
+				}
+				else
+					yield return go;
+			}
 		}
 
 		/// <summary>

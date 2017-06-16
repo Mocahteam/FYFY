@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Linq;
 
 namespace FYFY_plugins.TriggerManager {
 	/// <summary>
@@ -23,7 +22,7 @@ namespace FYFY_plugins.TriggerManager {
 		/// </summary>
 		public GameObject[] Targets {
 			get {
-				return _triggerSensitive._components.Keys.ToArray();
+				return _triggerSensitive.getTargets();
 			}
 		}
 	}

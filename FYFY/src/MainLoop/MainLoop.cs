@@ -54,7 +54,7 @@ namespace FYFY {
 			FSystemManager._lateUpdateSystems.Clear();
 			GameObjectManager._gameObjectWrappers.Clear();
 			GameObjectManager._delayedActions.Clear();
-			GameObjectManager._destroyedGameObjectIds.Clear();
+			GameObjectManager._unbindedGameObjectIds.Clear();
 			GameObjectManager._modifiedGameObjectIds.Clear();
 			GameObjectManager._sceneBuildIndex = -1;
 			GameObjectManager._sceneName = null;
@@ -79,20 +79,21 @@ namespace FYFY {
 			return system;
 		}
 
-		private void Start() { // creer tous les systemes
+		// Parse scene and bind all GameObjects to FYFY
+		// Create all systems
+		private void Start() {
 			if(Application.isPlaying == false){
 				return;
 			}
 
+			// Parse scene and bind all GameObjects to FYFY
 			GameObject[] roots = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
 			List<GameObject> sceneGameObjects = new List<GameObject>();
-
 			foreach (GameObject root in roots) {
 				foreach(Transform childTransform in root.GetComponentsInChildren<Transform>(true)) { // include root transform
 					sceneGameObjects.Add(childTransform.gameObject);
 				}
 			}
-
 			foreach(GameObject gameObject in sceneGameObjects) {
 				HashSet<uint> componentTypeIds = new HashSet<uint>();
 				foreach(Component c in gameObject.GetComponents<Component>()) {
@@ -105,6 +106,7 @@ namespace FYFY {
 				GameObjectManager._gameObjectWrappers.Add(gameObject.GetInstanceID(), gameObjectWrapper);
 			}
 
+			// Create all systems
 			for (int i = 0; i < _fixedUpdateSystemDescriptions.Length; ++i) {
 				SystemDescription systemDescription = _fixedUpdateSystemDescriptions[i];
 				FSystem system = this.createSystemInstance(systemDescription);
@@ -154,11 +156,11 @@ namespace FYFY {
 				GameObjectManager._delayedActions.Dequeue();
 			}
 			
-			foreach(int gameObjectId in GameObjectManager._destroyedGameObjectIds) {
+			foreach(int gameObjectId in GameObjectManager._unbindedGameObjectIds) {
 				FamilyManager.updateAfterGameObjectDestroyed(gameObjectId);
 				GameObjectManager._modifiedGameObjectIds.Remove(gameObjectId);
 			}
-			GameObjectManager._destroyedGameObjectIds.Clear();
+			GameObjectManager._unbindedGameObjectIds.Clear();
 
 			foreach(int gameObjectId in GameObjectManager._modifiedGameObjectIds)
 				FamilyManager.updateAfterGameObjectModified(gameObjectId);

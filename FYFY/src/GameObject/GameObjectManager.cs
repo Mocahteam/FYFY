@@ -25,8 +25,8 @@ namespace FYFY {
 		internal static readonly Dictionary<string, GameObject> _prefabResources        = new Dictionary<string, GameObject>();     // indexed by prefab name
 		internal static readonly Dictionary<int, GameObjectWrapper> _gameObjectWrappers = new Dictionary<int, GameObjectWrapper>(); // indexed by gameobject's id
 		internal static readonly Queue<IGameObjectManagerAction> _delayedActions        = new Queue<IGameObjectManagerAction>();
-		internal static readonly HashSet<int> _destroyedGameObjectIds                   = new HashSet<int>();                       // destroyGO
-		internal static readonly HashSet<int> _modifiedGameObjectIds                    = new HashSet<int>();                       // createGO or addComponent or removeComponent
+		internal static readonly HashSet<int> _unbindedGameObjectIds                    = new HashSet<int>();                       // unbindGO
+		internal static readonly HashSet<int> _modifiedGameObjectIds                    = new HashSet<int>();                       // bindGO or addComponent or removeComponent
 
 		internal static int _sceneBuildIndex = -1; // used in MainLoop LateUpdate
 		internal static string _sceneName = null;  // used in MainLoop LateUpdate
@@ -63,102 +63,40 @@ namespace FYFY {
 		}
 
 		/// <summary>
-		/// 	Creates a game object and returns it. The game object will be registered by FYFY at the beginning of the next update block.
+		/// 	Bind a game object with FYFY. The game object will be registered by FYFY at the beginning of the next update block.
 		/// </summary>
 		/// <remarks>
-		/// 	Even if the game object is not registered, you can use it in other <see cref="FYFY.GameObjectManager">functions</see> in current frame.
+		/// 	In the same frame of binding, you can use it in other <see cref="FYFY.GameObjectManager">functions</see>.
 		/// </remarks>
-		/// <returns>
-		/// 	The game object created but not yet registered.
-		/// </returns>
-		public static GameObject createGameObject() {
+		public static void bind(GameObject gameObject) {
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
-
-			GameObject gameObject = new GameObject();
-			_delayedActions.Enqueue(new CreateGameObjectWrapper(
-				gameObject, 
-				new HashSet<uint>{ TypeManager.getTypeId (typeof(Transform)) }, 
-				exceptionStackTrace)
-			);
-
-			return gameObject;
-		}
-
-		/// <summary>
-		/// 	Creates a game object with a primitive mesh renderer and appropriate collider and returns it. The game object will be registered by FYFY at the beginning of the next update block.
-		/// </summary>
-		/// <remarks>
-		/// 	Even if the game object is not registered, you can use it in other <see cref="FYFY.GameObjectManager">functions</see> in current frame.
-		/// </remarks>
-		/// <returns>
-		/// 	The game object created but not yet registered.
-		/// </returns>
-		/// <param name="type">
-		/// 	The type of primitive object to create.
-		/// </param>
-		public static GameObject createPrimitive(PrimitiveType type) {
-			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
-			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
-
-			GameObject gameObject = GameObject.CreatePrimitive(type);
-			_delayedActions.Enqueue(new CreateGameObjectWrapper(gameObject, exceptionStackTrace));
-
-			return gameObject;
-		}
-
-		/// <summary>
-		/// 	Creates a game object as a copy of the prefab and returns it. The game object will be registered by FYFY at the beginning of the next update block.
-		/// </summary>
-		/// <remarks>
-		/// 	Even if the game object is not registered, you can use it in other <see cref="FYFY.GameObjectManager">functions</see> in current frame.
-		/// </remarks>
-		/// <returns>
-		/// 	The game object created but not yet registered.
-		/// </returns>
-		/// <param name="prefabName">
-		/// 	The pathname of the target.
-		/// </param>
-		public static GameObject instantiatePrefab(string prefabName) {
-			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
-			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
-
-			if(prefabName == null) {
+			
+			if(gameObject == null) { // The GO has been destroyed !!!
 				throw new ArgumentNullException(exceptionStackTrace);
 			}
 
-			GameObject prefabResource;
-			if (_prefabResources.TryGetValue(prefabName, out prefabResource) == false) {
-				if ((prefabResource = Resources.Load<GameObject>(prefabName)) == null) {
-					Debug.LogWarning("Can't instantiate '" + prefabName + "', because it doesn't exist or it isn't present in 'Assets/Resources' folder.");
-					return null;
-				}
-					
-				_prefabResources.Add(prefabName, prefabResource);
-			}
-
-			GameObject gameObject = GameObject.Instantiate<GameObject>(prefabResource);
-
-			// Register the gameobject and all its children.
+			// Bind the gameobject and all its children.
 			foreach(Transform t in gameObject.GetComponentsInChildren<Transform>(true)) { // gameobject.transform is include
-				_delayedActions.Enqueue(new CreateGameObjectWrapper(t.gameObject, exceptionStackTrace));
+				_delayedActions.Enqueue(new BindGameObject(t.gameObject, exceptionStackTrace));
 			}
-
-			return gameObject;
 		}
 
 		/// <summary>
-		/// 	Destroies the game object at the beginning of the next update block.
+		/// 	Unbind a game object to FYFY at the beginning of the next update block.
 		/// </summary>
-		public static void destroyGameObject(GameObject gameObject){
+		public static void unbind(GameObject gameObject){
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
 
 			if(gameObject == null) {
 				throw new ArgumentNullException(exceptionStackTrace);
 			}
-
-			_delayedActions.Enqueue(new DestroyGameObject(gameObject, exceptionStackTrace));
+			
+			// Unbind the gameobject and all its children.
+			foreach(Transform t in gameObject.GetComponentsInChildren<Transform>(true)) { // gameobject.transform is include
+				_delayedActions.Enqueue(new UnbindGameObject(t.gameObject, exceptionStackTrace));
+			}
 		}
 
 		/// <summary>

@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Linq;
 
 namespace FYFY_plugins.CollisionManager {
 	/// <summary>
@@ -23,7 +22,7 @@ namespace FYFY_plugins.CollisionManager {
 		/// </summary>
 		public GameObject[] Targets {
 			get {
-				return _collisionSensitive._collisions.Keys.ToArray();
+				return _collisionSensitive.getTargets();
 			}
 		}
 
@@ -32,7 +31,7 @@ namespace FYFY_plugins.CollisionManager {
 		/// </summary>
 		public Collision[] Collisions {
 			get {
-				return _collisionSensitive._collisions.Values.ToArray();
+				return _collisionSensitive.getCollisions();
 			}
 		}
 	}
