@@ -1,5 +1,7 @@
-MLI
-============
+FYFY_Inspector
+==============
+
+This part of the project includes source code to easily manage FYFY in Unity editor.
 
 Build requirements
 ------------------
@@ -8,8 +10,8 @@ Build requirements
 - Microsoft .Net Framework 4.0
 - FYFY.dll
 
-Build
------
+Build the library
+-----------------
 
 Once the requirements have been installed, use the following command in order
 to compile the library:

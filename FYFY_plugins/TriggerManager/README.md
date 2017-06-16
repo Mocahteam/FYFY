@@ -1,6 +1,8 @@
 TriggerManager
 ==============
 
+This plugin provides components to manage Unity triggers in a consistent manner with ECS formalism.
+
 Build requirements
 ------------------
 

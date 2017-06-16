@@ -1,14 +1,16 @@
 FYFY
 ====
 
+This part of the project includes source code that enables you to manage Systems, Families and so on.
+
 Build requirements
 ------------------
 
 - Unity3D 5.3.4
 - Microsoft .Net Framework 4.0
 
-Build
------
+Build library
+-------------
 
 Once the requirements have been installed, use the following command in order
 to compile the library:

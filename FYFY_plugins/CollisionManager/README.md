@@ -1,6 +1,8 @@
 CollisionManager
 ================
 
+This plugin provides components to manage Unity collision in a consistent manner with ECS formalism.
+
 Build requirements
 ------------------
 

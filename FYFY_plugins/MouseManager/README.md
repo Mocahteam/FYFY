@@ -1,6 +1,8 @@
 MouseManager
 ============
 
+This plugin provides components to manage Mouse in a consistent manner with ECS formalism.
+
 Build requirements
 ------------------
 
