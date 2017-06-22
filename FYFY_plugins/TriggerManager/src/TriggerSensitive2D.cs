@@ -47,6 +47,11 @@ namespace FYFY_plugins.TriggerManager {
 			foreach(TriggerSensitive2DTarget tst in _targets.Values) {
 				Object.Destroy(tst);
 			}
+			
+			if (_inCollision){
+				Triggered2D component = GetComponent<Triggered2D>();
+				Object.Destroy(component);
+			}
 		}
 		
 		// Unregister a target

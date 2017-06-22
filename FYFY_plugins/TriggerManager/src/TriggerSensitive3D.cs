@@ -47,6 +47,11 @@ namespace FYFY_plugins.TriggerManager {
 			foreach(TriggerSensitive3DTarget tst in _targets.Values) {
 				Object.Destroy(tst);
 			}
+			
+			if (_inCollision){
+				Triggered3D component = GetComponent<Triggered3D>();
+				Object.Destroy(component);
+			}
 		}
 		
 		// Unregister a target

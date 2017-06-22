@@ -55,6 +55,11 @@ namespace FYFY_plugins.CollisionManager {
 			foreach(CollisionSensitive2DTarget cst in _targets.Values) {
 				Object.Destroy(cst);
 			}
+			
+			if (_inCollision){
+				InCollision2D component = GetComponent<InCollision2D>();
+				Object.Destroy(component);
+			}
 		}
 		
 		// Unregister a target
@@ -95,7 +100,7 @@ namespace FYFY_plugins.CollisionManager {
 			return _targets.Keys.ToArray();
 		}
 		
-		internal Collision2D[] getCollisions() {
+		internal GameObject[] getCollisions() {
 			return _collisions.Values.ToArray();
 		}
 	}

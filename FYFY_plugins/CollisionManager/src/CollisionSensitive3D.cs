@@ -55,6 +55,11 @@ namespace FYFY_plugins.CollisionManager {
 			foreach(CollisionSensitive3DTarget cst in _targets.Values) {
 				Object.Destroy(cst);
 			}
+			
+			if (_inCollision){
+				InCollision3D component = GetComponent<InCollision3D>();
+				Object.Destroy(component);
+			}
 		}
 		
 		// Unregister a target
