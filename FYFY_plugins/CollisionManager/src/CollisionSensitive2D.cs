@@ -100,7 +100,7 @@ namespace FYFY_plugins.CollisionManager {
 			return _targets.Keys.ToArray();
 		}
 		
-		internal GameObject[] getCollisions() {
+		internal Collision2D[] getCollisions() {
 			return _collisions.Values.ToArray();
 		}
 	}
