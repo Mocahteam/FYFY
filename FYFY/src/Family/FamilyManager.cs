@@ -91,7 +91,7 @@ namespace FYFY {
 			}
 		}
 
-		internal static void updateAfterGameObjectDestroyed(int gameObjectId){
+		internal static void updateAfterGameObjectUnbinded(int gameObjectId){
 			foreach(Family family in FamilyManager._families.Values) {
 				if (family._gameObjectIds.Remove(gameObjectId) && family._exitCallbacks != null) {
 					// execute family's exit callbacks on the GameObject if removed

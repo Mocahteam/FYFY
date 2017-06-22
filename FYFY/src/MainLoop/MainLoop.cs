@@ -157,7 +157,7 @@ namespace FYFY {
 			}
 			
 			foreach(int gameObjectId in GameObjectManager._unbindedGameObjectIds) {
-				FamilyManager.updateAfterGameObjectDestroyed(gameObjectId);
+				FamilyManager.updateAfterGameObjectUnbinded(gameObjectId);
 				GameObjectManager._modifiedGameObjectIds.Remove(gameObjectId);
 			}
 			GameObjectManager._unbindedGameObjectIds.Clear();
