@@ -196,7 +196,7 @@ namespace FYFY_Inspector {
 			if (!Application.isPlaying) {
 				string[] options = new string[]
 				{
-					"Do not load specified Game Objects on Start", "Load only specified Game Objects on Start", 
+					"Do not bind specified Game Objects on Start", "Bind only specified Game Objects on Start", 
 				};
 				int newValue = EditorGUILayout.Popup ("", _loadingState.intValue, options);
 				if (newValue != _loadingState.intValue) {

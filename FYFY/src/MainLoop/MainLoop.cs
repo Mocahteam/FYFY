@@ -32,8 +32,8 @@ namespace FYFY {
 		public int _forceUpdateInspector;		
 
 		/// <summary></summary>
-		// 0 means load all game objects except but exclude game objects defined into _specialGameObjects
-		// 1 means load only game objects defined into _specialGameObjects
+		// 0 means bind all game objects on start but exclude game objects defined into _specialGameObjects
+		// 1 means bind only game objects defined into _specialGameObjects
 		public int _loadingState = 0;
 		/// <summary></summary>
 		public List<GameObject> _specialGameObjects;
@@ -96,7 +96,7 @@ namespace FYFY {
 			// Parse scene and bind GameObjects to FYFY
 			List<GameObject> sceneGameObjects = new List<GameObject>();
 			if (_loadingState == 0) {
-				// Load all game objects except ones defined in _specialGameObjects
+				// Bind all game objects except ones defined in _specialGameObjects
 				GameObject[] roots = UnityEngine.SceneManagement.SceneManager.GetActiveScene ().GetRootGameObjects ();
 				foreach (GameObject root in roots) {
 					foreach (Transform childTransform in root.GetComponentsInChildren<Transform>(true)) { // include root transform
@@ -115,7 +115,7 @@ namespace FYFY {
 					}
 				}
 			} else {
-				// Load only game objects defined in _specialGameObjects
+				// Bind only game objects defined in _specialGameObjects
 				foreach (GameObject included in _specialGameObjects) {
 					if (included != null) {
 						foreach (Transform childTransform in included.GetComponentsInChildren<Transform>(true)) { // include itself
