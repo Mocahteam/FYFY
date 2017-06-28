@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
+using UnityEditor.SceneManagement;
 using System.Collections.Generic;
 using System.Linq;
 using FYFY;
@@ -16,6 +17,8 @@ namespace FYFY_Inspector {
 		private SerializedProperty _fixedUpdateSystemDescriptions;
 		private SerializedProperty _updateSystemDescriptions;
 		private SerializedProperty _lateUpdateSystemDescriptions;
+		private SerializedProperty _loadingState;
+		private SerializedProperty _specialGameObjects;
 
 		private ReorderableList _fixedUpdateDrawingList;
 		private ReorderableList _updateDrawingList;
@@ -142,6 +145,8 @@ namespace FYFY_Inspector {
 			_fixedUpdateSystemDescriptions = serializedObject.FindProperty("_fixedUpdateSystemDescriptions");
 			_updateSystemDescriptions = serializedObject.FindProperty("_updateSystemDescriptions");
 			_lateUpdateSystemDescriptions = serializedObject.FindProperty("_lateUpdateSystemDescriptions");
+			_loadingState = serializedObject.FindProperty("_loadingState");
+			_specialGameObjects = serializedObject.FindProperty("_specialGameObjects");
 
 			_fixedUpdateDrawingList = new ReorderableList(serializedObject, _fixedUpdateSystemDescriptions, true, false, true, false);
 			_updateDrawingList  = new ReorderableList(serializedObject, _updateSystemDescriptions, true, false, true, false);
@@ -187,6 +192,32 @@ namespace FYFY_Inspector {
 			_fixedUpdateDrawingList.DoLayoutList();
 			_updateDrawingList.DoLayoutList();
 			_lateUpdateDrawingList.DoLayoutList();
+
+			if (!Application.isPlaying) {
+				string[] options = new string[]
+				{
+					"Do not load specified Game Objects on Start", "Load only specified Game Objects on Start", 
+				};
+				int newValue = EditorGUILayout.Popup ("", _loadingState.intValue, options);
+				if (newValue != _loadingState.intValue) {
+					_loadingState.intValue = newValue;
+				}
+				EditorGUI.indentLevel += 1;
+				for (int i = 0 ; i < _specialGameObjects.arraySize ; i++) {
+					GameObject currentGO = (GameObject)_specialGameObjects.GetArrayElementAtIndex (i).objectReferenceValue;
+					if (currentGO == null) {
+						_specialGameObjects.DeleteArrayElementAtIndex (i);
+						i--;
+					} else {
+						GameObject updatedGO = (GameObject)EditorGUILayout.ObjectField (currentGO, typeof(GameObject), true);
+						_specialGameObjects.GetArrayElementAtIndex (i).objectReferenceValue = updatedGO;
+					}
+				}
+				_specialGameObjects.InsertArrayElementAtIndex (0);
+				_specialGameObjects.GetArrayElementAtIndex (0).objectReferenceValue = (GameObject)EditorGUILayout.ObjectField (null, typeof(GameObject), true);
+
+				EditorGUI.indentLevel -= 1;
+			}
 
 			serializedObject.ApplyModifiedProperties();
 		}

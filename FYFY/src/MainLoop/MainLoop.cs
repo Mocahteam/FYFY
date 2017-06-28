@@ -31,6 +31,13 @@ namespace FYFY {
 		// force update Inspector
 		public int _forceUpdateInspector;		
 
+		/// <summary></summary>
+		// 0 means load all game objects except but exclude game objects defined into _specialGameObjects
+		// 1 means load only game objects defined into _specialGameObjects
+		public int _loadingState = 0;
+		/// <summary></summary>
+		public List<GameObject> _specialGameObjects;
+
 		private int _familiesUpdateCount = 0;
 
 		// Parse scene to get all entities.
@@ -86,12 +93,35 @@ namespace FYFY {
 				return;
 			}
 
-			// Parse scene and bind all GameObjects to FYFY
-			GameObject[] roots = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
+			// Parse scene and bind GameObjects to FYFY
 			List<GameObject> sceneGameObjects = new List<GameObject>();
-			foreach (GameObject root in roots) {
-				foreach(Transform childTransform in root.GetComponentsInChildren<Transform>(true)) { // include root transform
-					sceneGameObjects.Add(childTransform.gameObject);
+			if (_loadingState == 0) {
+				// Load all game objects except ones defined in _specialGameObjects
+				GameObject[] roots = UnityEngine.SceneManagement.SceneManager.GetActiveScene ().GetRootGameObjects ();
+				foreach (GameObject root in roots) {
+					foreach (Transform childTransform in root.GetComponentsInChildren<Transform>(true)) { // include root transform
+						// Check if current game object is not an excluded game object or a child of an excluded game object
+						bool needToExclude = false;
+						foreach (GameObject excluded in _specialGameObjects) {
+							if (excluded != null) {
+								if (childTransform.IsChildOf (excluded.transform)) { // true if childTransform == excluded.transform
+									needToExclude = true;
+									break;
+								}
+							}
+						}
+						if (!needToExclude)
+							sceneGameObjects.Add (childTransform.gameObject);
+					}
+				}
+			} else {
+				// Load only game objects defined in _specialGameObjects
+				foreach (GameObject included in _specialGameObjects) {
+					if (included != null) {
+						foreach (Transform childTransform in included.GetComponentsInChildren<Transform>(true)) { // include itself
+							sceneGameObjects.Add (childTransform.gameObject);
+						}
+					}
 				}
 			}
 			foreach(GameObject gameObject in sceneGameObjects) {
