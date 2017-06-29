@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace FYFY {
 	/// <summary></summary>
@@ -29,7 +30,7 @@ namespace FYFY {
 		
 		/// <summary></summary>
 		// force update Inspector
-		public int _forceUpdateInspector;		
+		public int _forceUpdateInspector;
 
 		/// <summary></summary>
 		// 0 means bind all game objects on start but exclude game objects defined into _specialGameObjects
@@ -37,6 +38,14 @@ namespace FYFY {
 		public int _loadingState = 0;
 		/// <summary></summary>
 		public List<GameObject> _specialGameObjects;
+
+		/// <summary></summary>
+		public float _fixedUpdateStats = 0;
+		/// <summary></summary>
+		public float _updateStats = 0;
+		/// <summary></summary>
+		public float _lateUpdateStats = 0;
+		private Stopwatch _stopwatch;
 
 		private int _familiesUpdateCount = 0;
 
@@ -144,7 +153,7 @@ namespace FYFY {
 				if(system != null) {
 					FSystemManager._fixedUpdateSystems.Add(system);	
 				} else {
-					Debug.LogError("FSystems in FixedUpdate : " + systemDescription._typeFullName + " class doesnt exist.");
+					UnityEngine.Debug.LogError("FSystems in FixedUpdate : " + systemDescription._typeFullName + " class doesnt exist.");
 				}
 			}
 			for (int i = 0; i < _updateSystemDescriptions.Length; ++i) {
@@ -154,7 +163,7 @@ namespace FYFY {
 				if(system != null) {
 					FSystemManager._updateSystems.Add(system);
 				} else {
-					Debug.LogError("FSystems in Update : " + systemDescription._typeFullName + " class doesnt exist.");
+					UnityEngine.Debug.LogError("FSystems in Update : " + systemDescription._typeFullName + " class doesnt exist.");
 				}
 			}
 			for (int i = 0; i < _lateUpdateSystemDescriptions.Length; ++i) {
@@ -164,9 +173,11 @@ namespace FYFY {
 				if(system != null) {
 					FSystemManager._lateUpdateSystems.Add(system);
 				} else {
-					Debug.LogError("FSystems in LateUpdate : " + systemDescription._typeFullName + " class doesnt exist.");
+					UnityEngine.Debug.LogError("FSystems in LateUpdate : " + systemDescription._typeFullName + " class doesnt exist.");
 				}
 			}
+
+			_stopwatch = new Stopwatch ();
 		}
 
 		private void preprocess(){ // do action && update families
@@ -210,9 +221,13 @@ namespace FYFY {
 
 			this.preprocess();
 
+			_stopwatch.Reset ();
+			_stopwatch.Start ();
 			foreach(FSystem system in FSystemManager._fixedUpdateSystems)
 				if(system.Pause == false)
 					system.process(_familiesUpdateCount);
+			_stopwatch.Stop ();
+			_fixedUpdateStats = _stopwatch.ElapsedMilliseconds;
 		}
 
 		private void Update(){ // process systems
@@ -222,9 +237,13 @@ namespace FYFY {
 
 			this.preprocess();
 
+			_stopwatch.Reset ();
+			_stopwatch.Start ();
 			foreach(FSystem system in FSystemManager._updateSystems)
 				if(system.Pause == false)
 					system.process(_familiesUpdateCount);
+			_stopwatch.Stop ();
+			_updateStats = _stopwatch.ElapsedMilliseconds;
 		}
 
 		private void LateUpdate(){ // process systems
@@ -234,9 +253,13 @@ namespace FYFY {
 
 			this.preprocess();
 
+			_stopwatch.Reset ();
+			_stopwatch.Start ();
 			foreach(FSystem system in FSystemManager._lateUpdateSystems)
 				if(system.Pause == false)
 					system.process(_familiesUpdateCount);
+			_stopwatch.Stop ();
+			_lateUpdateStats = _stopwatch.ElapsedMilliseconds;
 
 			if(GameObjectManager._sceneBuildIndex != -1) { // load scene if it's desired
 				UnityEngine.SceneManagement.SceneManager.LoadScene(GameObjectManager._sceneBuildIndex); // done at the beginning of the "Unity" next frame

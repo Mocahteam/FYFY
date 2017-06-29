@@ -1,4 +1,6 @@
-﻿namespace FYFY {
+﻿using System.Diagnostics;
+
+namespace FYFY {
 	/// <summary>
 	/// 	Base class every FYFY system derives from.
 	/// </summary>
@@ -7,6 +9,18 @@
 	/// </remarks>
 	public abstract class FSystem {
 		private bool? _pause; // bool default == 0 -> donc sinon le setter n'est appele a linit que de la cas on set a true (true != false)
+		/// <summary>
+		/// 	Gets the average execution time taken by onProcess
+		/// </summary>
+		public double avgExecDuration = 0;
+		/// <summary>
+		/// 	Gets the maximum execution time taken by onProcess
+		/// </summary>
+		public double maxExecDuration = 0;
+
+		private double _accumulatedExecDuration = 0;
+		private int _execDurationCount = 0;
+		private Stopwatch _stopwatch = new Stopwatch ();
 
 		/// <summary>
 		/// 	Gets or sets a value indicating whether this <see cref="FYFY.FSystem"/> is paused.
@@ -59,7 +73,16 @@
 		}
 
 		internal void process(int familiesUpdateCount) {
+			_stopwatch.Reset ();
+			_stopwatch.Start ();
 			this.onProcess(familiesUpdateCount);
+			_stopwatch.Stop ();
+			double duration = _stopwatch.ElapsedMilliseconds;
+			if (maxExecDuration < duration)
+				maxExecDuration = duration;
+			_accumulatedExecDuration += duration;
+			_execDurationCount += 1;
+			avgExecDuration = _accumulatedExecDuration / _execDurationCount;
 		}
 	}
 }

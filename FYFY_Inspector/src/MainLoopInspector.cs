@@ -19,10 +19,19 @@ namespace FYFY_Inspector {
 		private SerializedProperty _lateUpdateSystemDescriptions;
 		private SerializedProperty _loadingState;
 		private SerializedProperty _specialGameObjects;
+		private SerializedProperty _fixedUpdateStats;
+		private SerializedProperty _updateStats;
+		private SerializedProperty _lateUpdateStats;
 
 		private ReorderableList _fixedUpdateDrawingList;
 		private ReorderableList _updateDrawingList;
 		private ReorderableList _lateUpdateDrawingList;
+
+		private SystemsMonitor _systemsMonitor;
+		private const int HISTORY_DATA_LENGTH = 100;
+		private Queue<float> _fixedUpdateStatsHistory;
+		private Queue<float> _updateStatsHistory;
+		private Queue<float> _lateUpdateStatsHistory;
 
 		// Called in Edit and Game mode by default.
 		private void Awake(){
@@ -43,7 +52,7 @@ namespace FYFY_Inspector {
 				system.Pause = !system.Pause;
 			GUI.color = baseColor;
 
-			string typeFullName = system.GetType().FullName;
+			string typeFullName = system.GetType().FullName+string.Format(" avg: {0:00.000}", system.avgExecDuration/1000)+string.Format(" max: {0:00.000}", system.maxExecDuration/1000);
 			EditorGUI.LabelField(new Rect(rect.x + buttonSize + 5, rect.y + 1.35f, rect.width - (buttonSize + 5), buttonSize), typeFullName);
 		}
 
@@ -147,6 +156,9 @@ namespace FYFY_Inspector {
 			_lateUpdateSystemDescriptions = serializedObject.FindProperty("_lateUpdateSystemDescriptions");
 			_loadingState = serializedObject.FindProperty("_loadingState");
 			_specialGameObjects = serializedObject.FindProperty("_specialGameObjects");
+			_fixedUpdateStats = serializedObject.FindProperty("_fixedUpdateStats");
+			_updateStats = serializedObject.FindProperty("_updateStats");
+			_lateUpdateStats = serializedObject.FindProperty("_lateUpdateStats");
 
 			_fixedUpdateDrawingList = new ReorderableList(serializedObject, _fixedUpdateSystemDescriptions, true, false, true, false);
 			_updateDrawingList  = new ReorderableList(serializedObject, _updateSystemDescriptions, true, false, true, false);
@@ -175,13 +187,22 @@ namespace FYFY_Inspector {
 			}
 
 			_fixedUpdateDrawingList.drawHeaderCallback = delegate(Rect rect) {
-				EditorGUI.LabelField(rect, "FSystems in FixedUpdate");
+				GUIStyle style = new GUIStyle();
+				if (Application.isPlaying)
+					style.normal.textColor = Color.magenta;
+				EditorGUI.LabelField(rect, "FSystems in FixedUpdate", style);
 			};
 			_updateDrawingList.drawHeaderCallback = delegate(Rect rect) {
-				EditorGUI.LabelField(rect, "FSystems in Update");
+				GUIStyle style = new GUIStyle();
+				if (Application.isPlaying)
+					style.normal.textColor = new Color(255, 215, 0); // gold
+				EditorGUI.LabelField(rect, "FSystems in Update", style);
 			};
 			_lateUpdateDrawingList.drawHeaderCallback = delegate(Rect rect) {
-				EditorGUI.LabelField(rect, "FSystems in LateUpdate");
+				GUIStyle style = new GUIStyle();
+				if (Application.isPlaying)
+					style.normal.textColor = new Color(0, 139, 139); // dark cyan
+				EditorGUI.LabelField(rect, "FSystems in LateUpdate", style);
 			};
 		}
 
@@ -194,8 +215,7 @@ namespace FYFY_Inspector {
 			_lateUpdateDrawingList.DoLayoutList();
 
 			if (!Application.isPlaying) {
-				string[] options = new string[]
-				{
+				string[] options = new string[] {
 					"Do not bind specified Game Objects on Start", "Bind only specified Game Objects on Start", 
 				};
 				int newValue = EditorGUILayout.Popup ("", _loadingState.intValue, options);
@@ -203,7 +223,7 @@ namespace FYFY_Inspector {
 					_loadingState.intValue = newValue;
 				}
 				EditorGUI.indentLevel += 1;
-				for (int i = 0 ; i < _specialGameObjects.arraySize ; i++) {
+				for (int i = 0; i < _specialGameObjects.arraySize; i++) {
 					GameObject currentGO = (GameObject)_specialGameObjects.GetArrayElementAtIndex (i).objectReferenceValue;
 					if (currentGO == null) {
 						_specialGameObjects.DeleteArrayElementAtIndex (i);
@@ -217,6 +237,27 @@ namespace FYFY_Inspector {
 				_specialGameObjects.GetArrayElementAtIndex (0).objectReferenceValue = (GameObject)EditorGUILayout.ObjectField (null, typeof(GameObject), true);
 
 				EditorGUI.indentLevel -= 1;
+			} else {
+				if (_systemsMonitor == null) {
+					_systemsMonitor = new SystemsMonitor (HISTORY_DATA_LENGTH);
+					_fixedUpdateStatsHistory = new Queue<float> (new float[HISTORY_DATA_LENGTH]);
+					_updateStatsHistory = new Queue<float> (new float[HISTORY_DATA_LENGTH]);
+					_lateUpdateStatsHistory = new Queue<float> (new float[HISTORY_DATA_LENGTH]);
+					_fixedUpdateStats = serializedObject.FindProperty("_fixedUpdateStats");
+					_updateStats = serializedObject.FindProperty("_updateStats");
+					_lateUpdateStats = serializedObject.FindProperty("_lateUpdateStats");
+				}
+				if (!EditorApplication.isPaused) {
+					_fixedUpdateStatsHistory.Dequeue ();
+					_fixedUpdateStatsHistory.Enqueue(_fixedUpdateStats.floatValue);
+					_updateStatsHistory.Dequeue ();
+					_updateStatsHistory.Enqueue(_updateStats.floatValue);
+					_lateUpdateStatsHistory.Dequeue ();
+					_lateUpdateStatsHistory.Enqueue(_lateUpdateStats.floatValue);
+				}
+				EditorGUILayout.Space ();
+				EditorGUILayout.LabelField ("FSystem profiler (ms)");
+				_systemsMonitor.Draw(_fixedUpdateStatsHistory.ToArray(), _updateStatsHistory.ToArray(), _lateUpdateStatsHistory.ToArray(), 100f);
 			}
 
 			serializedObject.ApplyModifiedProperties();
