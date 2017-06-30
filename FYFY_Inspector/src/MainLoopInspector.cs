@@ -43,6 +43,27 @@ namespace FYFY_Inspector {
 			_mainLoopInspector = null;
 		}				
 
+		// string elision if the area content is too small
+		private string findFittableString(string originalString, Rect textArea){
+			int cpt = originalString.Length;
+			bool writeSize = false;
+			string workingString = "";
+			while (!writeSize && cpt > 0) {
+				workingString = "";
+				if (cpt != originalString.Length)
+					workingString = originalString.Substring (0, cpt) + "...";
+				else
+					workingString = originalString;
+				GUIContent textContent = new GUIContent(workingString);
+				Vector2 textSize = GUIStyle.none.CalcSize(textContent); // default style
+				if (textSize.x < textArea.width)
+					writeSize = true;
+				else
+					cpt--;
+			}
+			return workingString;
+		}
+
 		private void playingModeDrawElementCallBack(FYFY.FSystem system, Rect rect) {
 			float buttonSize = EditorGUIUtility.singleLineHeight;
 
@@ -53,7 +74,9 @@ namespace FYFY_Inspector {
 			GUI.color = baseColor;
 
 			string typeFullName = system.GetType().FullName+string.Format(" avg: {0:00.000}", system.avgExecDuration/1000)+string.Format(" max: {0:00.000}", system.maxExecDuration/1000);
-			EditorGUI.LabelField(new Rect(rect.x + buttonSize + 5, rect.y + 1.35f, rect.width - (buttonSize + 5), buttonSize), typeFullName);
+			Rect textArea = new Rect (rect.x + buttonSize + 5, rect.y + 1.35f, rect.width - (buttonSize + 5), buttonSize);
+
+			EditorGUI.LabelField (textArea, findFittableString(typeFullName, textArea));
 		}
 
 		private void OnEnableInPlayingMode() {
@@ -88,7 +111,8 @@ namespace FYFY_Inspector {
 				pause.boolValue = !pause.boolValue;
 			GUI.color = baseColor;
 
-			EditorGUI.LabelField(new Rect(rect.x + buttonSize + 5, rect.y + 1.35f, rect.width - (buttonSize + 5), buttonSize), typeFullName.stringValue);
+			Rect textArea = new Rect (rect.x + buttonSize + 5, rect.y + 1.35f, rect.width - (buttonSize + 35), buttonSize);
+			EditorGUI.LabelField(textArea, findFittableString(typeFullName.stringValue, textArea));
 
 			GUIStyle buttonStyle = new GUIStyle();
 			buttonStyle.alignment = TextAnchor.MiddleCenter;
