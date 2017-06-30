@@ -22,6 +22,10 @@ namespace FYFY {
 		/// 	Type of the exit callbacks.
 		/// </summary>
 		public delegate void ExitCallback(int gameObjectId);
+		/// <summary>
+		/// 	Show game objects included into this family
+		/// </summary>
+		public bool showContent = false;
 
 		internal readonly HashSet<int> _gameObjectIds;
 		internal readonly Matcher[] _matchers;

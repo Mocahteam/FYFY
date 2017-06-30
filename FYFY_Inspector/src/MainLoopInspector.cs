@@ -4,6 +4,7 @@ using UnityEditorInternal;
 using UnityEditor.SceneManagement;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using FYFY;
 
 namespace FYFY_Inspector {
@@ -19,9 +20,6 @@ namespace FYFY_Inspector {
 		private SerializedProperty _lateUpdateSystemDescriptions;
 		private SerializedProperty _loadingState;
 		private SerializedProperty _specialGameObjects;
-		private SerializedProperty _fixedUpdateStats;
-		private SerializedProperty _updateStats;
-		private SerializedProperty _lateUpdateStats;
 
 		private ReorderableList _fixedUpdateDrawingList;
 		private ReorderableList _updateDrawingList;
@@ -180,9 +178,6 @@ namespace FYFY_Inspector {
 			_lateUpdateSystemDescriptions = serializedObject.FindProperty("_lateUpdateSystemDescriptions");
 			_loadingState = serializedObject.FindProperty("_loadingState");
 			_specialGameObjects = serializedObject.FindProperty("_specialGameObjects");
-			_fixedUpdateStats = serializedObject.FindProperty("_fixedUpdateStats");
-			_updateStats = serializedObject.FindProperty("_updateStats");
-			_lateUpdateStats = serializedObject.FindProperty("_lateUpdateStats");
 
 			_fixedUpdateDrawingList = new ReorderableList(serializedObject, _fixedUpdateSystemDescriptions, true, false, true, false);
 			_updateDrawingList  = new ReorderableList(serializedObject, _updateSystemDescriptions, true, false, true, false);
@@ -230,6 +225,34 @@ namespace FYFY_Inspector {
 			};
 		}
 
+		private void displayFamilies(List<FSystem> systems){
+			EditorGUI.indentLevel += 1;
+			foreach (FSystem system in systems) {
+				system.showFamilies = EditorGUILayout.Foldout (system.showFamilies, system.GetType ().FullName);
+				if (system.showFamilies) {
+					EditorGUI.indentLevel += 1;
+					MemberInfo[] members = system.GetType ().GetMembers (BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+					foreach (MemberInfo member in members) {
+						if (member.MemberType == MemberTypes.Field) {
+							FieldInfo field = (FieldInfo)member;
+							if (field.FieldType == typeof(FYFY.Family)) {
+								Family f = (Family)field.GetValue (system);
+								f.showContent = EditorGUILayout.Foldout (f.showContent, field.Name);
+								if (f.showContent) {
+									EditorGUI.indentLevel += 1;
+									foreach (GameObject go in f)
+										EditorGUILayout.ObjectField (go, typeof(GameObject), false);
+									EditorGUI.indentLevel -= 1;
+								}
+							}
+						}
+					}
+					EditorGUI.indentLevel -= 1;
+				}
+			}
+			EditorGUI.indentLevel -= 1;
+		}
+
 		/// <summary></summary>
 		public override void OnInspectorGUI(){
 			serializedObject.Update();
@@ -239,6 +262,7 @@ namespace FYFY_Inspector {
 			_lateUpdateDrawingList.DoLayoutList();
 
 			if (!Application.isPlaying) {
+				EditorGUILayout.Space ();
 				string[] options = new string[] {
 					"Do not bind specified Game Objects on Start", "Bind only specified Game Objects on Start", 
 				};
@@ -262,26 +286,43 @@ namespace FYFY_Inspector {
 
 				EditorGUI.indentLevel -= 1;
 			} else {
+				MainLoop ml = (MainLoop)target;
+				// init monitor if required
 				if (_systemsMonitor == null) {
 					_systemsMonitor = new SystemsMonitor (HISTORY_DATA_LENGTH);
 					_fixedUpdateStatsHistory = new Queue<float> (new float[HISTORY_DATA_LENGTH]);
 					_updateStatsHistory = new Queue<float> (new float[HISTORY_DATA_LENGTH]);
 					_lateUpdateStatsHistory = new Queue<float> (new float[HISTORY_DATA_LENGTH]);
-					_fixedUpdateStats = serializedObject.FindProperty("_fixedUpdateStats");
-					_updateStats = serializedObject.FindProperty("_updateStats");
-					_lateUpdateStats = serializedObject.FindProperty("_lateUpdateStats");
 				}
 				if (!EditorApplication.isPaused) {
 					_fixedUpdateStatsHistory.Dequeue ();
-					_fixedUpdateStatsHistory.Enqueue(_fixedUpdateStats.floatValue);
+					_fixedUpdateStatsHistory.Enqueue(ml.fixedUpdateStats);
 					_updateStatsHistory.Dequeue ();
-					_updateStatsHistory.Enqueue(_updateStats.floatValue);
+					_updateStatsHistory.Enqueue(ml.updateStats);
 					_lateUpdateStatsHistory.Dequeue ();
-					_lateUpdateStatsHistory.Enqueue(_lateUpdateStats.floatValue);
+					_lateUpdateStatsHistory.Enqueue(ml.lateUpdateStats);
 				}
+
 				EditorGUILayout.Space ();
-				EditorGUILayout.LabelField ("FSystem profiler (ms)");
-				_systemsMonitor.Draw(_fixedUpdateStatsHistory.ToArray(), _updateStatsHistory.ToArray(), _lateUpdateStatsHistory.ToArray(), 100f);
+				ml.showSystemProfiler = EditorGUILayout.Foldout (ml.showSystemProfiler, "FSystem profiler (ms)");
+				if (ml.showSystemProfiler)
+					_systemsMonitor.Draw (_fixedUpdateStatsHistory.ToArray (), _updateStatsHistory.ToArray (), _lateUpdateStatsHistory.ToArray (), 100f);
+
+				EditorGUILayout.Space ();
+				ml.showFamilyInspector = EditorGUILayout.Foldout (ml.showFamilyInspector, "Families inspector");
+				if (ml.showFamilyInspector) {
+					EditorGUI.indentLevel += 1;
+					ml.showFamilyInspectorFixedUpdate = EditorGUILayout.Foldout (ml.showFamilyInspectorFixedUpdate, "FixedUpdate");
+					if (ml.showFamilyInspectorFixedUpdate)
+						displayFamilies (FSystemManager._fixedUpdateSystems);
+					ml.showFamilyInspectorUpdate = EditorGUILayout.Foldout (ml.showFamilyInspectorUpdate, "Update");
+					if (ml.showFamilyInspectorUpdate)
+						displayFamilies (FSystemManager._updateSystems);
+					ml.showFamilyInspectorLateUpdate = EditorGUILayout.Foldout (ml.showFamilyInspectorLateUpdate, "LateUpdate");
+					if (ml.showFamilyInspectorLateUpdate)
+						displayFamilies (FSystemManager._lateUpdateSystems);
+					EditorGUI.indentLevel -= 1;
+				}
 			}
 
 			serializedObject.ApplyModifiedProperties();

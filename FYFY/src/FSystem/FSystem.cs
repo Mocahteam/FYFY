@@ -17,6 +17,10 @@ namespace FYFY {
 		/// 	Gets the maximum execution time taken by onProcess
 		/// </summary>
 		public double maxExecDuration = 0;
+		/// <summary>
+		/// 	Show families used in this system
+		/// </summary>
+		public bool showFamilies = false;
 
 		private double _accumulatedExecDuration = 0;
 		private int _execDurationCount = 0;

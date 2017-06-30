@@ -14,37 +14,54 @@ namespace FYFY {
 		public bool _pause;
 	}
 
-	/// <summary></summary>
+	/// <summary>
+	/// MainLoop enables:
+	///  (1) to set systems into the three contexts (fixedUpdate, update and lateUpdate)
+	///  (2) to define which game object binding on start
+	///  (3) to follow system load and families content during playing mode
+	/// </summary>
 	[ExecuteInEditMode] // permet dexecuter awake et start etc aussi en mode edition
 	[DisallowMultipleComponent]
 	[AddComponentMenu("")]
 	public class MainLoop : MonoBehaviour {
 		internal static MainLoop _mainLoop; // eviter davoir plusieurs composants MainLoop dans toute la scene (cf Awake)
 
-		/// <summary></summary>
+		/// <summary>List of systems defined in fixedUpdate context through the Inspector</summary>
 		public SystemDescription[] _fixedUpdateSystemDescriptions; // initialized in inspector, otherwise == null
-		/// <summary></summary>
+		/// <summary>List of systems defined in Update context through the Inspector</summary>
 		public SystemDescription[] _updateSystemDescriptions;      // initialized in inspector, otherwise == null
-		/// <summary></summary>
+		/// <summary>List of systems defined in lateUpdate context through the Inspector</summary>
 		public SystemDescription[] _lateUpdateSystemDescriptions;  // initialized in inspector, otherwise == null
 		
-		/// <summary></summary>
-		// force update Inspector
+		/// <summary>Used in FSystem to force Inspector redraw when pause is update by code</summary>
 		public int _forceUpdateInspector;
 
-		/// <summary></summary>
-		// 0 means bind all game objects on start but exclude game objects defined into _specialGameObjects
-		// 1 means bind only game objects defined into _specialGameObjects
+		/// <summary>
+		/// Define how game objects are binded on start
+		/// 0 means bind all game objects on start but exclude game objects defined into _specialGameObjects
+		/// 1 means bind only game objects defined into _specialGameObjects
+		/// </summary>
 		public int _loadingState = 0;
 		/// <summary></summary>
 		public List<GameObject> _specialGameObjects;
 
-		/// <summary></summary>
-		public float _fixedUpdateStats = 0;
-		/// <summary></summary>
-		public float _updateStats = 0;
-		/// <summary></summary>
-		public float _lateUpdateStats = 0;
+		/// <summary>Show system profiler</summary>
+		public bool showSystemProfiler = true;
+		/// <summary>Show families used in systems</summary>
+		public bool showFamilyInspector = false;
+		/// <summary>Show families used in fixed update systems</summary>
+		public bool showFamilyInspectorFixedUpdate = false;
+		/// <summary>Show families used in update systems</summary>
+		public bool showFamilyInspectorUpdate = false;
+		/// <summary>Show families used in late update systems</summary>
+		public bool showFamilyInspectorLateUpdate = false;
+
+		/// <summary>How much time (ms) the previous fixed update execution lasted</summary>
+		public float fixedUpdateStats = 0;
+		/// <summary>How much time (ms) the previous update execution lasted</summary>
+		public float updateStats = 0;
+		/// <summary>How much time (ms) the previous late update execution lasted</summary>
+		public float lateUpdateStats = 0;
 		private Stopwatch _stopwatch;
 
 		private int _familiesUpdateCount = 0;
@@ -227,7 +244,7 @@ namespace FYFY {
 				if(system.Pause == false)
 					system.process(_familiesUpdateCount);
 			_stopwatch.Stop ();
-			_fixedUpdateStats = _stopwatch.ElapsedMilliseconds;
+			fixedUpdateStats = _stopwatch.ElapsedMilliseconds;
 		}
 
 		private void Update(){ // process systems
@@ -243,7 +260,7 @@ namespace FYFY {
 				if(system.Pause == false)
 					system.process(_familiesUpdateCount);
 			_stopwatch.Stop ();
-			_updateStats = _stopwatch.ElapsedMilliseconds;
+			updateStats = _stopwatch.ElapsedMilliseconds;
 		}
 
 		private void LateUpdate(){ // process systems
@@ -259,7 +276,7 @@ namespace FYFY {
 				if(system.Pause == false)
 					system.process(_familiesUpdateCount);
 			_stopwatch.Stop ();
-			_lateUpdateStats = _stopwatch.ElapsedMilliseconds;
+			lateUpdateStats = _stopwatch.ElapsedMilliseconds;
 
 			if(GameObjectManager._sceneBuildIndex != -1) { // load scene if it's desired
 				UnityEngine.SceneManagement.SceneManager.LoadScene(GameObjectManager._sceneBuildIndex); // done at the beginning of the "Unity" next frame
