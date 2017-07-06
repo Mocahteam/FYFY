@@ -40,6 +40,7 @@ namespace FYFY_plugins.TriggerManager {
 
 			// Effects in TriggerSensitive2DTarget.OnDestroy
 			Object.Destroy(tst);
+			_targets.Remove(target);
 		}
 
 		private void OnDestroy() {

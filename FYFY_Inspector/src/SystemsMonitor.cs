@@ -47,7 +47,7 @@ public class SystemsMonitor {
 		if (max % axisRounding != 0) {
 			max = max + axisRounding - (max % axisRounding);
 		}
-
+		max = max == 0 ? 1 : max;
 		drawGridLines(top, rect.width, availableHeight, max);
 		drawAvg(data1, top, floor, rect.width, availableHeight, max, Color.magenta);
 		drawLine(data1, floor, rect.width, availableHeight, max, Color.magenta);

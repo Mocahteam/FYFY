@@ -48,6 +48,7 @@ namespace FYFY_plugins.CollisionManager {
 
 			// Effects in CollisionSensitive2DTarget.OnDestroy
 			Object.Destroy(cst);
+			_targets.Remove(target);
 		}
 
 		private void OnDestroy() {
