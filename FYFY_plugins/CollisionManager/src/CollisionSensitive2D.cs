@@ -44,10 +44,13 @@ namespace FYFY_plugins.CollisionManager {
 		// Not fired when this GameObject or the target is destroyed.
 		private void OnCollisionExit2D(Collision2D coll) {
 			GameObject target = coll.gameObject;
+			if (!_targets.ContainsKey(target))
+				return;
 			CollisionSensitive2DTarget cst = _targets[target];
 
 			// Effects in CollisionSensitive2DTarget.OnDestroy
 			Object.Destroy(cst);
+			_targets.Remove(target);
 		}
 
 		private void OnDestroy() {

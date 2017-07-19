@@ -36,10 +36,13 @@ namespace FYFY_plugins.TriggerManager {
 		// Not fired when this GameObject or the target is destroyed.
 		private void OnTriggerExit(Collider other){
 			GameObject target = other.gameObject;
+			if (!_targets.ContainsKey(target))
+				return;
 			TriggerSensitive3DTarget tst = _targets[target];
 
 			// Effects in TriggerSensitive3DTarget.OnDestroy
 			Object.Destroy(tst);
+			_targets.Remove(target);
 		}
 
 		private void OnDestroy() {
