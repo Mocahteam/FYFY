@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <SrcPath>src</SrcPath>
+    <OutputPath>bin</OutputPath>
+    <RootNamespace>FYFY_plugins.PointerManager</RootNamespace>
+    <AssemblyName>PointerManager</AssemblyName>
+    <UnityEnginePath>C:\Program Files\Unity\Editor\Data\Managed\UnityEngine.dll</UnityEnginePath>
+	<UnityEngineUIPath>C:\Program Files\Unity\Editor\Data\UnityExtensions\Unity\GUISystem\UnityEngine.UI.dll</UnityEngineUIPath>
+    <FYFYPath>..\..\FYFY\bin\FYFY.dll</FYFYPath>
+    <DocumentationFile>doc\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Configuration>Release</Configuration>
+    <OutputType>Library</OutputType>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
+    <StopOnFirstFailure>true</StopOnFirstFailure>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="UnityEngine">
+      <HintPath>$(UnityEnginePath)</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(UnityEngineUIPath)</HintPath>
+    </Reference>
+    <Reference Include="FYFY">
+      <HintPath>$(FYFYPath)</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="$(SrcPath)\**\*.cs" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  
+</Project>
