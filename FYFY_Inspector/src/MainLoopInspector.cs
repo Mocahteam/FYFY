@@ -323,6 +323,7 @@ namespace FYFY_Inspector {
 						displayFamilies (FSystemManager._lateUpdateSystems);
 					EditorGUI.indentLevel -= 1;
 				}
+				this.Repaint ();
 			}
 
 			serializedObject.ApplyModifiedProperties();
