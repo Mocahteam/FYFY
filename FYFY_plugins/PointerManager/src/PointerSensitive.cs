@@ -19,6 +19,11 @@ namespace FYFY_plugins.PointerManager {
 	[DisallowMultipleComponent]
 	public class PointerSensitive : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
 		
+		private void OnDisable(){
+			if (this.gameObject.GetComponent<PointerOver>() != null)
+				FYFY.GameObjectManager.removeComponent<PointerOver>(this.gameObject);
+		}
+		
 		///////////////////////////////////////////////////
 		// OnPointerEnter/Exit is useful for UI elements //
 		///////////////////////////////////////////////////
