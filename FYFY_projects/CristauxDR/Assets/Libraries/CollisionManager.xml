@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CollisionManager</name>
+    </assembly>
+    <members>
+        <member name="T:FYFY_plugins.CollisionManager.CollisionSensitive2D">
+            <summary>
+            	CollisionSensitive2D allows GameObject to be noticed when it is in contact with another GameObject.
+                In this case the InCollision2d component (dynamically added) provides the list of GameObject in contact with him.
+            </summary>
+        </member>
+        <member name="T:FYFY_plugins.CollisionManager.CollisionSensitive2DTarget">
+            <summary></summary>
+        </member>
+        <member name="F:FYFY_plugins.CollisionManager.CollisionSensitive2DTarget._source">
+            <summary></summary>
+        </member>
+        <member name="T:FYFY_plugins.CollisionManager.CollisionSensitive3D">
+            <summary>
+            	CollisionSensitive3D allows GameObject to be noticed when it is in contact with another GameObject.
+                In this case the InCollision3d component (dynamically added) provides the list of GameObject in contact with him.
+            </summary>
+        </member>
+        <member name="T:FYFY_plugins.CollisionManager.CollisionSensitive3DTarget">
+            <summary></summary>
+        </member>
+        <member name="F:FYFY_plugins.CollisionManager.CollisionSensitive3DTarget._source">
+            <summary></summary>
+        </member>
+        <member name="T:FYFY_plugins.CollisionManager.InCollision2D">
+            <summary>
+            	Component specifying that the GameObject is in contact with at least one other GameObject.
+            </summary>
+            <remarks>
+            	<para>! AUTOMATICALLY ADDED, UPDATED OR REMOVED !</para>
+            	<para>! DO NOT TOUCH MANUALLY OTHERWISE WE CAN'T GUARANTEE THE COMPORTMENT !</para>
+            </remarks>
+        </member>
+        <member name="P:FYFY_plugins.CollisionManager.InCollision2D.Targets">
+            <summary>
+            	Gets all the GameObjects in contact with this GameObject.
+            </summary>
+        </member>
+        <member name="P:FYFY_plugins.CollisionManager.InCollision2D.Collisions">
+            <summary>
+            	Gets all the collisions informations involving this GameObject.
+            </summary>
+        </member>
+        <member name="T:FYFY_plugins.CollisionManager.InCollision3D">
+            <summary>
+            	Component specifying that the GameObject is in contact with at least one other GameObject.
+            </summary>
+            <remarks>
+            	<para>! AUTOMATICALLY ADDED, UPDATED OR REMOVED !</para>
+            	<para>! DO NOT TOUCH MANUALLY OTHERWISE WE CAN'T GUARANTEE THE COMPORTMENT !</para>
+            </remarks>
+        </member>
+        <member name="P:FYFY_plugins.CollisionManager.InCollision3D.Targets">
+            <summary>
+            	Gets all the GameObjects in contact with this GameObject.
+            </summary>
+        </member>
+        <member name="P:FYFY_plugins.CollisionManager.InCollision3D.Collisions">
+            <summary>
+            	Gets all the collisions informations involving this GameObject.
+            </summary>
+        </member>
+    </members>
+</doc>
