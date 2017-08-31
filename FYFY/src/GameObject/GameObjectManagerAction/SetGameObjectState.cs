@@ -28,8 +28,8 @@ namespace FYFY {
 				bool newState  = _enabled;
 
 				if(isChild){ // quand pas de parent -> activeInHierarchy == activeSelf donc pas bon faire ca tt le tps
-					lastState &= _gameObject.activeInHierarchy;
-					newState &= _gameObject.activeInHierarchy;
+					lastState = _gameObject.activeInHierarchy;
+					newState &= _gameObject.transform.parent.gameObject.activeInHierarchy;
 				}
 
 				if(lastState != newState){
