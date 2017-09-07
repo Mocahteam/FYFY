@@ -1,0 +1,105 @@
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+ <net id="n-35C8-285D8-0" type ="http://www.pnml.org/version-2009/grammar/ptnet">
+  <name>
+   <text>handObject</text>
+  </name>
+ <page id="g-35C8-285E3-1">
+  <transition id="t-35C8-285E6-2">
+  <name>
+   <text>drop</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="120" y="205"/>
+   </graphics>
+  </transition>
+  <transition id="t-35C8-285F6-3">
+  <name>
+   <text>get</text>
+    <graphics>
+     <offset x="10" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="170" y="135"/>
+   </graphics>
+  </transition>
+  <place id="p-35C8-285F8-4">
+  <name>
+   <text>inHand</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="245" y="195"/>
+   </graphics>
+  </place>
+  <place id="p-35C8-285FD-5">
+  <name>
+   <text>inInventory</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="160" y="50"/>
+   </graphics>
+  </place>
+  <place id="p-35C8-28601-6">
+  <name>
+   <text>onTheFloor</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>1</text>
+   </initialMarking>
+   <graphics>
+    <position x="45" y="170"/>
+   </graphics>
+  </place>
+  <transition id="t-35C8-28604-7">
+  <name>
+   <text>store</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="90" y="95"/>
+   </graphics>
+  </transition>
+  <transition id="t-35C8-28606-8">
+  <name>
+   <text>storeBack</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="280" y="75"/>
+   </graphics>
+  </transition>
+  <arc id="e-35C8-2860A-9" source="p-35C8-28601-6" target="t-35C8-28604-7">
+  </arc>
+  <arc id="e-35C8-2860D-10" source="p-35C8-285F8-4" target="t-35C8-285E6-2">
+  </arc>
+  <arc id="e-35C8-2860D-11" source="p-35C8-285F8-4" target="t-35C8-28606-8">
+  </arc>
+  <arc id="e-35C8-2860E-12" source="p-35C8-285FD-5" target="t-35C8-285F6-3">
+  </arc>
+  <arc id="e-35C8-28610-13" source="t-35C8-285E6-2" target="p-35C8-28601-6">
+  </arc>
+  <arc id="e-35C8-28612-14" source="t-35C8-285F6-3" target="p-35C8-285F8-4">
+  </arc>
+  <arc id="e-35C8-28613-15" source="t-35C8-28604-7" target="p-35C8-285FD-5">
+  </arc>
+  <arc id="e-35C8-28613-16" source="t-35C8-28606-8" target="p-35C8-285FD-5">
+  </arc>
+ </page>
+ </net>
+</pnml>

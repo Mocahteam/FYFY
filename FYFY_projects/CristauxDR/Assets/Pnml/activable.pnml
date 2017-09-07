@@ -1,0 +1,64 @@
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+ <net id="n-811C-2A9B1-0" type ="http://www.pnml.org/version-2009/grammar/ptnet">
+  <name>
+   <text>activable</text>
+  </name>
+ <page id="g-811C-2A9BE-1">
+  <place id="p-811C-2A9C1-2">
+  <name>
+   <text>off</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>1</text>
+   </initialMarking>
+   <graphics>
+    <position x="200" y="80"/>
+   </graphics>
+  </place>
+  <place id="p-811C-2A9D1-3">
+  <name>
+   <text>on</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="30" y="85"/>
+   </graphics>
+  </place>
+  <transition id="t-811C-2A9D4-4">
+  <name>
+   <text>turnOff</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="115" y="50"/>
+   </graphics>
+  </transition>
+  <transition id="t-811C-2A9D8-5">
+  <name>
+   <text>turnOn</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="115" y="145"/>
+   </graphics>
+  </transition>
+  <arc id="e-811C-2A9DC-6" source="t-811C-2A9D4-4" target="p-811C-2A9C1-2">
+  </arc>
+  <arc id="e-811C-2A9DF-7" source="t-811C-2A9D8-5" target="p-811C-2A9D1-3">
+  </arc>
+  <arc id="e-811C-2A9E0-8" source="p-811C-2A9C1-2" target="t-811C-2A9D8-5">
+  </arc>
+  <arc id="e-811C-2A9E1-9" source="p-811C-2A9D1-3" target="t-811C-2A9D4-4">
+  </arc>
+ </page>
+ </net>
+</pnml>

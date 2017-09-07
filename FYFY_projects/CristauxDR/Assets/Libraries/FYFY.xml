@@ -138,6 +138,11 @@
             	Callback function.
             </param>
         </member>
+        <member name="M:FYFY.Family.Equals(FYFY.Family)">
+            <summary>
+            	Check if two families are equals.
+            </summary>
+        </member>
         <member name="P:FYFY.Family.Count">
             <summary>
             	Gets the number of <c>GameObjects</c> belonging to this <see cref="T:FYFY.Family"/>.

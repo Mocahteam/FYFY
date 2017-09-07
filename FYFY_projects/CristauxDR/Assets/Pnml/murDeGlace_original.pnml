@@ -1,0 +1,994 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+ <net id="n-9650-C9441-0" type ="http://www.laas.fr/tina/tpn">
+  <name>
+   <text>murDeGlace</text>
+  </name>
+ <page id="g-9650-C944F-1">
+  <place id="p-9650-C9455-2">
+  <name>
+   <text>T chaudiere = -3 + x</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="110" y="420"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C9466-3">
+  <name>
+   <text>T in [0]</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="210" y="650"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C946A-4">
+  <name>
+   <text>T in ]-inf ; 0[</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>1</text>
+   </initialMarking>
+   <graphics>
+    <position x="110" y="650"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C946F-5">
+  <name>
+   <text>T in ]0; +inf[</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="310" y="650"/>
+   </graphics>
+  </place>
+  <transition id="t-9650-C9473-6">
+  <name>
+   <text>activate-chaudiere;3</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="710" y="130"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C9478-7">
+  <name>
+   <text>activate-levier_plus_2_1;9</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="510" y="330"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C947D-8">
+  <name>
+   <text>activate-message_panneau;10</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="710" y="330"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C9482-9">
+  <name>
+   <text>activate-panneau;4</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="910" y="130"/>
+   </graphics>
+  </transition>
+  <place id="p-9650-C9486-10">
+  <name>
+   <text>alumettes_floor;1</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>1</text>
+   </initialMarking>
+   <graphics>
+    <position x="250" y="150"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C948A-11">
+  <name>
+   <text>alumettes_hand;1</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="390" y="150"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C948F-12">
+  <name>
+   <text>alumettes_inv;1</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="330" y="60"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C9492-13">
+  <name>
+   <text>chaudiere_Off;3</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>1</text>
+   </initialMarking>
+   <graphics>
+    <position x="750" y="110"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C9496-14">
+  <name>
+   <text>chaudiere_On;3</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="650" y="100"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C949A-15">
+  <name>
+   <text>clef_floor;5</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>1</text>
+   </initialMarking>
+   <graphics>
+    <position x="1050" y="150"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C949E-16">
+  <name>
+   <text>clef_hand;5</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="1190" y="150"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C94A1-17">
+  <name>
+   <text>clef_inv;5</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="1130" y="60"/>
+   </graphics>
+  </place>
+  <transition id="t-9650-C94A4-18">
+  <name>
+   <text>close-porte;2</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="510" y="70"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C9530-19">
+  <name>
+   <text>cooling_[0]_to_]-inf ; 0[_1</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="110" y="810"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C9537-20">
+  <name>
+   <text>cooling_[0]_to_]-inf ; 0[_2</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="230" y="800"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C953B-21">
+  <name>
+   <text>cooling_]0; +inf[_to_[0]_3</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="350" y="790"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C9541-22">
+  <name>
+   <text>cooling_]0; +inf[_to_[0]_4</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="490" y="780"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C9546-23">
+  <name>
+   <text>desactivate-chaudiere;3</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="710" y="70"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C954C-24">
+  <name>
+   <text>desactivate-levier_plus_2_1;9</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="510" y="270"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C9552-25">
+  <name>
+   <text>desactivate-message_panneau;10</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="710" y="270"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C9558-26">
+  <name>
+   <text>desactivate-panneau;4</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="910" y="70"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C955E-27">
+  <name>
+   <text>destroy-bloc1;16</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="850" y="400"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C9561-28">
+  <name>
+   <text>drop-alumettes;1</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="330" y="140"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C9565-29">
+  <name>
+   <text>drop-clef;5</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="1130" y="140"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C9569-30">
+  <name>
+   <text>drop-masse;7</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="330" y="340"/>
+   </graphics>
+  </transition>
+  <place id="p-9650-C956C-31">
+  <name>
+   <text>endLevel-;6</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="970" y="780"/>
+   </graphics>
+  </place>
+  <transition id="t-9650-C9570-32">
+  <name>
+   <text>exit-7</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="1030" y="640"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C9573-33">
+  <name>
+   <text>exit-;6</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="880" y="640"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C9576-34">
+  <name>
+   <text>get-alumettes;1</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="370" y="110"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C9587-35">
+  <name>
+   <text>get-clef;5</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="1170" y="110"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C958A-36">
+  <name>
+   <text>get-masse;7</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="370" y="310"/>
+   </graphics>
+  </transition>
+  <place id="p-9650-C95BF-37">
+  <name>
+   <text>levier_plus_2_1_Off;9</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>6</text>
+   </initialMarking>
+   <graphics>
+    <position x="550" y="310"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C95C5-38">
+  <name>
+   <text>levier_plus_2_1_On;9</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="450" y="300"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C95C9-39">
+  <name>
+   <text>liquid_water</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="610" y="900"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C95CD-40">
+  <name>
+   <text>masse_floor;7</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>1</text>
+   </initialMarking>
+   <graphics>
+    <position x="250" y="350"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C95D1-41">
+  <name>
+   <text>masse_hand;7</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="390" y="350"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C95D4-42">
+  <name>
+   <text>masse_inv;7</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="330" y="260"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C95D8-43">
+  <name>
+   <text>message_panneau;10</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>1</text>
+   </initialMarking>
+   <graphics>
+    <position x="810" y="50"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C95DD-44">
+  <name>
+   <text>message_panneau_Off;10</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>1</text>
+   </initialMarking>
+   <graphics>
+    <position x="750" y="310"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C95E0-45">
+  <name>
+   <text>message_panneau_On;10</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="650" y="300"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C95E6-46">
+  <name>
+   <text>nbbloc1;16</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>6</text>
+   </initialMarking>
+   <graphics>
+    <position x="1010" y="400"/>
+   </graphics>
+  </place>
+  <transition id="t-9650-C95E9-47">
+  <name>
+   <text>open-porte;2</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="510" y="130"/>
+   </graphics>
+  </transition>
+  <place id="p-9650-C95EC-48">
+  <name>
+   <text>panneau;4</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>1</text>
+   </initialMarking>
+   <graphics>
+    <position x="610" y="250"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C95EF-49">
+  <name>
+   <text>panneau_Off;4</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>1</text>
+   </initialMarking>
+   <graphics>
+    <position x="950" y="110"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C95F2-50">
+  <name>
+   <text>panneau_On;4</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="850" y="100"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C95F6-51">
+  <name>
+   <text>porte_closed;2</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>1</text>
+   </initialMarking>
+   <graphics>
+    <position x="550" y="110"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C95FA-52">
+  <name>
+   <text>porte_open;2</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="450" y="100"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C95FD-53">
+  <name>
+   <text>solid_liquid_transition_water</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="510" y="880"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C9613-54">
+  <name>
+   <text>solid_water</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>1</text>
+   </initialMarking>
+   <graphics>
+    <position x="410" y="850"/>
+   </graphics>
+  </place>
+  <place id="p-9650-C9617-55">
+  <name>
+   <text>state_bloc1;16</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>1</text>
+   </initialMarking>
+   <graphics>
+    <position x="810" y="350"/>
+   </graphics>
+  </place>
+  <transition id="t-9650-C961B-56">
+  <name>
+   <text>store-alumettes;1</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="290" y="90"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C961F-57">
+  <name>
+   <text>store-clef;5</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="1090" y="90"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C9623-58">
+  <name>
+   <text>store-masse;7</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="290" y="290"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C9627-59">
+  <name>
+   <text>storeBack-alumettes;1</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="390" y="60"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C962B-60">
+  <name>
+   <text>storeBack-clef;5</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="1190" y="60"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C962F-61">
+  <name>
+   <text>storeBack-masse;7</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="390" y="260"/>
+   </graphics>
+  </transition>
+  <place id="p-9650-C9633-62">
+  <name>
+   <text>teleporteur;6</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>1</text>
+   </initialMarking>
+   <graphics>
+    <position x="910" y="570"/>
+   </graphics>
+  </place>
+  <transition id="t-9650-C9637-63">
+  <name>
+   <text>warming_[0]_to_]0; +inf[_chaudiere</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="230" y="540"/>
+   </graphics>
+  </transition>
+  <transition id="t-9650-C963D-64">
+  <name>
+   <text>warming_]-inf ; 0[_to_[0]_chaudiere</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="110" y="550"/>
+   </graphics>
+  </transition>
+  <arc id="e-9650-C9644-65" source="p-9650-C95E6-46" target="t-9650-C9570-32">
+   <inscription>
+    <text>6</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+   </inscription>
+   <type value="inhibitor"/>
+  </arc>
+  <arc id="e-9650-C964C-66" source="p-9650-C9633-62" target="t-9650-C9573-33">
+  </arc>
+  <arc id="e-9650-C964D-67" source="t-9650-C962F-61" target="p-9650-C95D4-42">
+  </arc>
+  <arc id="e-9650-C964F-68" source="t-9650-C962B-60" target="p-9650-C94A1-17">
+  </arc>
+  <arc id="e-9650-C9650-69" source="t-9650-C9627-59" target="p-9650-C948F-12">
+  </arc>
+  <arc id="e-9650-C9651-70" source="t-9650-C9623-58" target="p-9650-C95D4-42">
+  </arc>
+  <arc id="e-9650-C9652-71" source="t-9650-C961F-57" target="p-9650-C94A1-17">
+  </arc>
+  <arc id="e-9650-C9653-72" source="p-9650-C9466-3" target="t-9650-C9637-63">
+  </arc>
+  <arc id="e-9650-C9655-73" source="t-9650-C961B-56" target="p-9650-C948F-12">
+  </arc>
+  <arc id="e-9650-C9656-74" source="p-9650-C9613-54" target="t-9650-C963D-64">
+  </arc>
+  <arc id="e-9650-C9658-75" source="p-9650-C95FD-53" target="t-9650-C9637-63">
+  </arc>
+  <arc id="e-9650-C9659-76" source="t-9650-C9570-32" target="p-9650-C956C-31">
+  </arc>
+  <arc id="e-9650-C965A-77" source="p-9650-C95FD-53" target="t-9650-C9537-20">
+  </arc>
+  <arc id="e-9650-C965C-78" source="p-9650-C95FD-53" target="t-9650-C9530-19">
+  </arc>
+  <arc id="e-9650-C9686-79" source="p-9650-C95FA-52" target="t-9650-C94A4-18">
+  </arc>
+  <arc id="e-9650-C9687-80" source="p-9650-C95F6-51" target="t-9650-C95E9-47">
+  </arc>
+  <arc id="e-9650-C9689-81" source="p-9650-C95F2-50" target="t-9650-C9558-26">
+  </arc>
+  <arc id="e-9650-C968B-82" source="p-9650-C95EF-49" target="t-9650-C9482-9">
+  </arc>
+  <arc id="e-9650-C968C-83" source="p-9650-C95EC-48" target="t-9650-C947D-8">
+   <type value="test"/>
+  </arc>
+  <arc id="e-9650-C968E-84" source="p-9650-C9466-3" target="t-9650-C9537-20">
+  </arc>
+  <arc id="e-9650-C968F-85" source="t-9650-C95E9-47" target="p-9650-C95FA-52">
+  </arc>
+  <arc id="e-9650-C9690-86" source="p-9650-C95E6-46" target="t-9650-C955E-27">
+  </arc>
+  <arc id="e-9650-C9691-87" source="p-9650-C9633-62" target="t-9650-C9570-32">
+  </arc>
+  <arc id="e-9650-C9694-88" source="p-9650-C95E0-45" target="t-9650-C9552-25">
+  </arc>
+  <arc id="e-9650-C9694-89" source="p-9650-C95DD-44" target="t-9650-C947D-8">
+  </arc>
+  <arc id="e-9650-C9696-90" source="p-9650-C95D8-43" target="t-9650-C9558-26">
+   <type value="test"/>
+  </arc>
+  <arc id="e-9650-C9697-91" source="p-9650-C95D4-42" target="t-9650-C958A-36">
+  </arc>
+  <arc id="e-9650-C9699-92" source="p-9650-C95D1-41" target="t-9650-C962F-61">
+  </arc>
+  <arc id="e-9650-C969A-93" source="p-9650-C95D1-41" target="t-9650-C9569-30">
+  </arc>
+  <arc id="e-9650-C969B-94" source="p-9650-C95D1-41" target="t-9650-C955E-27">
+   <type value="test"/>
+  </arc>
+  <arc id="e-9650-C969D-95" source="p-9650-C95CD-40" target="t-9650-C9623-58">
+  </arc>
+  <arc id="e-9650-C969F-96" source="p-9650-C9466-3" target="t-9650-C9530-19">
+  </arc>
+  <arc id="e-9650-C96A0-97" source="p-9650-C95C9-39" target="t-9650-C9541-22">
+  </arc>
+  <arc id="e-9650-C96A1-98" source="p-9650-C95C9-39" target="t-9650-C9573-33">
+   <type value="test"/>
+  </arc>
+  <arc id="e-9650-C96A2-99" source="p-9650-C95C9-39" target="t-9650-C953B-21">
+  </arc>
+  <arc id="e-9650-C96A3-100" source="p-9650-C95C5-38" target="t-9650-C954C-24">
+  </arc>
+  <arc id="e-9650-C96A5-101" source="p-9650-C95BF-37" target="t-9650-C9478-7">
+  </arc>
+  <arc id="e-9650-C96A6-102" source="t-9650-C958A-36" target="p-9650-C95D1-41">
+  </arc>
+  <arc id="e-9650-C96A9-103" source="t-9650-C9587-35" target="p-9650-C949E-16">
+  </arc>
+  <arc id="e-9650-C96AB-104" source="t-9650-C9576-34" target="p-9650-C948A-11">
+  </arc>
+  <arc id="e-9650-C96AC-105" source="t-9650-C9573-33" target="p-9650-C956C-31">
+  </arc>
+  <arc id="e-9650-C96AD-106" source="t-9650-C9569-30" target="p-9650-C95CD-40">
+  </arc>
+  <arc id="e-9650-C96AE-107" source="t-9650-C9565-29" target="p-9650-C949A-15">
+  </arc>
+  <arc id="e-9650-C96AF-108" source="p-9650-C9455-2" target="t-9650-C963D-64">
+   <inscription>
+    <text>3</text>
+    <graphics>
+     <offset x="10" y="0" />
+    </graphics>
+   </inscription>
+   <type value="test"/>
+  </arc>
+  <arc id="e-9650-C96B2-109" source="p-9650-C946A-4" target="t-9650-C963D-64">
+  </arc>
+  <arc id="e-9650-C96B5-110" source="t-9650-C9561-28" target="p-9650-C9486-10">
+  </arc>
+  <arc id="e-9650-C96B6-111" source="t-9650-C9558-26" target="p-9650-C95EF-49">
+  </arc>
+  <arc id="e-9650-C96B7-112" source="t-9650-C9552-25" target="p-9650-C95DD-44">
+  </arc>
+  <arc id="e-9650-C96B8-113" source="t-9650-C954C-24" target="p-9650-C95BF-37">
+  </arc>
+  <arc id="e-9650-C96BA-114" source="t-9650-C9546-23" target="p-9650-C9492-13">
+  </arc>
+  <arc id="e-9650-C96BB-115" source="t-9650-C9541-22" target="p-9650-C95FD-53">
+  </arc>
+  <arc id="e-9650-C96BC-116" source="t-9650-C9541-22" target="p-9650-C9466-3">
+  </arc>
+  <arc id="e-9650-C96BD-117" source="t-9650-C953B-21" target="p-9650-C95FD-53">
+  </arc>
+  <arc id="e-9650-C96BF-118" source="t-9650-C953B-21" target="p-9650-C9466-3">
+  </arc>
+  <arc id="e-9650-C96C0-119" source="t-9650-C9537-20" target="p-9650-C9613-54">
+  </arc>
+  <arc id="e-9650-C96C1-120" source="t-9650-C963D-64" target="p-9650-C95FD-53">
+  </arc>
+  <arc id="e-9650-C96C2-121" source="p-9650-C9455-2" target="t-9650-C9637-63">
+   <inscription>
+    <text>4</text>
+    <graphics>
+     <offset x="10" y="0" />
+    </graphics>
+   </inscription>
+   <type value="test"/>
+  </arc>
+  <arc id="e-9650-C96D3-122" source="t-9650-C9537-20" target="p-9650-C946A-4">
+  </arc>
+  <arc id="e-9650-C96D5-123" source="t-9650-C9530-19" target="p-9650-C9613-54">
+  </arc>
+  <arc id="e-9650-C96D7-124" source="t-9650-C9530-19" target="p-9650-C946A-4">
+  </arc>
+  <arc id="e-9650-C96D8-125" source="t-9650-C94A4-18" target="p-9650-C95F6-51">
+  </arc>
+  <arc id="e-9650-C96DA-126" source="p-9650-C94A1-17" target="t-9650-C9587-35">
+  </arc>
+  <arc id="e-9650-C96DB-127" source="p-9650-C949E-16" target="t-9650-C962B-60">
+  </arc>
+  <arc id="e-9650-C96DC-128" source="p-9650-C949E-16" target="t-9650-C95E9-47">
+   <type value="test"/>
+  </arc>
+  <arc id="e-9650-C96DD-129" source="p-9650-C949E-16" target="t-9650-C9565-29">
+  </arc>
+  <arc id="e-9650-C96DE-130" source="p-9650-C949E-16" target="t-9650-C94A4-18">
+   <type value="test"/>
+  </arc>
+  <arc id="e-9650-C96DF-131" source="t-9650-C963D-64" target="p-9650-C9466-3">
+  </arc>
+  <arc id="e-9650-C96E1-132" source="p-9650-C949A-15" target="t-9650-C961F-57">
+  </arc>
+  <arc id="e-9650-C96E2-133" source="p-9650-C9455-2" target="t-9650-C954C-24">
+   <inscription>
+    <text>2</text>
+    <graphics>
+     <offset x="10" y="0" />
+    </graphics>
+   </inscription>
+  </arc>
+  <arc id="e-9650-C96E4-134" source="p-9650-C9496-14" target="t-9650-C963D-64">
+   <type value="test"/>
+  </arc>
+  <arc id="e-9650-C96E6-135" source="p-9650-C9496-14" target="t-9650-C9637-63">
+   <type value="test"/>
+  </arc>
+  <arc id="e-9650-C96E7-136" source="p-9650-C9496-14" target="t-9650-C9546-23">
+  </arc>
+  <arc id="e-9650-C96E7-137" source="p-9650-C9496-14" target="t-9650-C953B-21">
+   <type value="inhibitor"/>
+  </arc>
+  <arc id="e-9650-C96EA-138" source="p-9650-C9496-14" target="t-9650-C9530-19">
+   <type value="inhibitor"/>
+  </arc>
+  <arc id="e-9650-C96EB-139" source="p-9650-C9492-13" target="t-9650-C9541-22">
+   <type value="inhibitor"/>
+  </arc>
+  <arc id="e-9650-C96EC-140" source="p-9650-C9492-13" target="t-9650-C9537-20">
+   <type value="inhibitor"/>
+  </arc>
+  <arc id="e-9650-C96ED-141" source="p-9650-C9492-13" target="t-9650-C9473-6">
+  </arc>
+  <arc id="e-9650-C96EF-142" source="t-9650-C9637-63" target="p-9650-C95C9-39">
+  </arc>
+  <arc id="e-9650-C96F0-143" source="p-9650-C948F-12" target="t-9650-C9576-34">
+  </arc>
+  <arc id="e-9650-C96F1-144" source="p-9650-C948A-11" target="t-9650-C9627-59">
+  </arc>
+  <arc id="e-9650-C96F3-145" source="p-9650-C9455-2" target="t-9650-C9541-22">
+   <inscription>
+    <text>4</text>
+    <graphics>
+     <offset x="10" y="0" />
+    </graphics>
+   </inscription>
+   <type value="inhibitor"/>
+  </arc>
+  <arc id="e-9650-C96F5-146" source="p-9650-C948A-11" target="t-9650-C9561-28">
+  </arc>
+  <arc id="e-9650-C96F6-147" source="p-9650-C948A-11" target="t-9650-C9473-6">
+   <type value="test"/>
+  </arc>
+  <arc id="e-9650-C96F8-148" source="p-9650-C9486-10" target="t-9650-C961B-56">
+  </arc>
+  <arc id="e-9650-C96F9-149" source="t-9650-C9482-9" target="p-9650-C95F2-50">
+  </arc>
+  <arc id="e-9650-C96FA-150" source="t-9650-C947D-8" target="p-9650-C95E0-45">
+  </arc>
+  <arc id="e-9650-C96FC-151" source="t-9650-C9478-7" target="p-9650-C95C5-38">
+  </arc>
+  <arc id="e-9650-C96FD-152" source="t-9650-C9478-7" target="p-9650-C9455-2">
+   <inscription>
+    <text>2</text>
+    <graphics>
+     <offset x="10" y="0" />
+    </graphics>
+   </inscription>
+  </arc>
+  <arc id="e-9650-C96FF-153" source="t-9650-C9637-63" target="p-9650-C946F-5">
+  </arc>
+  <arc id="e-9650-C9700-154" source="t-9650-C9473-6" target="p-9650-C9496-14">
+  </arc>
+  <arc id="e-9650-C9701-155" source="p-9650-C946F-5" target="t-9650-C9541-22">
+  </arc>
+  <arc id="e-9650-C9702-156" source="p-9650-C946F-5" target="t-9650-C953B-21">
+  </arc>
+  <arc id="e-9650-C9703-157" source="p-9650-C9455-2" target="t-9650-C9537-20">
+   <inscription>
+    <text>3</text>
+    <graphics>
+     <offset x="10" y="0" />
+    </graphics>
+   </inscription>
+   <type value="inhibitor"/>
+  </arc>
+ </page>
+ </net>
+</pnml>

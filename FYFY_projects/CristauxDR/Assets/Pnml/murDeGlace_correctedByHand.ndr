@@ -1,0 +1,168 @@
+p 110.0 430.0 {T chaudiere = -3 + x} 0 n
+p 210.0 660.0 {T in [0]} 0 n
+p 110.0 660.0 {T in ]-inf ; 0[} 1 n
+p 310.0 660.0 {T in ]0; +inf[} 0 n
+p 1010.0 175.0 {clef_floor;5} 1 n
+p 1150.0 175.0 {clef_hand;5} 0 n
+p 1090.0 85.0 {clef_inv;5} 0 n
+t 110.0 820.0 {cooling_[0]_to_]-inf ; 0[_1} n 0 w n {} ne
+t 230.0 810.0 {cooling_[0]_to_]-inf ; 0[_2} n 0 w n {} ne
+t 350.0 800.0 {cooling_]0; +inf[_to_[0]_3} n 0 w n {} ne
+t 490.0 790.0 {cooling_]0; +inf[_to_[0]_4} n 0 w n {} ne
+p 970.0 790.0 {endLevel-;6} 0 n
+t 1030.0 650.0 {exit-7} n 0 w n {} ne
+t 880.0 650.0 {exit-;6} n 0 w n {} ne
+t 1130.0 135.0 {get-clef;5} n 0 w n {} ne
+p 610.0 910.0 liquid_water 0 n
+p 875.0 395.0 {masse_floor;7} 1 n
+p 955.0 305.0 {masse_inv;7} 0 n
+p 1035.0 560.0 {nbbloc1;16} 6 n
+p 510.0 890.0 solid_liquid_transition_water 0 n
+p 410.0 860.0 solid_water 1 n
+p 910.0 580.0 {teleporteur;6} 1 n
+t 230.0 550.0 {warming_[0]_to_]0; +inf[_chaudiere} n 0 w n {} ne
+t 110.0 560.0 {warming_]-inf ; 0[_to_[0]_chaudiere} n 0 w n {} ne
+t 1150.0 500.0 {destroy-bloc1;16} n 0 w n {} ne
+t 950.0 420.0 {drop-masse;7} n 0 w n {} ne
+t 875.0 325.0 {store-masse;7} n 0 w n {} ne
+p 1050.0 425.0 {masse_hand;7} 0 n
+t 1010.0 360.0 {get-masse;7} n 0 w n {} ne
+t 1080.0 310.0 {storeBack-masse;7} n 0 w n {} ne
+t 205.0 410.0 {activate-levier_plus_2_1;9} n 0 w n {} ne
+p 180.0 290.0 {levier_plus_2_1_On;9} 0 n
+t 95.0 350.0 {desactivate-levier_plus_2_1;9} n 0 w n {} ne
+t 1075.0 225.0 {drop-clef;5} n 0 w n {} ne
+t 1020.0 105.0 {store-clef;5} n 0 w n {} ne
+t 1180.0 85.0 {storeBack-clef;5} n 0 w n {} ne
+t 880.0 80.0 {close-porte;2} n 0 w n {} ne
+p 945.0 140.0 {porte_closed;2} 1 n
+t 880.0 195.0 {open-porte;2} n 0 w n {} ne
+t 190.0 95.0 {store_matchstick;1} n 0 w n {} ne
+p 190.0 160.0 {matchstick_floor;1} 1 n
+t 285.0 175.0 {drop_matchstick;1} n 0 w n {} ne
+p 260.0 345.0 {levier_plus_2_1_Off;9} 6 n
+p 375.0 450.0 {chaudiere_On;3} 0 n
+t 465.0 490.0 {activate-chaudiere;3} n 0 w n {} ne
+t 465.0 410.0 {desactivate-chaudiere;3} n 0 w n {} ne
+p 570.0 450.0 {chaudiere_Off;3} 1 n
+t 730.0 240.0 exit_room n 0 w n {} ne
+p 810.0 165.0 {porte_open;2} 0 n
+p 680.0 140.0 player_inside_room 0 s
+t 740.0 55.0 enter_room n 0 w n {} ne
+p 740.0 145.0 player_outside_room 1 n
+t 405.0 55.0 {storeBack_matchstick;1} n 0 w n {} ne
+p 395.0 195.0 {matchstick_hand;1} 0 n
+t 335.0 115.0 {get_matchstick;1} n 0 w n {} ne
+p 280.0 50.0 {matchstick_inv;1} 0 n
+p 505.0 95.0 matchstick_inside_room 1 n
+p 510.0 180.0 matchstick_outside_room 0 n
+t 100.0 80.0 {store_matchstick_2;1} n 0 w n {} ne
+t 280.0 235.0 {drop_matchstick_2;1} n 0 w n {} ne
+e player_outside_room {drop_matchstick_2;1} ?1 n
+e {drop_matchstick_2;1} matchstick_outside_room 1 n
+e {drop_matchstick_2;1} {matchstick_floor;1} 1 n
+e {matchstick_hand;1} {drop_matchstick_2;1} 1 n
+e {drop_matchstick;1} matchstick_inside_room 1 n
+e player_outside_room {store_matchstick_2;1} ?1 n
+e matchstick_outside_room {store_matchstick_2;1} 1 n
+e {store_matchstick_2;1} {matchstick_inv;1} 1 n
+e {matchstick_floor;1} {store_matchstick_2;1} 1 n
+e matchstick_inside_room {store_matchstick;1} 1 n
+e player_outside_room {activate-levier_plus_2_1;9} ?1 n
+e player_outside_room {desactivate-levier_plus_2_1;9} ?1 n
+e player_outside_room {activate-chaudiere;3} ?1 n
+e player_outside_room {desactivate-chaudiere;3} ?1 n
+e player_inside_room {store_matchstick;1} ?1 n
+e player_inside_room {drop_matchstick;1} ?1 n
+e {porte_open;2} exit_room ?1 n
+e {porte_open;2} enter_room ?1 n
+e enter_room player_inside_room 1 n
+e player_outside_room enter_room 1 n
+e exit_room player_outside_room 1 n
+e player_inside_room exit_room 1 n
+e {nbbloc1;16} {exit-7} ?-6 n
+e {exit-7} {endLevel-;6} 1 n
+e {teleporteur;6} {exit-7} 1 n
+e liquid_water {exit-;6} ?1 n
+e {T in ]-inf ; 0[} {warming_]-inf ; 0[_to_[0]_chaudiere} 1 n
+e {warming_]-inf ; 0[_to_[0]_chaudiere} solid_liquid_transition_water 1 n
+e {warming_]-inf ; 0[_to_[0]_chaudiere} {T in [0]} 1 n
+e {warming_[0]_to_]0; +inf[_chaudiere} liquid_water 1 n
+e {warming_[0]_to_]0; +inf[_chaudiere} {T in ]0; +inf[} 1 n
+e {teleporteur;6} {exit-;6} 1 n
+e {storeBack-masse;7} {masse_inv;7} 1 n
+e {storeBack-clef;5} {clef_inv;5} 1 n
+e {storeBack_matchstick;1} {matchstick_inv;1} 1 n
+e {store-masse;7} {masse_inv;7} 1 n
+e {store-clef;5} {clef_inv;5} 1 n
+e {T in [0]} {warming_[0]_to_]0; +inf[_chaudiere} 1 n
+e {store_matchstick;1} {matchstick_inv;1} 1 n
+e solid_water {warming_]-inf ; 0[_to_[0]_chaudiere} 1 n
+e solid_liquid_transition_water {warming_[0]_to_]0; +inf[_chaudiere} 1 n
+e solid_liquid_transition_water {cooling_[0]_to_]-inf ; 0[_2} 1 n
+e solid_liquid_transition_water {cooling_[0]_to_]-inf ; 0[_1} 1 n
+e {porte_open;2} {close-porte;2} 1 n
+e {porte_closed;2} {open-porte;2} 1 n
+e {T in [0]} {cooling_[0]_to_]-inf ; 0[_2} 1 n
+e {open-porte;2} {porte_open;2} 1 n
+e {nbbloc1;16} {destroy-bloc1;16} 1 n
+e {masse_inv;7} {get-masse;7} 1 n
+e {masse_hand;7} {storeBack-masse;7} 1 n
+e {masse_hand;7} {drop-masse;7} 1 n
+e {masse_hand;7} {destroy-bloc1;16} ?1 n
+e {masse_floor;7} {store-masse;7} 1 n
+e {T in [0]} {cooling_[0]_to_]-inf ; 0[_1} 1 n
+e liquid_water {cooling_]0; +inf[_to_[0]_4} 1 n
+e liquid_water {cooling_]0; +inf[_to_[0]_3} 1 n
+e {levier_plus_2_1_On;9} {desactivate-levier_plus_2_1;9} 1 n
+e {levier_plus_2_1_Off;9} {activate-levier_plus_2_1;9} 1 n
+e {get-masse;7} {masse_hand;7} 1 n
+e {get-clef;5} {clef_hand;5} 1 n
+e {get_matchstick;1} {matchstick_hand;1} 1 n
+e {exit-;6} {endLevel-;6} 1 n
+e {drop-masse;7} {masse_floor;7} 1 n
+e {drop-clef;5} {clef_floor;5} 1 n
+e {T chaudiere = -3 + x} {warming_]-inf ; 0[_to_[0]_chaudiere} ?3 e
+e {drop_matchstick;1} {matchstick_floor;1} 1 n
+e {desactivate-levier_plus_2_1;9} {levier_plus_2_1_Off;9} 1 n
+e {desactivate-chaudiere;3} {chaudiere_Off;3} 1 n
+e {cooling_]0; +inf[_to_[0]_4} solid_liquid_transition_water 1 n
+e {cooling_]0; +inf[_to_[0]_4} {T in [0]} 1 n
+e {cooling_]0; +inf[_to_[0]_3} solid_liquid_transition_water 1 n
+e {cooling_]0; +inf[_to_[0]_3} {T in [0]} 1 n
+e {cooling_[0]_to_]-inf ; 0[_2} solid_water 1 n
+e {T chaudiere = -3 + x} {warming_[0]_to_]0; +inf[_chaudiere} ?4 e
+e {cooling_[0]_to_]-inf ; 0[_2} {T in ]-inf ; 0[} 1 n
+e {cooling_[0]_to_]-inf ; 0[_1} solid_water 1 n
+e {cooling_[0]_to_]-inf ; 0[_1} {T in ]-inf ; 0[} 1 n
+e {close-porte;2} {porte_closed;2} 1 n
+e {clef_inv;5} {get-clef;5} 1 n
+e {clef_hand;5} {storeBack-clef;5} 1 n
+e {clef_hand;5} {open-porte;2} ?1 n
+e {clef_hand;5} {drop-clef;5} 1 n
+e {clef_hand;5} {close-porte;2} ?1 n
+e {clef_floor;5} {store-clef;5} 1 n
+e {T chaudiere = -3 + x} {desactivate-levier_plus_2_1;9} 2 e
+e {chaudiere_On;3} {warming_]-inf ; 0[_to_[0]_chaudiere} ?1 n
+e {chaudiere_On;3} {warming_[0]_to_]0; +inf[_chaudiere} ?1 n
+e {chaudiere_On;3} {desactivate-chaudiere;3} 1 n
+e {chaudiere_On;3} {cooling_]0; +inf[_to_[0]_3} ?-1 n
+e {chaudiere_On;3} {cooling_[0]_to_]-inf ; 0[_1} ?-1 n
+e {chaudiere_Off;3} {cooling_]0; +inf[_to_[0]_4} ?-1 n
+e {chaudiere_Off;3} {cooling_[0]_to_]-inf ; 0[_2} ?-1 n
+e {chaudiere_Off;3} {activate-chaudiere;3} 1 n
+e {matchstick_inv;1} {get_matchstick;1} 1 n
+e {matchstick_hand;1} {storeBack_matchstick;1} 1 n
+e {T chaudiere = -3 + x} {cooling_]0; +inf[_to_[0]_4} ?-4 e
+e {matchstick_hand;1} {drop_matchstick;1} 1 n
+e {matchstick_hand;1} {activate-chaudiere;3} ?1 n
+e {matchstick_floor;1} {store_matchstick;1} 1 n
+e {activate-levier_plus_2_1;9} {levier_plus_2_1_On;9} 1 n
+e {activate-levier_plus_2_1;9} {T chaudiere = -3 + x} 2 e
+e {activate-chaudiere;3} {chaudiere_On;3} 1 n
+e {T in ]0; +inf[} {cooling_]0; +inf[_to_[0]_4} 1 n
+e {T in ]0; +inf[} {cooling_]0; +inf[_to_[0]_3} 1 n
+e {T chaudiere = -3 + x} {cooling_[0]_to_]-inf ; 0[_2} ?-3 e
+h murDeGlace2
+
+

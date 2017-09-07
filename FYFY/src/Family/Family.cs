@@ -88,6 +88,29 @@ namespace FYFY {
 		public void addExitCallback(ExitCallback callback) {
 			_exitCallbacks += callback;
 		}
+		
+		/// <summary>
+		/// 	Check if two families are equals.
+		/// </summary>
+		public bool Equals(Family other){
+			if (_matchers.Length != other._matchers.Length)
+				return false;
+			return this.IncludedInto(other) && other.IncludedInto(this);
+		}
+		
+		// Check if "this" is included into "other"
+		private bool IncludedInto(Family other){
+			for (int i = 0; i < _matchers.Length; ++i){
+				bool found = false;
+				for (int j = 0 ; !found && j < other._matchers.Length ; j++){
+					if (_matchers[i]._descriptor == other._matchers[j]._descriptor)
+						found = true;
+				}
+				if (!found)
+					return false;
+			}
+			return true;
+		}
 
 		internal bool matches(GameObjectWrapper gameObjectWrapper) {
 			for (int i = 0; i < _matchers.Length; ++i)

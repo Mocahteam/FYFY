@@ -1,0 +1,19 @@
+Version actuelle de la partie Suivi :
+
+BTreeOperator est la partie qui permet le traitement de la logique pour les contraintes.
+FamilyHandling contient le prototype d'éditeur de familles, une de ces classes est toujours utilisée pour gérer les familles suivies dans la version courante
+Suivi contient les scripts nécéssaires pour gérer les RdPs ainsi que l'éditeur de lien entre les sous réseaux
+Trace est la partie qui permet la génération de trace dans les systèmes.
+
+TODO :
+- Corriger la récupération des familles dans l'outil de suivi (Plus robuste que l'analyse du code) (Et ainsi se débarasser de la partie éditeur de familles).
+- Implémenter le système d'initialisation des RdPs suivant le modèle des traces (en l'état, c'est l'ancienne version, celle avec génération de code qui subsiste)
+- Refactoring du code pour une meilleure archi logicielle et plus de commentaires.
+	- Meilleur système d'id avec collection statique de suivis dans la classe.
+	- Meilleur organisation des données dans le composant de suivi (Manque de sens de la classe transition contrainte (Liens), les contraintes devraient être directement dans les places ?)
+- Correction sur le système de trace : par défaut, passer tous les objets qui sensibilisent la transition en paramètre lors de l'appel.
+
+Améliorations :
+- Possibilité de configurer dans l'éditeur les transitions systèmes.
+- Possibilité de modifier les sous RdPs dans l'éditeur.
+- Interface graphique style Tina pour configurer les liens entre les sous réseaux.
