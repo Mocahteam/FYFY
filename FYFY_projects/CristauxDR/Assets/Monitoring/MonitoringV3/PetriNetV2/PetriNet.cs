@@ -70,12 +70,12 @@ namespace petriNetV2{
 			foreach (Arc oldArc in old.arcs) {
 
 				Node newSource;
-				referencesMatcher.TryGetValue (oldArc.Source.label,out newSource);
+				referencesMatcher.TryGetValue (oldArc.source.label,out newSource);
 
 				Node newTarget;
-				referencesMatcher.TryGetValue (oldArc.Target.label,out newTarget);
+				referencesMatcher.TryGetValue (oldArc.target.label,out newTarget);
 
-				arcs.Add (new Arc (newSource, newTarget, oldArc.Type, oldArc.Poid));
+				arcs.Add (new Arc (newSource, newTarget, oldArc.type, oldArc.weight));
 			}	
 		}
 
@@ -102,8 +102,6 @@ namespace petriNetV2{
 			places.Clear ();
 		}
 
-
-		//TODO : Nettoyage des noms de cette merde
 		public Arc[] getConcernedArcs(Node n){
 			List<Arc> lArcs = new List<Arc>();
 			foreach (Arc a in arcs) {
@@ -117,12 +115,10 @@ namespace petriNetV2{
 		public void addSubNet(PetriNet pnet){
 
 			foreach (Node transition in pnet.transitions) {
-				//transition.name += "_"+pnet.id; //Permetre différentiation avec autres réseaux identiques
 				transitions.Add (transition);
 			}
 
 			foreach (Node place in pnet.places) {
-				//place.name += "_"+pnet.id;
 				places.Add (place);
 			}
 			foreach (Arc arc in pnet.arcs) {
@@ -160,51 +156,6 @@ namespace petriNetV2{
             }
             return null;
         }
-
-		//Getters & Setters TODO Refactor if readonly
-		public string Label {
-			get {
-				return this.label;
-			}
-			set {
-				label = value;
-			}
-		}
-
-		public int Id {
-			get {
-				return this.id;
-			}
-			set {
-				id = value;
-			}
-		}
-
-		public List<Node> Transitions {
-			get {
-				return this.transitions;
-			}
-			set {
-				transitions = value;
-			}
-		}
-
-		public List<Node> Places {
-			get {
-				return this.places;
-			}
-			set {
-				places = value;
-			}
-		}
-		public List<Arc> Arcs {
-			get {
-				return this.arcs;
-			}
-			set {
-				arcs = value;
-			}
-		}
 
 		//Les fonctions width et height suivantes servent à gérer la position du réseau dans sa représentation graphique
 		public float getWidth(){
@@ -314,10 +265,10 @@ namespace petriNetV2{
 
 			foreach (Arc arc in arcs) {
 				str += "\tEdge " + (++cpt) + " :\n";
-				str += "\t\tSource : "+arc.Source.Label+"\n";
-				str += "\t\tTarget : "+arc.Target.Label+"\n";
-				str += "\t\tType : "+arc.Type+"\n";
-				str += "\t\tPoid : "+arc.Poid+"\n";
+				str += "\t\tSource : "+arc.source.Label+"\n";
+				str += "\t\tTarget : "+arc.target.Label+"\n";
+				str += "\t\tType : "+arc.type+"\n";
+				str += "\t\tPoid : "+arc.weight+"\n";
 
 			}
 			str += "Places count : " + places.Count + " \n";

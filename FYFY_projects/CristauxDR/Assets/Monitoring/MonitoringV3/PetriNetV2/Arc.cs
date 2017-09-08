@@ -18,31 +18,19 @@ namespace petriNetV2{
 		public Node source;
 		public Node target;
 		public ArcType type;
-		public int poid;
-		public static string[] optType = new string[] {"regular", "test", "inhibitor"}; //TODO Type arc dans classe arc
+		public int weight;
+		public static string[] optType = new string[] {"test", "inhibitor"};
 
-		public Arc (Node source,Node target, ArcType type,int poid)
+		public Arc (Node source,Node target, ArcType type, int weight)
 		{
 			this.source = source;
 			this.target = target;
 			this.type = type;
-			this.poid = poid;
+			this.weight = weight;
 		}
-
-		//Pas de sens de copier l'arc, perte des références... 
-		//Copy constructor :
-		//public Arc(Arc old){
-		//	source = old.source;//ref ?
-		//	target = old.target; //ref ? 
-		//	type = old.Type;
-		//	poids = old.poids;			
-		//}
 
 		public static ArcType stringToArcType(string name){
 			switch (name) {
-				case "regular":
-					return ArcType.regular;
-
 				case "test":
 					return ArcType.test;
 
@@ -55,43 +43,7 @@ namespace petriNetV2{
 
 		}
 
-		//Getters & Setters TODO Refactor if readonly
-		public Node Source {
-			get {
-				return this.source;
-			}
-			set {
-				source = value;
-			}
-		}
-
-		public Node Target {
-			get {
-				return this.target;
-			}
-			set {
-				target = value;
-			}
-		}
-
-		public ArcType Type {
-			get {
-				return this.type;
-			}
-			set {
-				type = value;
-			}
-		}
-
-		public int Poid {
-			get {
-				return this.poid;
-			}
-			set {
-				poid = value;
-			}
-		}
-	public override string ToString ()
+		public override string ToString ()
 		{
 			return string.Format ("[Arc: source={0}, target={1}]", source, target);
 		}

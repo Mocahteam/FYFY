@@ -6,27 +6,25 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Trace {
-
-    public string label = "";
-    public ComponentMonitoring suivi = null;
+public class TraceHelper {
+	
+    public string type = "";
+    public ComponentMonitoring monitor = null;
     
 
-    public Trace(string label,  ComponentMonitoring suivi)
+    public TraceHelper(string typeOfTrace,  ComponentMonitoring monitor)
     {
-        this.label = label;
-        this.suivi = suivi;
+        this.type = typeOfTrace;
+        this.monitor = monitor;
     }
 
 
-    public void trace(string system, params GameObject[] objs)
+    public void trace(string type, params GameObject[] objs)
     {
 
         string prefix = "";
         bool aMap = false;
-        //Debug.Log("trace, label : "+label);
-        TransitionLink transitionLink  = suivi.getTransitionLinkByTransitionLabel(label);
-        //Debug.Log("trace, label : " + label+" transition contrainte : "+transitionContrainte);
+        TransitionLink transitionLink  = monitor.getTransitionLinkByTransitionLabel(type);
         if (transitionLink != null)
         {
             AriParser arip = new AriParser();
@@ -43,7 +41,7 @@ public class Trace {
                     if (!s.Equals("+") && !s.Equals("*"))
                     {
 						Link curLink = transitionLink.getLabeledLink(s);
-						Node place = curLink.objLink.GetComponent<ComponentMonitoring>().petriNet.places.ElementAt(curLink.placeId);
+						Node place = curLink.getPlaceFromLinkedObject(curLink.placeId);
                         tmpList.Add(place.id);
                     }
                     else if (s.Equals("+"))
@@ -101,7 +99,7 @@ public class Trace {
             }
 
             //Verif suivi pour construction des Or
-            if (aMap) { /*Debug.Log(system+" : "+prefix + label + "_" + suivi.id);*/ TraceHandler.trace(system, prefix + label + "_" + suivi.id); } //<--- C'est ici qu'on trace
+            if (aMap) { /*Debug.Log(system+" : "+prefix + label + "_" + suivi.id);*/ TraceHandler.trace(type, prefix + type + "_" + monitor.id); } //<--- C'est ici qu'on trace
             else { Debug.Log("Erreur paramètres"); }
         }
         else

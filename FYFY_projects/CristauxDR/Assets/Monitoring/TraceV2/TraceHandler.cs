@@ -12,7 +12,7 @@ public class TraceHandler {
 
     static List<XElement> xelemList = new List<XElement>();
 
-    public static void trace(string system, string trace)
+    public static void trace(string type, string trace)
     {
   
         Debug.Log("record element");
@@ -20,7 +20,7 @@ public class TraceHandler {
         xelemList.Add(
                     new XElement("transition", 
                         new XAttribute("action", trace),
-                        new XAttribute("origin", system),
+                        new XAttribute("origin", type),
                         new XAttribute("try", "false"))
 
                     );

@@ -21,8 +21,13 @@ namespace monitorV3{
     {
 
         public delegate void traceFunc(string system ,params GameObject[] objects);
-        public Dictionary<string, traceFunc> trace = new Dictionary<string, traceFunc>();
+		// Dictionnary containing available traces
+        public Dictionary<string, traceFunc> traceHelper = new Dictionary<string, traceFunc>();
         
+		public delegate void initFunc(int nbToken);
+		// Dictionnary containing available places available for initialization
+		public Dictionary<string, initFunc> initHelper = new Dictionary<string, initFunc>();
+
         //[HideInInspector]
         public UnityEngine.Object PnmlFile;
 
@@ -47,7 +52,6 @@ namespace monitorV3{
 			return id;
 		}
 
-
         public TransitionLink getTransitionLinkByTransitionLabel(String label)
         {
 			//Debug.Log("tc count : "+transitionLinks.Count);
@@ -60,20 +64,6 @@ namespace monitorV3{
             return null;
         }
 
-        public void loadData()
-        {
-            //Debug.Log("loadData");
-            /*string file = AssetDatabase.GetAssetPath(fichierPNML);
-            getID();
-            petriNet = PetriNet.loadFromFile(file, id);
-            oldFichierPNML = fichierPNML;*/
-            foreach(Node transition in petriNet.transitions)
-            {
-                Trace traceur = new Trace(transition.label, this);
-                trace.Add(transition.label,traceur.trace);
-            }
-
-        }
         string printList(List<int> list)
         {
             string str = "";
@@ -88,28 +78,21 @@ namespace monitorV3{
         public void Start()
         {
 #if UNITY_EDITOR
-            
-            /*if (!Application.isPlaying && id == -1 && IDGenerator.isAviable(id))
-            {
-                id = getID();
-                if (fichierPNML != null)
-                    petriNet = PetriNet.loadFromFile(AssetDatabase.GetAssetPath(fichierPNML), id);
-            }*/
             if (Application.isPlaying)
             {
 #endif
-                //Debug.Log("Start");
-                ComponentMonitoring sc = GetComponent<ComponentMonitoring>();
-                if (sc != null)
-                {
-                    //Debug.Log("PetriNet : " + sc.petriNet.label);
-                    //Debug.Log("Places : " + sc.petriNet.transitions.Count);
-                    //Debug.Log("Transitions : " + sc.petriNet.places.Count);
-                    //Debug.Log("TransitionsLinks : " + sc.transitionLinks.Count);
-                }
-                loadData();
-                //if (trace.ContainsKey("deverouiller"))
-                //    debugTest();
+				// Make association between transitions name and trace function
+				foreach(Node transition in petriNet.transitions)
+				{
+					TraceHelper traceur = new TraceHelper(transition.label, this);
+					traceHelper.Add(transition.label,traceur.trace);
+				}
+				// Make association between places name and trace function
+				foreach(Node place in petriNet.places)
+				{
+					InitHelper initializer = new InitHelper(place.label, this);
+					initHelper.Add(place.label, initializer.init);
+				}
 #if UNITY_EDITOR
             }
 #endif            
@@ -122,17 +105,17 @@ namespace monitorV3{
             GameObject cle2 = GameObject.Find("Cle2");
             GameObject cle3 = GameObject.Find("Cle3");
             GameObject cle4 = GameObject.Find("Cle4");
-            trace["ouvrir"]("player");
-            trace["ouvrir"]("player",cle1);
-            trace["deverouiller"]("player");
-            trace["deverouiller"]("player",cle2);
-            trace["deverouiller"]("player",cle2,cle1);
-            trace["deverouiller"]("player",cle1,cle2);
-            trace["deverouiller"]("player",cle1, cle3);
-            trace["deverouiller"]("player",cle4, cle2);
-            trace["deverouiller"]("player",cle4);
-            trace["deverouiller"]("player",cle3);
-            trace["deverouiller"]("player",cle4, cle3);
+            traceHelper["ouvrir"]("player");
+            traceHelper["ouvrir"]("player",cle1);
+            traceHelper["deverouiller"]("player");
+            traceHelper["deverouiller"]("player",cle2);
+            traceHelper["deverouiller"]("player",cle2,cle1);
+            traceHelper["deverouiller"]("player",cle1,cle2);
+            traceHelper["deverouiller"]("player",cle1, cle3);
+            traceHelper["deverouiller"]("player",cle4, cle2);
+            traceHelper["deverouiller"]("player",cle4);
+            traceHelper["deverouiller"]("player",cle3);
+            traceHelper["deverouiller"]("player",cle4, cle3);
         }
 #if UNITY_EDITOR
 

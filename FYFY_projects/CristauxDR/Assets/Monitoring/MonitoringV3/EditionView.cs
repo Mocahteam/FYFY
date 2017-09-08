@@ -19,7 +19,7 @@ public class EditionView : EditorWindow
 {
     public Rect windowRect = new Rect(20, 20, 20, 20);
 	private static EditorWindow window;
-    private static string[] optType = new string[] { "at least (with use)", "at least (without use)", "at the most (without use)" }; //TODO Type arc dans classe arc
+    private static string[] optType = new string[] { "at least", "at the most" };
 
 	private int ObjectSelectedFlag = 0;
     private int oldFlag;
@@ -55,7 +55,7 @@ public class EditionView : EditorWindow
         //Show existing window instance. If one doesn't exist, make one.
 		window = EditorWindow.GetWindow(typeof(EditionView));
 		// Add callback to process Undo/Redo events
-		Undo.undoRedoPerformed += window.Repaint;
+		Undo.undoRedoPerformed += window.Repaint; 
     }
 
     // Use this for initialization
@@ -269,24 +269,24 @@ public class EditionView : EditorWindow
 							EditorGUILayout.BeginHorizontal();
 							// Add GameObject Input
                             EditorGUIUtility.labelWidth = 80;
-							GameObject newLinkWithGO = (GameObject)EditorGUILayout.ObjectField("Linked with: ", link.objLink, typeof(GameObject), true);
-							if (newLinkWithGO != link.objLink) {
+							GameObject newLinkWithGO = (GameObject)EditorGUILayout.ObjectField("Linked with: ", link.linkedObject, typeof(GameObject), true);
+							if (newLinkWithGO != link.linkedObject) {
 								if (newLinkWithGO != null)
 									Undo.RecordObject(monitor, "Update \"Linked with\"");
 								else
 									Undo.RecordObject(monitor, "Remove \"Linked with\"");
-								link.objLink = newLinkWithGO;
+								link.linkedObject = newLinkWithGO;
 							}
 							EditorGUIUtility.labelWidth = 0; // reset default value
 							EditorGUILayout.EndHorizontal();
 
-                            if (link.objLink != null)
+							if (link.linkedObject != null)
 							{
 								// Check if linked object is monitored, contains at least one monitor component
-								if (link.objLink.GetComponent<ComponentMonitoring> () != null) {
+								if (link.linkedObject.GetComponent<ComponentMonitoring> () != null) {
 									// Check if at least one Pnml file is attached to one of monitor components
 									bool pnmlFound = false;
-									foreach (ComponentMonitoring m in link.objLink.GetComponents<ComponentMonitoring> ())
+									foreach (ComponentMonitoring m in link.linkedObject.GetComponents<ComponentMonitoring> ())
 										if (m.PnmlFile != null)
 											pnmlFound = true;
 									if (pnmlFound) {
@@ -294,14 +294,14 @@ public class EditionView : EditorWindow
 										EditorGUILayout.BeginHorizontal ();
 										// Add Produce/Require combo box
 										EditorGUIUtility.labelWidth = 30;
-										bool newDiff = EditorGUILayout.Popup ("And", link.diffusion ? 0 : 1, new string[] { "Produce", "Require" }, GUILayout.MaxWidth (90)) == 0 ? true : false;
-										if (newDiff != link.diffusion) {
-											Undo.RecordObject (monitor, "Update Produce/Require");
-											link.diffusion = newDiff;
+										int newType = EditorGUILayout.Popup ("And", link.type, new string[] { "Get", "Produce", "Require" }, GUILayout.MaxWidth (90));
+										if (newType != link.type) {
+											Undo.RecordObject (monitor, "Update Type of Link");
+											link.type = newType;
 										}
 										EditorGUIUtility.labelWidth = 0; // reset default value
 										// if Require selected, add "at least"/"at most" combo box
-										if (!link.diffusion) {
+										if (link.type == 2) {
 											int newFlag = EditorGUILayout.Popup (link.flagsType, optType, GUILayout.MaxWidth (150));
 											if (newFlag != link.flagsType) {
 												Undo.RecordObject (monitor, "Update At least/At most"); 
@@ -309,21 +309,19 @@ public class EditionView : EditorWindow
 											}
 										}
 										// Add weight input field
-										int newWeight = EditorGUILayout.IntField (link.poids, GUILayout.MaxWidth (25));
-										if (newWeight != link.poids) {
+										int newWeight = EditorGUILayout.IntField (link.weight, GUILayout.MaxWidth (25));
+										if (newWeight != link.weight) {
 											Undo.RecordObject (monitor, "Update Link Weight");
-											link.poids = newWeight;
+											link.weight = newWeight;
 										}
+										// Add in/from field
 										EditorGUIUtility.labelWidth = 20;
-										// build list of all places defined into target monitors
-										List<string> places = new List<String>();
-										foreach (ComponentMonitoring m in link.objLink.GetComponents<ComponentMonitoring> ()) {
-											if (m.PnmlFile != null){
-												foreach (string newItem in m.petriNet.getPlacesNames ())
-													places.Add (newItem+" ("+m.PnmlFile.name+")");
-											}
+										string src = "in";
+										if (link.type == 0) {
+											EditorGUIUtility.labelWidth = 40;
+											src = "from";
 										}
-										int newPlaceId = EditorGUILayout.Popup ("in", link.placeId, places.ToArray());
+										int newPlaceId = EditorGUILayout.Popup (src, link.placeId, link.getPlacesNameFromLinkedObject());
 										if (newPlaceId != link.placeId) {
 											Undo.RecordObject (monitor, "Update Link Target");
 											link.placeId = newPlaceId;
@@ -480,13 +478,13 @@ public class EditionView : EditorWindow
 						monitor.transitionLinks.Clear ();
 						monitor.petriNet = PetriNet.loadFromFile (path, monitor.id);
 						monitor.loadTransitionsLinks ();
-						// Add comments field
-						EditorGUILayout.LabelField ("Comments:");
-						string newComment = EditorGUILayout.TextArea (monitor.comments);
-						if (newComment != monitor.comments) {
-							Undo.RecordObject (monitor, "Update Comments");
-							monitor.comments = newComment;
-						}
+					}
+					// Add comments field
+					EditorGUILayout.LabelField ("Comments:");
+					string newComment = EditorGUILayout.TextArea (monitor.comments);
+					if (newComment != monitor.comments) {
+						Undo.RecordObject (monitor, "Update Comments");
+						monitor.comments = newComment;
 					}
 					// Draw links
 					DrawList (monitor);

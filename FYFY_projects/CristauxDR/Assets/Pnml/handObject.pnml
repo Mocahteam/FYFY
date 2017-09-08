@@ -1,10 +1,10 @@
 <pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
- <net id="n-35C8-285D8-0" type ="http://www.pnml.org/version-2009/grammar/ptnet">
+ <net id="n-A384-32B70-0" type ="http://www.pnml.org/version-2009/grammar/ptnet">
   <name>
    <text>handObject</text>
   </name>
- <page id="g-35C8-285E3-1">
-  <transition id="t-35C8-285E6-2">
+ <page id="g-A384-32B85-1">
+  <transition id="t-A384-32B8B-2">
   <name>
    <text>drop</text>
     <graphics>
@@ -12,10 +12,10 @@
     </graphics>
   </name>
    <graphics>
-    <position x="120" y="205"/>
+    <position x="215" y="165"/>
    </graphics>
   </transition>
-  <transition id="t-35C8-285F6-3">
+  <transition id="t-A384-32BAD-3">
   <name>
    <text>get</text>
     <graphics>
@@ -23,10 +23,10 @@
     </graphics>
   </name>
    <graphics>
-    <position x="170" y="135"/>
+    <position x="25" y="90"/>
    </graphics>
   </transition>
-  <place id="p-35C8-285F8-4">
+  <place id="p-A384-32BB0-4">
   <name>
    <text>inHand</text>
     <graphics>
@@ -34,10 +34,10 @@
     </graphics>
   </name>
    <graphics>
-    <position x="245" y="195"/>
+    <position x="110" y="50"/>
    </graphics>
   </place>
-  <place id="p-35C8-285FD-5">
+  <place id="p-A384-32BB5-5">
   <name>
    <text>inInventory</text>
     <graphics>
@@ -45,10 +45,10 @@
     </graphics>
   </name>
    <graphics>
-    <position x="160" y="50"/>
+    <position x="110" y="120"/>
    </graphics>
   </place>
-  <place id="p-35C8-28601-6">
+  <place id="p-A384-32BB9-6">
   <name>
    <text>onTheFloor</text>
     <graphics>
@@ -59,10 +59,10 @@
     <text>1</text>
    </initialMarking>
    <graphics>
-    <position x="45" y="170"/>
+    <position x="110" y="200"/>
    </graphics>
   </place>
-  <transition id="t-35C8-28604-7">
+  <transition id="t-A384-32BBE-7">
   <name>
    <text>store</text>
     <graphics>
@@ -70,10 +70,10 @@
     </graphics>
   </name>
    <graphics>
-    <position x="90" y="95"/>
+    <position x="25" y="165"/>
    </graphics>
   </transition>
-  <transition id="t-35C8-28606-8">
+  <transition id="t-A384-32BC0-8">
   <name>
    <text>storeBack</text>
     <graphics>
@@ -81,24 +81,24 @@
     </graphics>
   </name>
    <graphics>
-    <position x="280" y="75"/>
+    <position x="215" y="90"/>
    </graphics>
   </transition>
-  <arc id="e-35C8-2860A-9" source="p-35C8-28601-6" target="t-35C8-28604-7">
+  <arc id="e-A384-32BC4-9" source="t-A384-32BC0-8" target="p-A384-32BB5-5">
   </arc>
-  <arc id="e-35C8-2860D-10" source="p-35C8-285F8-4" target="t-35C8-285E6-2">
+  <arc id="e-A384-32BCA-10" source="t-A384-32BBE-7" target="p-A384-32BB5-5">
   </arc>
-  <arc id="e-35C8-2860D-11" source="p-35C8-285F8-4" target="t-35C8-28606-8">
+  <arc id="e-A384-32BCB-11" source="t-A384-32BAD-3" target="p-A384-32BB0-4">
   </arc>
-  <arc id="e-35C8-2860E-12" source="p-35C8-285FD-5" target="t-35C8-285F6-3">
+  <arc id="e-A384-32BCC-12" source="t-A384-32B8B-2" target="p-A384-32BB9-6">
   </arc>
-  <arc id="e-35C8-28610-13" source="t-35C8-285E6-2" target="p-35C8-28601-6">
+  <arc id="e-A384-32BCF-13" source="p-A384-32BB5-5" target="t-A384-32BAD-3">
   </arc>
-  <arc id="e-35C8-28612-14" source="t-35C8-285F6-3" target="p-35C8-285F8-4">
+  <arc id="e-A384-32BD0-14" source="p-A384-32BB0-4" target="t-A384-32BC0-8">
   </arc>
-  <arc id="e-35C8-28613-15" source="t-35C8-28604-7" target="p-35C8-285FD-5">
+  <arc id="e-A384-32BD1-15" source="p-A384-32BB0-4" target="t-A384-32B8B-2">
   </arc>
-  <arc id="e-35C8-28613-16" source="t-35C8-28606-8" target="p-35C8-285FD-5">
+  <arc id="e-A384-32BD2-16" source="p-A384-32BB9-6" target="t-A384-32BBE-7">
   </arc>
  </page>
  </net>

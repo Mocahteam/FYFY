@@ -12,30 +12,52 @@ namespace monitorV3{
 	public class Link {
 
 		public string label; //label utilisé pour arithmétique booléenne pour la construction des contraintes pendnant la génération du réseau de petri
-		public bool diffusion;
+		public int type = 2; // 0 means Get, 1 means Produce, 2 means Require
+		public int flagsType = 0; // 0 means "at least", 1 means "at most"
+		public int weight = 1;
 		public int placeId;
 		public Vector2 scroll;
 
-		public GameObject objLink;
+		public GameObject linkedObject;
 
-		//Type de la contrainte
-		public int flagsType;
-
-		//Poid de la contrainte
-		public int poids = 1;
-
-		public Link(string label,bool diffusion, int placeId, GameObject obj, int poids)
+		public Link(string label, int type, int placeId, GameObject obj, int weight)
         {
             this.label = label;
-            this.diffusion = diffusion;
+			this.type = type;
             this.placeId = placeId;
 
-            this.objLink = obj;
-            this.poids = poids;
+			this.linkedObject = obj;
+            this.weight = weight;
         }
         public Link()
         {
         }
 
+		public string [] getPlacesNameFromLinkedObject (){
+			List<string> places = new List<string> ();
+			if (linkedObject != null){
+				foreach (ComponentMonitoring m in linkedObject.GetComponents<ComponentMonitoring> ()) {
+					if (m.petriNet != null){
+						foreach (string newItem in m.petriNet.getPlacesNames ())
+							places.Add (newItem+" ("+m.PnmlFile.name+")");
+					}
+				}
+			}
+			return places.ToArray();
+		}
+
+		public Node getPlaceFromLinkedObject (int i){
+			if (linkedObject != null) {
+				foreach (ComponentMonitoring m in linkedObject.GetComponents<ComponentMonitoring> ()) {
+					if (m.petriNet != null) {
+						if (m.petriNet.places.Count <= i)
+							i -= m.petriNet.places.Count;
+						else
+							return m.petriNet.places[i];
+					}
+				}
+			}
+			return null;
+		}
     }
 }

@@ -33,7 +33,7 @@ namespace petriNetV2{
 			XDocument xDoc = XDocument.Load (path);
 
 			//Load Header
-			petriNet.Label = xDoc.Element ("{" + ns + "}pnml").Element ("{" + ns + "}net").Element ("{" + ns + "}name").Value;
+			petriNet.label = xDoc.Element ("{" + ns + "}pnml").Element ("{" + ns + "}net").Element ("{" + ns + "}name").Value;
 
 			//Load Transitions
 			IEnumerable<XElement> transitions = xDoc.Descendants ("{" + ns + "}transition");
@@ -48,7 +48,7 @@ namespace petriNetV2{
 				);
 
 				idNodeMatcher.Add (transition.Attribute ("id").Value, newTransition);
-				petriNet.Transitions.Add (newTransition);
+				petriNet.transitions.Add (newTransition);
 			}
 
 			//Load Places
@@ -64,7 +64,7 @@ namespace petriNetV2{
 				);
 
 				idNodeMatcher.Add(place.Attribute("id").Value,newPlace);
-				petriNet.Places.Add (newPlace);
+				petriNet.places.Add (newPlace);
 			}
 
 			//Load Arcs
@@ -80,8 +80,7 @@ namespace petriNetV2{
 								arc.Element ("{" + ns + "}type") != null ? Arc.stringToArcType(arc.Element ("{" + ns + "}type").Attribute ("value").Value) : ArcType.regular,
 					             arc.Element ("{" + ns + "}inscription") != null ? int.Parse (arc.Element ("{" + ns + "}inscription").Element ("{" + ns + "}text").Value) : 1
 				             );
-
-				petriNet.Arcs.Add (newArc);
+				petriNet.arcs.Add (newArc);
 			}
 		
 			return petriNet;
@@ -135,7 +134,7 @@ namespace petriNetV2{
 				xelemList.Add ( 
 					new XElement(ns+"arc",new XAttribute("id",++cptNodes),new XAttribute("source",arc.source.label+"_"+ arc.source.id),new XAttribute("target",arc.target.label+"_"+arc.target.id),
 						new XElement(ns+"inscription",
-							new XElement(ns+"text",arc.poid),
+							new XElement(ns+"text",arc.weight),
 							new XElement(ns+"graphics",
 								new XElement(ns+"offset",new XAttribute("x",0),new XAttribute("y",-10))
 							)
@@ -155,11 +154,7 @@ namespace petriNetV2{
 
 						new XElement(ns+"page",new XAttribute("id","A-A-1"),
 							xelemList.Select(x => x)
-
 						)
-
-
-
 					)
 				)
 			);

@@ -1,0 +1,105 @@
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+ <net id="n-90F8-B959D-0" type ="http://www.pnml.org/version-2009/grammar/ptnet">
+  <name>
+   <text>statePhases</text>
+  </name>
+ <page id="g-90F8-B95AE-1">
+  <place id="p-90F8-B95B2-2">
+  <name>
+   <text>inTransition</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="195" y="185"/>
+   </graphics>
+  </place>
+  <place id="p-90F8-B95C7-3">
+  <name>
+   <text>liquid</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="370" y="185"/>
+   </graphics>
+  </place>
+  <transition id="t-90F8-B95CC-4">
+  <name>
+   <text>meltingEnd</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="300" y="60"/>
+   </graphics>
+  </transition>
+  <transition id="t-90F8-B95D3-5">
+  <name>
+   <text>meltingStart</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="110" y="50"/>
+   </graphics>
+  </transition>
+  <place id="p-90F8-B95D7-6">
+  <name>
+   <text>solid</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>1</text>
+   </initialMarking>
+   <graphics>
+    <position x="30" y="160"/>
+   </graphics>
+  </place>
+  <transition id="t-90F8-B95DB-7">
+  <name>
+   <text>solidifyingEnd</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="125" y="315"/>
+   </graphics>
+  </transition>
+  <transition id="t-90F8-B95E0-8">
+  <name>
+   <text>solidifyingStart</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="305" y="315"/>
+   </graphics>
+  </transition>
+  <arc id="e-90F8-B95E6-9" source="t-90F8-B95DB-7" target="p-90F8-B95D7-6">
+  </arc>
+  <arc id="e-90F8-B95EA-10" source="t-90F8-B95E0-8" target="p-90F8-B95B2-2">
+  </arc>
+  <arc id="e-90F8-B95ED-11" source="p-90F8-B95C7-3" target="t-90F8-B95E0-8">
+  </arc>
+  <arc id="e-90F8-B95EE-12" source="p-90F8-B95B2-2" target="t-90F8-B95DB-7">
+  </arc>
+  <arc id="e-90F8-B95F0-13" source="p-90F8-B95B2-2" target="t-90F8-B95CC-4">
+  </arc>
+  <arc id="e-90F8-B95F1-14" source="p-90F8-B95D7-6" target="t-90F8-B95D3-5">
+  </arc>
+  <arc id="e-90F8-B95F2-15" source="t-90F8-B95CC-4" target="p-90F8-B95C7-3">
+  </arc>
+  <arc id="e-90F8-B95F3-16" source="t-90F8-B95D3-5" target="p-90F8-B95B2-2">
+  </arc>
+ </page>
+ </net>
+</pnml>
