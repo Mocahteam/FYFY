@@ -50,13 +50,15 @@ namespace monitorV3{
 							// Default : And of all link
 							foreach(Link curLink in transitionLink.links)
                             {
-                                // Make a copy of linked place and prefix its name with its game object name
-								Node linkedPlace_copy = new Node (curLink.getPlaceFromLinkedObject(curLink.placeId));
-								linkedPlace_copy.label = curLink.linkedObject.name+"_"+linkedPlace_copy.label;
-								// Define arc type
-								ArcType arcType = curLink.type == 2 ? Arc.stringToArcType(Arc.optType.ElementAt(curLink.flagsType)) : ArcType.regular;
-								// Create arc between Transition and linked place (depends on Get/Produce/Require diffusion state)
-								petriNet.arcs.Add(curLink.type != 1 ? new Arc(linkedPlace_copy, curTransition_copy, arcType, curLink.weight) : new Arc(curTransition_copy, linkedPlace_copy, arcType, curLink.weight));
+								if (curLink.linkedObject != null) {
+									// Make a copy of linked place and prefix its name with its game object name
+									Node linkedPlace_copy = new Node (curLink.getPlaceFromLinkedObject (curLink.placeId));
+									linkedPlace_copy.label = curLink.linkedObject.name + "_" + linkedPlace_copy.label;
+									// Define arc type
+									ArcType arcType = curLink.type == 2 ? Arc.stringToArcType (Arc.optType.ElementAt (curLink.flagsType)) : ArcType.regular;
+									// Create arc between Transition and linked place (depends on Get/Produce/Require diffusion state)
+									petriNet.arcs.Add (curLink.type != 1 ? new Arc (linkedPlace_copy, curTransition_copy, arcType, curLink.weight) : new Arc (curTransition_copy, linkedPlace_copy, arcType, curLink.weight));
+								}
                             }
                         }
                         else
@@ -79,13 +81,15 @@ namespace monitorV3{
 	                                {
 										// It's not an operator => we load the link
 										Link curLink = transitionLink.getLabeledLink(token);
-										// Make a copy of linked place and prefix its name with its game object name
-										Node linkedPlace_copy = new Node (curLink.getPlaceFromLinkedObject(curLink.placeId));
-										linkedPlace_copy.label = curLink.linkedObject.name+"_"+linkedPlace_copy.label;
-										// Define arc type
-										ArcType arcType = curLink.type == 2 ? Arc.stringToArcType(Arc.optType.ElementAt(curLink.flagsType)) : ArcType.regular;
-										// Create arc between Transition and linked place (depends on Get/Produce/Require diffusion state)
-										petriNet.arcs.Add(curLink.type != 1 ? new Arc(linkedPlace_copy, curTransition_copy, arcType, curLink.weight) : new Arc(curTransition_copy, linkedPlace_copy, arcType, curLink.weight));
+										if (curLink.linkedObject != null) {
+											// Make a copy of linked place and prefix its name with its game object name
+											Node linkedPlace_copy = new Node (curLink.getPlaceFromLinkedObject (curLink.placeId));
+											linkedPlace_copy.label = curLink.linkedObject.name + "_" + linkedPlace_copy.label;
+											// Define arc type
+											ArcType arcType = curLink.type == 2 ? Arc.stringToArcType (Arc.optType.ElementAt (curLink.flagsType)) : ArcType.regular;
+											// Create arc between Transition and linked place (depends on Get/Produce/Require diffusion state)
+											petriNet.arcs.Add (curLink.type != 1 ? new Arc (linkedPlace_copy, curTransition_copy, arcType, curLink.weight) : new Arc (curTransition_copy, linkedPlace_copy, arcType, curLink.weight));
+										}
 	                                }
 	                                else if (token.Equals("+"))
 	                                {

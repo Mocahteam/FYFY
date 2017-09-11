@@ -2,9 +2,11 @@
 using FYFY;
 using FYFY_plugins.TriggerManager;
 using FYFY_plugins.PointerManager;
+using System.Collections.Generic;
+using monitorV3;
 
 public class LeverManager : FSystem {
-	private Family levers = FamilyManager.getFamily(new AllOfComponents(typeof(Triggered3D), typeof(PointerOver), typeof(Lever), typeof(SpriteRenderer)));
+	private Family interactLevers = FamilyManager.getFamily(new AllOfComponents(typeof(Triggered3D), typeof(PointerOver), typeof(Lever), typeof(SpriteRenderer)));
 
 	// Use this to update member variables when system pause. 
 	// Advice: avoid to update your families inside this function.
@@ -19,7 +21,7 @@ public class LeverManager : FSystem {
 	// Use to process your families.
 	protected override void onProcess(int familiesUpdateCount) {
 		if (Input.GetMouseButtonDown (0)) {
-			foreach (GameObject go in levers) {
+			foreach (GameObject go in interactLevers) {
 				Lever lever = go.GetComponent<Lever> ();
 				Triggered3D triggered = go.GetComponent<Triggered3D> ();
 				foreach (GameObject target in triggered.Targets) {

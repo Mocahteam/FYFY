@@ -11,6 +11,7 @@ namespace petriNetV2{
 	public class PetriNet{
 		
 		public string label;
+		[HideInInspector]
 		public int id;
 		public List<Node> transitions;
 		public List<Node> places;
@@ -51,7 +52,7 @@ namespace petriNetV2{
 			foreach (Node oldTransition in old.transitions) {
 				Node newTransition = new Node (oldTransition);
 				if (prefix != null && prefix != "")
-					newTransition.Label = prefix + "_" + newTransition.Label;
+					newTransition.label = prefix + "_" + newTransition.label;
 				referencesMatcher.Add (oldTransition.label, newTransition);
 				transitions.Add (newTransition);
 			}
@@ -60,7 +61,7 @@ namespace petriNetV2{
 			foreach(Node oldPlace in old.places){
 				Node newPlace = new Node (oldPlace);
 				if (prefix != null && prefix != "")
-					newPlace.Label = prefix + "_" + newPlace.Label;
+					newPlace.label = prefix + "_" + newPlace.label;
 				referencesMatcher.Add (oldPlace.label, newPlace);
 				places.Add (new Node(newPlace));
 			}
@@ -265,8 +266,8 @@ namespace petriNetV2{
 
 			foreach (Arc arc in arcs) {
 				str += "\tEdge " + (++cpt) + " :\n";
-				str += "\t\tSource : "+arc.source.Label+"\n";
-				str += "\t\tTarget : "+arc.target.Label+"\n";
+				str += "\t\tSource : "+arc.source.label+"\n";
+				str += "\t\tTarget : "+arc.target.label+"\n";
 				str += "\t\tType : "+arc.type+"\n";
 				str += "\t\tPoid : "+arc.weight+"\n";
 

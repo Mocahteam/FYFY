@@ -8,11 +8,14 @@ namespace petriNetV2{
 	[Serializable]
 	public class Node  {
 
-        //Datas set to match pnml format
-        public int id;
+		//Datas set to match pnml format
+		[HideInInspector]
+		public int id;
 		public string label;
-		public Vector2 offset;
 		public int initialMarking;
+		[HideInInspector]
+		public Vector2 offset;
+		[HideInInspector]
 		public Vector2 position;
 
 		public Node(string label,int id, Vector2 offset, int initialMarking,Vector2 position){
@@ -40,44 +43,7 @@ namespace petriNetV2{
 			position = old.position;
 		}
 
-
-		//Getters & Setters TODO Refactor if readonly
-		public string Label {
-			get {
-				return this.label;
-			}
-			set {
-				label = value;
-			}
-		}
-
-		public Vector2 Offset {
-			get {
-				return this.offset;
-			}
-			set {
-				offset = value;
-			}
-		}
-
-		public int InitialMarking {
-			get {
-				return this.initialMarking;
-			}
-			set {
-				initialMarking = value;
-			}
-		}
-
-		public Vector2 Position {
-			get {
-				return this.position;
-			}
-			set {
-				position = value;
-			}
-		}
-			public override string ToString ()
+		public override string ToString ()
 		{
 			return string.Format ("[Node: label={0}]", label);
 		}

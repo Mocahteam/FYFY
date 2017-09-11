@@ -14,9 +14,6 @@ public class TraceHandler {
 
     public static void trace(string type, string trace)
     {
-  
-        Debug.Log("record element");
-
         xelemList.Add(
                     new XElement("transition", 
                         new XAttribute("action", trace),
@@ -29,7 +26,6 @@ public class TraceHandler {
     //Création des fichiers après destruction (comportement potentiellement anormal ?)
     public static void save(string name)
     {
-        Debug.Log("Close Instance");
         string timeStamp = GetTimestamp(DateTime.Now);
         //<? xml version = "1.0" encoding = "utf-8" ?>
         //< data >
@@ -58,7 +54,6 @@ public class TraceHandler {
     internal static void saveTransitionsLabels(string name,List<Node> transitions)
     {
         if(!File.Exists("specifs\\" + name + "_specifs" + ".xml")){
-            Debug.Log("create specifs file");
             List<XElement> xelemListLabels = new List<XElement>();
             foreach(Node n in transitions)
             {

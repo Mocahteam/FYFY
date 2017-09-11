@@ -19,7 +19,7 @@ public class EditionView : EditorWindow
 {
     public Rect windowRect = new Rect(20, 20, 20, 20);
 	private static EditorWindow window;
-    private static string[] optType = new string[] { "at least", "at the most" };
+    private static string[] optType = new string[] { "at least", "less than" };
 
 	private int ObjectSelectedFlag = 0;
     private int oldFlag;
@@ -41,6 +41,9 @@ public class EditionView : EditorWindow
     private int flagTransition;
     static int cptSt = 0;
     private Vector2 scrollPosition;
+
+	private bool showStates = false;
+	private bool showActions = false;
 
 	private class Family2Monitor {
 		public string systemName;
@@ -237,225 +240,19 @@ public class EditionView : EditorWindow
         }
         
         windowRect = GUI.Window(0, windowRect, DoMyWindow, "Editing monitors");
-    }
+	}
 
-	private void DrawList(ComponentMonitoring monitor)
-    {
-        if (monitor.petriNet.transitions.Count != 0)
-        {
-            // Build explicit labels
-			List<string> labelsBuilt = new List<string>();
-
-			foreach (TransitionLink tc in monitor.transitionLinks)
-                labelsBuilt.Add(tc.transition.label + " (links: "+ tc.links.Count+")");
-
-            flagTransition = EditorGUILayout.Popup("Action: ", flagTransition, labelsBuilt.ToArray());
-    
-            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-
-			TransitionLink tLink = monitor.transitionLinks[flagTransition];
-            scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
-            {
-				foreach (Link link in tLink.links.ToArray())
-                {
-                    if (tLink.links.IndexOf(link) != 0)
-						EditorGUILayout.Space();
-					Rect rect = EditorGUILayout.BeginHorizontal();
-					{
-						EditorGUI.DrawRect(rect, new Color(0.9f, 0.9f, 0.9f, 1));
-						EditorGUILayout.BeginVertical();
-                        {
-							// Add first line
-							EditorGUILayout.BeginHorizontal();
-							// Add GameObject Input
-                            EditorGUIUtility.labelWidth = 80;
-							GameObject newLinkWithGO = (GameObject)EditorGUILayout.ObjectField("Linked with: ", link.linkedObject, typeof(GameObject), true);
-							if (newLinkWithGO != link.linkedObject) {
-								if (newLinkWithGO != null)
-									Undo.RecordObject(monitor, "Update \"Linked with\"");
-								else
-									Undo.RecordObject(monitor, "Remove \"Linked with\"");
-								link.linkedObject = newLinkWithGO;
-							}
-							EditorGUIUtility.labelWidth = 0; // reset default value
-							EditorGUILayout.EndHorizontal();
-
-							if (link.linkedObject != null)
-							{
-								// Check if linked object is monitored, contains at least one monitor component
-								if (link.linkedObject.GetComponent<ComponentMonitoring> () != null) {
-									// Check if at least one Pnml file is attached to one of monitor components
-									bool pnmlFound = false;
-									foreach (ComponentMonitoring m in link.linkedObject.GetComponents<ComponentMonitoring> ())
-										if (m.PnmlFile != null)
-											pnmlFound = true;
-									if (pnmlFound) {
-										// Add second line
-										EditorGUILayout.BeginHorizontal ();
-										// Add Produce/Require combo box
-										EditorGUIUtility.labelWidth = 30;
-										int newType = EditorGUILayout.Popup ("And", link.type, new string[] { "Get", "Produce", "Require" }, GUILayout.MaxWidth (90));
-										if (newType != link.type) {
-											Undo.RecordObject (monitor, "Update Type of Link");
-											link.type = newType;
-										}
-										EditorGUIUtility.labelWidth = 0; // reset default value
-										// if Require selected, add "at least"/"at most" combo box
-										if (link.type == 2) {
-											int newFlag = EditorGUILayout.Popup (link.flagsType, optType, GUILayout.MaxWidth (150));
-											if (newFlag != link.flagsType) {
-												Undo.RecordObject (monitor, "Update At least/At most"); 
-												link.flagsType = newFlag;
-											}
-										}
-										// Add weight input field
-										int newWeight = EditorGUILayout.IntField (link.weight, GUILayout.MaxWidth (25));
-										if (newWeight != link.weight) {
-											Undo.RecordObject (monitor, "Update Link Weight");
-											link.weight = newWeight;
-										}
-										// Add in/from field
-										EditorGUIUtility.labelWidth = 20;
-										string src = "in";
-										if (link.type == 0) {
-											EditorGUIUtility.labelWidth = 40;
-											src = "from";
-										}
-										int newPlaceId = EditorGUILayout.Popup (src, link.placeId, link.getPlacesNameFromLinkedObject());
-										if (newPlaceId != link.placeId) {
-											Undo.RecordObject (monitor, "Update Link Target");
-											link.placeId = newPlaceId;
-										}
-										EditorGUIUtility.labelWidth = 0; // reset default value
-										EditorGUILayout.EndHorizontal ();
-										// Add third line
-										EditorGUILayout.BeginHorizontal ();
-										EditorGUIUtility.labelWidth = 220;
-										string newLabel = EditorGUILayout.TextField ("Label for logic expression (optional):", link.label);
-										if (newLabel != link.label) {
-											Undo.RecordObject (monitor, "Update Link Label");
-											link.label = newLabel;
-										}
-										EditorGUIUtility.labelWidth = 0; // reset default value
-										EditorGUILayout.EndHorizontal ();
-										// Check label
-										// Add warning if label includes "()*+ " token
-										GUIStyle s = new GUIStyle (GUI.skin.label);
-										if (link.label.Contains ("(") || link.label.Contains (")") || link.label.Contains ("*") || link.label.Contains ("+") || link.label.Contains (" ")) {
-											s.normal.textColor = Color.red;
-											s.fontStyle = FontStyle.Bold;
-											link.scroll = EditorGUILayout.BeginScrollView (link.scroll, GUILayout.Height (35));
-											EditorGUILayout.LabelField ("Error! \"(\", \")\", \"*\", \"+\" and \" \" are not allowed into link label.", s, GUILayout.Width (405));
-											EditorGUILayout.EndScrollView ();
-										} else {
-											// Add warning message if new label is not included into links logic expression
-											if (tLink.logic != null && tLink.logic != "" && !tLink.logic.Contains (link.label)) {
-												s.normal.textColor = new Color (0.9f, 0.5f, 0.1f, 1); // orange
-												s.fontStyle = FontStyle.Bold;
-												link.scroll = EditorGUILayout.BeginScrollView (link.scroll, GUILayout.Height (35));
-												EditorGUILayout.LabelField ("Warning! This label is not curently included into \"Links logic expression\" field. If so, this link will not be used in monitoring process.", s, GUILayout.Width (865));
-												EditorGUILayout.EndScrollView ();
-											} else {
-												// Add warning if two links have the same label
-												bool unique = true;
-												foreach (Link l in tLink.links)
-													if (l != link && l.label == link.label)
-														unique = false;
-												if (!unique) {
-													s.normal.textColor = Color.red;
-													s.fontStyle = FontStyle.Bold;
-													link.scroll = EditorGUILayout.BeginScrollView (link.scroll, GUILayout.Height (35));
-													EditorGUILayout.LabelField ("Warning! Two links have the same label. This is ambiguous in \"Links logic expression\" field.", s, GUILayout.Width (605));
-													EditorGUILayout.EndScrollView ();
-												} else {
-													// Add blank area to avoid flickering on editing labels in case of warning (lost of focus)
-													link.scroll = EditorGUILayout.BeginScrollView (link.scroll, GUILayout.Height (35));
-													EditorGUILayout.LabelField ("", s, GUILayout.Width (80));
-													EditorGUILayout.EndScrollView ();
-												}
-											}
-										}
-									} else {
-										EditorGUILayout.BeginHorizontal();
-										EditorGUILayout.LabelField("No Petri Net attached to the chosen game object.");
-										EditorGUILayout.EndHorizontal();
-									}
-								} else {
-									EditorGUILayout.BeginHorizontal();
-									EditorGUILayout.LabelField("The game object chosen is not monitored.");
-									EditorGUILayout.EndHorizontal();
-								}
-                            }
-                        }
-                        EditorGUILayout.EndVertical();
-						if (GUILayout.Button ("X", GUILayout.Width (20))) {
-							Undo.RecordObject (monitor, "Delete link");
-							tLink.links.Remove (link);
-						}
-                    }
-                    EditorGUILayout.EndHorizontal();
-                }
-            }
-            EditorGUILayout.EndScrollView();
-            if (GUILayout.Button("Add link"))
-            {
-				Link newLink = new Link();
-                newLink.label = "l" + (cptSt++);
-				// Check if another link have the same name
-				bool unique;
-				do {
-					unique = true;
-					foreach (Link l in tLink.links)
-						if (l.label == newLink.label)
-							unique = false;
-					if (!unique)
-						newLink.label = "l" + (cptSt++);
-				} while (!unique);
-				Undo.RecordObject (monitor, "Create link");
-				tLink.links.Add(newLink);
-            }
-
-            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-
-            EditorGUIUtility.labelWidth = 150;
-			string newExpr = EditorGUILayout.TextField("Logic expression of links:", tLink.logic);
-			GUIStyle skin = new GUIStyle (GUI.skin.label);
-			skin.normal.textColor = new Color (0.4f, 0.4f, 0.4f, 1); // soft grey
-			EditorGUILayout.LabelField ("Exemple: (l0+l2)*l3; Default: *", skin);
-			if (newExpr != tLink.logic) {
-				Undo.RecordObject (monitor, "Update logic expression");
-				tLink.logic = newExpr;
-			}
-			// Check expression 
-			if (tLink.logic != null && tLink.logic != "") {
-				AriParser arip = new AriParser ();
-				if (arip.validAri (tLink)) {
-					skin.normal.textColor = new Color (0, 0.6f, 0, 1); // green
-					EditorGUILayout.LabelField ("\tValid expression.", skin);
-				} else {
-					skin.normal.textColor = Color.red;
-					EditorGUILayout.LabelField ("\tInvalid expression.", skin);
-				}
-			}
-        }
-        else
-            EditorGUILayout.LabelField("This Petri Net doesn't contain transitions.");
-    }
-
-    public void DrawUI(ComponentMonitoring monitor)
-    {
-        // Pnml input field
+	public void DrawUI(ComponentMonitoring monitor)
+	{
+		// Pnml input field
 		UnityEngine.Object tmp = EditorGUILayout.ObjectField("PNML file:", monitor.PnmlFile, typeof(UnityEngine.Object), true);
 		if (tmp == null) {
 			if (tmp != monitor.PnmlFile) {
 				Undo.RecordObject (monitor, "Remove PNML file");
 				// Unloading
 				monitor.PnmlFile = tmp;
-				monitor.transitionLinks.Clear ();
-				if (monitor.petriNet != null)
-					monitor.petriNet = null;
 			}
-			
+
 		} else {
 			bool validFileType = Path.GetExtension (AssetDatabase.GetAssetPath (tmp)).Equals (".pnml");
 			if (!validFileType)
@@ -473,11 +270,7 @@ public class EditionView : EditorWindow
 						Undo.RecordObject (monitor, "Change PNML file");
 						// Loading
 						monitor.PnmlFile = tmp;
-						string path = AssetDatabase.GetAssetPath (monitor.PnmlFile);
 						flagTransition = 0;
-						monitor.transitionLinks.Clear ();
-						monitor.petriNet = PetriNet.loadFromFile (path, monitor.id);
-						monitor.loadTransitionsLinks ();
 					}
 					// Add comments field
 					EditorGUILayout.LabelField ("Comments:");
@@ -486,11 +279,246 @@ public class EditionView : EditorWindow
 						Undo.RecordObject (monitor, "Update Comments");
 						monitor.comments = newComment;
 					}
-					// Draw links
-					DrawList (monitor);
+					// Draw states
+
+					EditorGUILayout.LabelField ("", GUI.skin.horizontalSlider);
+					DrawStates (monitor);
+					EditorGUILayout.LabelField ("", GUI.skin.horizontalSlider);
+					// Draw actions
+					DrawActions (monitor);
+					EditorGUILayout.LabelField ("", GUI.skin.horizontalSlider);
 				}
 			}
 		}
+	}
+
+	private void DrawStates(ComponentMonitoring monitor)
+	{
+		
+		showStates = EditorGUILayout.Foldout (showStates, "Set initial states");
+		if (showStates) {
+			EditorGUI.indentLevel += 1;
+			if (monitor.petriNet.places.Count == 0)
+				EditorGUILayout.LabelField ("This Petri Net doesn't contain places.");
+			else {
+				foreach (Node place in monitor.petriNet.places) {
+					// Add input field to change initial marking
+					EditorGUIUtility.labelWidth = 150;
+					int newMarking = EditorGUILayout.IntField (place.label, place.initialMarking, GUILayout.MaxWidth (175));
+					EditorGUIUtility.labelWidth = 0; // reset default value
+					if (newMarking != place.initialMarking) {
+						Undo.RecordObject (monitor, "Update Initial state");
+						place.initialMarking = newMarking;
+					}
+				}
+			}
+			EditorGUI.indentLevel -= 1;
+		}
+	}
+
+	private void DrawActions(ComponentMonitoring monitor)
+    {
+		showActions = EditorGUILayout.Foldout (showActions, "Define links on actions");
+		if (showActions) {
+			EditorGUI.indentLevel += 1;
+			if (monitor.petriNet.transitions.Count == 0)
+				EditorGUILayout.LabelField("This Petri Net doesn't contain transitions.");
+			else
+			{
+				// Build explicit labels
+				List<string> labelsBuilt = new List<string> ();
+
+				foreach (TransitionLink tc in monitor.transitionLinks)
+					labelsBuilt.Add (tc.transition.label + " (links: " + tc.links.Count + ")");
+
+				flagTransition = EditorGUILayout.Popup ("Action: ", flagTransition, labelsBuilt.ToArray ());
+
+				TransitionLink tLink = monitor.transitionLinks [flagTransition];
+				scrollPosition = EditorGUILayout.BeginScrollView (scrollPosition);
+				{
+					foreach (Link link in tLink.links.ToArray()) {
+						if (tLink.links.IndexOf (link) != 0)
+							EditorGUILayout.Space ();
+						Rect rect = EditorGUILayout.BeginHorizontal ();
+						{
+							EditorGUI.DrawRect (rect, new Color (0.9f, 0.9f, 0.9f, 1));
+							EditorGUILayout.BeginVertical ();
+							{
+								// Add first line
+								EditorGUILayout.BeginHorizontal ();
+								// Add GameObject Input
+								EditorGUIUtility.labelWidth = 100;
+								GameObject newLinkWithGO = (GameObject)EditorGUILayout.ObjectField ("Linked with: ", link.linkedObject, typeof(GameObject), true);
+								if (newLinkWithGO != link.linkedObject) {
+									if (newLinkWithGO != null)
+										Undo.RecordObject (monitor, "Update \"Linked with\"");
+									else
+										Undo.RecordObject (monitor, "Remove \"Linked with\"");
+									link.linkedObject = newLinkWithGO;
+								}
+								EditorGUIUtility.labelWidth = 0; // reset default value
+								EditorGUILayout.EndHorizontal ();
+
+								if (link.linkedObject != null) {
+									// Check if linked object is monitored, contains at least one monitor component
+									if (link.linkedObject.GetComponent<ComponentMonitoring> () != null) {
+										// Check if at least one Pnml file is attached to one of monitor components
+										bool pnmlFound = false;
+										foreach (ComponentMonitoring m in link.linkedObject.GetComponents<ComponentMonitoring> ())
+											if (m.PnmlFile != null)
+												pnmlFound = true;
+										if (pnmlFound) {
+											// Add second line
+											EditorGUILayout.BeginHorizontal ();
+											// Add Produce/Require combo box
+											EditorGUIUtility.labelWidth = 50;
+											int newType = EditorGUILayout.Popup ("And", link.type, new string[] { "Get", "Produce", "Require" }, GUILayout.MaxWidth (110));
+											if (newType != link.type) {
+												Undo.RecordObject (monitor, "Update Type of Link");
+												link.type = newType;
+											}
+											EditorGUI.indentLevel -= 1;
+											EditorGUIUtility.labelWidth = 0; // reset default value
+											// if Require selected, add "at least"/"at most" combo box
+											if (link.type == 2) {
+												int newFlag = EditorGUILayout.Popup (link.flagsType, optType, GUILayout.MaxWidth (80));
+												if (newFlag != link.flagsType) {
+													Undo.RecordObject (monitor, "Update At least/At most"); 
+													link.flagsType = newFlag;
+												}
+											}
+											// Add weight input field
+											int newWeight = EditorGUILayout.IntField (link.weight, GUILayout.MaxWidth (25));
+											if (newWeight != link.weight) {
+												Undo.RecordObject (monitor, "Update Link Weight");
+												link.weight = newWeight;
+											}
+											// Add in/from field
+											EditorGUIUtility.labelWidth = 20;
+											string src = "in";
+											if (link.type == 0) {
+												EditorGUIUtility.labelWidth = 40;
+												src = "from";
+											}
+											int newPlaceId = EditorGUILayout.Popup (src, link.placeId, link.getPlacesNameFromLinkedObject ());
+											if (newPlaceId != link.placeId) {
+												Undo.RecordObject (monitor, "Update Link Target");
+												link.placeId = newPlaceId;
+											}
+											EditorGUIUtility.labelWidth = 0; // reset default value
+											EditorGUILayout.EndHorizontal ();
+											// Add third line
+											EditorGUILayout.BeginHorizontal ();
+											EditorGUIUtility.labelWidth = 240;
+											EditorGUI.indentLevel += 1;
+											string newLabel = EditorGUILayout.TextField ("Label for logic expression (optional):", link.label);
+											if (newLabel != link.label) {
+												Undo.RecordObject (monitor, "Update Link Label");
+												link.label = newLabel;
+											}
+											EditorGUIUtility.labelWidth = 0; // reset default value
+											EditorGUILayout.EndHorizontal ();
+											// Check label
+											// Add warning if label includes "()*+ " token
+											GUIStyle s = new GUIStyle (GUI.skin.label);
+											if (link.label.Contains ("(") || link.label.Contains (")") || link.label.Contains ("*") || link.label.Contains ("+") || link.label.Contains (" ")) {
+												s.normal.textColor = Color.red;
+												s.fontStyle = FontStyle.Bold;
+												link.scroll = EditorGUILayout.BeginScrollView (link.scroll, GUILayout.Height (35));
+												EditorGUILayout.LabelField ("Error! \"(\", \")\", \"*\", \"+\" and \" \" are not allowed into link label.", s, GUILayout.Width (425));
+												EditorGUILayout.EndScrollView ();
+											} else {
+												// Add warning message if new label is not included into links logic expression
+												if (tLink.logic != null && tLink.logic != "" && !tLink.logic.Contains (link.label)) {
+													s.normal.textColor = new Color (0.9f, 0.5f, 0.1f, 1); // orange
+													s.fontStyle = FontStyle.Bold;
+													link.scroll = EditorGUILayout.BeginScrollView (link.scroll, GUILayout.Height (35));
+													EditorGUILayout.LabelField ("Warning! This label is not curently included into \"Links logic expression\" field. If so, this link will not be used in monitoring process.", s, GUILayout.Width (885));
+													EditorGUILayout.EndScrollView ();
+												} else {
+													// Add warning if two links have the same label
+													bool unique = true;
+													foreach (Link l in tLink.links)
+														if (l != link && l.label == link.label)
+															unique = false;
+													if (!unique) {
+														s.normal.textColor = Color.red;
+														s.fontStyle = FontStyle.Bold;
+														link.scroll = EditorGUILayout.BeginScrollView (link.scroll, GUILayout.Height (35));
+														EditorGUILayout.LabelField ("Warning! Two links have the same label. This is ambiguous in \"Links logic expression\" field.", s, GUILayout.Width (625));
+														EditorGUILayout.EndScrollView ();
+													} else {
+														// Add blank area to avoid flickering on editing labels in case of warning (lost of focus)
+														link.scroll = EditorGUILayout.BeginScrollView (link.scroll, GUILayout.Height (35));
+														EditorGUILayout.LabelField ("", s, GUILayout.Width (80));
+														EditorGUILayout.EndScrollView ();
+													}
+												}
+											}
+										} else {
+											EditorGUILayout.BeginHorizontal ();
+											EditorGUILayout.LabelField ("No Petri Net attached to the chosen game object.");
+											EditorGUILayout.EndHorizontal ();
+										}
+									} else {
+										EditorGUILayout.BeginHorizontal ();
+										EditorGUILayout.LabelField ("The game object chosen is not monitored.");
+										EditorGUILayout.EndHorizontal ();
+									}
+								}
+							}
+							EditorGUILayout.EndVertical ();
+							if (GUILayout.Button ("X", GUILayout.Width (20))) {
+								Undo.RecordObject (monitor, "Delete link");
+								tLink.links.Remove (link);
+							}
+						}
+						EditorGUILayout.EndHorizontal ();
+					}
+				}
+				EditorGUILayout.EndScrollView ();
+				if (GUILayout.Button ("Add link")) {
+					Link newLink = new Link ();
+					newLink.label = "l" + (cptSt++);
+					// Check if another link have the same name
+					bool unique;
+					do {
+						unique = true;
+						foreach (Link l in tLink.links)
+							if (l.label == newLink.label)
+								unique = false;
+						if (!unique)
+							newLink.label = "l" + (cptSt++);
+					} while (!unique);
+					Undo.RecordObject (monitor, "Create link");
+					tLink.links.Add (newLink);
+				}
+
+				EditorGUILayout.LabelField ("", GUI.skin.horizontalSlider);
+
+				EditorGUIUtility.labelWidth = 150;
+				string newExpr = EditorGUILayout.TextField ("Logic expression of links:", tLink.logic);
+				GUIStyle skin = new GUIStyle (GUI.skin.label);
+				skin.normal.textColor = new Color (0.4f, 0.4f, 0.4f, 1); // soft grey
+				EditorGUILayout.LabelField ("Exemple: (l0+l2)*l3; Default: *", skin);
+				if (newExpr != tLink.logic) {
+					Undo.RecordObject (monitor, "Update logic expression");
+					tLink.logic = newExpr;
+				}
+				// Check expression 
+				if (tLink.logic != null && tLink.logic != "") {
+					AriParser arip = new AriParser ();
+					if (arip.validAri (tLink)) {
+						skin.normal.textColor = new Color (0, 0.6f, 0, 1); // green
+						EditorGUILayout.LabelField ("\tValid expression.", skin);
+					} else {
+						skin.normal.textColor = Color.red;
+						EditorGUILayout.LabelField ("\tInvalid expression.", skin);
+					}
+				}
+			}
+			EditorGUI.indentLevel -= 1;
+        }
     }
 
     void makeMenu()
