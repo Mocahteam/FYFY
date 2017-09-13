@@ -12,6 +12,8 @@ namespace monitoring{
 	public class TransitionLink {
 		public List<Link> links;
 		public Node transition;
+		public bool isSystemAction = false;
+		public bool isEndAction = false;
 		public string logic;
 
 		public TransitionLink(){

@@ -8,21 +8,26 @@ using System.Linq;
 
 
 namespace monitoring{
-	public class PetriNetGenerator : MonoBehaviour {
+	public class MonitoringManager : MonoBehaviour {
+
+		public static class Source {
+			public static string SYSTEM = "system";
+			public static string PLAYER = "player";
+		};
 
         public string filename;
 
         public void Start()
         {
-            GeneratePN();
+            GeneratePNandSpecifs ();
         }
 
         public void OnDestroy()
         {
-            TraceHandler.save(filename);
+            XmlHandler.saveTraces(filename);
         }
 
-        void GeneratePN () {
+        private void GeneratePNandSpecifs () {
 			// Build final PetriNet
 			PetriNet petriNet = new PetriNet ();
 
@@ -43,6 +48,8 @@ namespace monitoring{
 						// Make a copy of current transition and prefix its name with its game object name
 						Node curTransition_copy = new Node(transitionLink.transition);
 						curTransition_copy.label = monitor.gameObject.name+"_"+curTransition_copy.label;
+						// Add this transition to Specifications
+						XmlHandler.addSpecif(curTransition_copy.label, transitionLink.isSystemAction, transitionLink.isEndAction);
                         Node oldTransition = curTransition_copy;
                         if (isNullOrWhiteSpace(transitionLink.logic))
                         {
@@ -107,6 +114,8 @@ namespace monitoring{
 										curTransition_copy = new Node("or" + (or++) + "_" + oldTransition.label, curTransition_copy.id, curTransition_copy.offset, curTransition_copy.initialMarking, curTransition_copy.position);
 										// Add this new transition to PN
 	                                    petriNet.transitions.Add(curTransition_copy);
+										// and to specifications
+										XmlHandler.addSpecif(curTransition_copy.label, transitionLink.isSystemAction, transitionLink.isEndAction);
 										// Duplicate arcs from old transition
 	                                    foreach (Arc a in tmpPN.getConcernedArcs(oldTransition))
 	                                    {
@@ -123,7 +132,7 @@ namespace monitoring{
 								}
 							}
 							else
-								Debug.LogError("Error!!! PetriNetGenerator: Logic expression not valid");
+								Debug.LogError("Petri Net Building aborted: Logic expression of \""+transitionLink.transition.label+"\" action from \""+monitor.gameObject.name+"\" is not valid => \""+transitionLink.logic+"\". Please check it from Monitor edit view.");
                         }
                     }
 					offsetX += monitor.PetriNet.getWidth ()+50; // Add spaces between PN
@@ -131,7 +140,7 @@ namespace monitoring{
 			}
 				
 			PnmlParser.SaveAtPath (petriNet, filename+".pnml");
-            TraceHandler.saveTransitionsLabels(filename, petriNet.transitions);
+			XmlHandler.saveSpecifications(filename);
         }
 
         private static bool isNullOrWhiteSpace(string str)

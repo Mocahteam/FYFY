@@ -42,18 +42,18 @@ public class LeverManager : FSystem {
 						SpriteRenderer sr = go.GetComponent<SpriteRenderer> ();
 						if (lever.isOn) {
 							sr.sprite = lever.on;
-							fm.trace("turnOn", TraceHandler.Source.PLAYER);
+							fm.trace("turnOn", MonitoringManager.Source.PLAYER);
 						} else {
 							sr.sprite = lever.off;
-							fm.trace("turnOff", TraceHandler.Source.PLAYER);
+							fm.trace("turnOff", MonitoringManager.Source.PLAYER);
 						}
 					}
 				}
 				if (!heroFound) {
 					if (lever.isOn)
-						fm.trace("turnOff", TraceHandler.Source.PLAYER, true);
+						fm.trace("turnOff", MonitoringManager.Source.PLAYER, true);
 					else
-						fm.trace("turnOn", TraceHandler.Source.PLAYER, true);
+						fm.trace("turnOn", MonitoringManager.Source.PLAYER, true);
 				}
 			}
 		}

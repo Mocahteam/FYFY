@@ -32,18 +32,18 @@ public class DoorManager : FSystem {
 							heroFound = true;
 							door.isOpen = !door.isOpen;
 							if (door.isOpen)
-								monitor.trace("turnOn", TraceHandler.Source.PLAYER, false, "l0");
+								monitor.trace("turnOn", MonitoringManager.Source.PLAYER, false, "l0");
 							else
-								monitor.trace("trunOff", TraceHandler.Source.PLAYER);
+								monitor.trace("trunOff", MonitoringManager.Source.PLAYER);
 							anim.SetBool ("isOpen", door.isOpen);
 						}
 					}
 				}
 				if (!(door.constraint == null || door.constraint.activeInHierarchy) || !heroFound) {
 					if (door.isOpen)
-						monitor.trace("turnOff", TraceHandler.Source.PLAYER, true);
+						monitor.trace("turnOff", MonitoringManager.Source.PLAYER, true);
 					else
-						monitor.trace("turnOn", TraceHandler.Source.PLAYER, true);
+						monitor.trace("turnOn", MonitoringManager.Source.PLAYER, true);
 				}
 			}
 		}

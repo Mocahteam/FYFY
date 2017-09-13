@@ -33,17 +33,17 @@ public class BoilerManager : FSystem {
 							boiler.isOn = !boiler.isOn;
 							anim.SetBool ("isOn", boiler.isOn);
 							if (boiler.isOn)
-								cm.trace("turnOn", TraceHandler.Source.PLAYER);
+								cm.trace("turnOn", MonitoringManager.Source.PLAYER);
 							else
-								cm.trace("turnOff", TraceHandler.Source.PLAYER);
+								cm.trace("turnOff", MonitoringManager.Source.PLAYER);
 						}
 					}
 				}
 				if (!(boiler.isOn || boiler.constraint == null || boiler.constraint.activeInHierarchy) || !heroFound) {
 					if (boiler.isOn)
-						cm.trace ("turnOn", TraceHandler.Source.PLAYER, true);
+						cm.trace ("turnOn", MonitoringManager.Source.PLAYER, true);
 					else
-						cm.trace("turnOff", TraceHandler.Source.PLAYER, true);
+						cm.trace("turnOff", MonitoringManager.Source.PLAYER, true);
 				}
 			}
 		}

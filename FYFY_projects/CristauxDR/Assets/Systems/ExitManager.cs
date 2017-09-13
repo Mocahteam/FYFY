@@ -43,7 +43,7 @@ public class ExitManager : FSystem {
 			foreach (GameObject target in triggered.Targets) {
 				if (target == hero_GO) {
 					heroFound = true;
-					monitor.trace("perform", TraceHandler.Source.PLAYER);
+					monitor.trace("perform", MonitoringManager.Source.PLAYER);
 					GameObjectManager.setGameObjectState (endScreen_GO, true);
 					foreach (FSystem sys in FSystemManager.fixedUpdateSystems())
 						sys.Pause = true;
@@ -54,7 +54,7 @@ public class ExitManager : FSystem {
 				}
 			}
 			if (!heroFound)
-				monitor.trace("perform", TraceHandler.Source.PLAYER, true);
+				monitor.trace("perform", MonitoringManager.Source.PLAYER, true);
 		}
 	}
 }

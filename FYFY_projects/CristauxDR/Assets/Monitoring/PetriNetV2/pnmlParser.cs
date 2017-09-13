@@ -161,7 +161,5 @@ namespace monitoring{
             System.IO.Directory.CreateDirectory("completeNet");
             doc.Save ("completeNet\\"+path);
 		}
-
-
 	}
 }

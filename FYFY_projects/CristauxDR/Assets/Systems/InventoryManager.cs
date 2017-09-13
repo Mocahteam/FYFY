@@ -71,18 +71,18 @@ public class InventoryManager : FSystem {
 						alreadySelected = true;
 						if (cm != null)
 							// already selected => player deselect the item
-							cm.trace("storeBack", TraceHandler.Source.PLAYER);
+							cm.trace("storeBack", MonitoringManager.Source.PLAYER);
 					} else
 						if (cm != null)
 							// player select another item  => System action to storeback current item
-							cm.trace("storeBack", TraceHandler.Source.SYSTEM);
+							cm.trace("storeBack", MonitoringManager.Source.SYSTEM);
 				}
 				if (!alreadySelected) {
 					// Select current go
 					GameObjectManager.addComponent<CurrentSelection> (go.transform.parent.gameObject);
 					if (cm != null)
 						// player select a new item
-						cm.trace("get", TraceHandler.Source.PLAYER);
+						cm.trace("get", MonitoringManager.Source.PLAYER);
 				}
 			}
 		}

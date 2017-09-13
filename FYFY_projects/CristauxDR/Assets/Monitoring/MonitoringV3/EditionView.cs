@@ -351,6 +351,16 @@ namespace monitoring {
 					flagTransition = EditorGUILayout.Popup ("Action: ", flagTransition, labelsBuilt.ToArray ());
 
 					TransitionLink tLink = monitor.transitionLinks [flagTransition];
+					bool newToggle = EditorGUILayout.ToggleLeft ("Not a player action (triggered by game simlation)", tLink.isSystemAction);
+					if (newToggle != tLink.isSystemAction) {
+						Undo.RecordObject (monitor, "Is Player Action");
+						tLink.isSystemAction = newToggle;
+					}
+					newToggle = EditorGUILayout.ToggleLeft ("Player objective", tLink.isEndAction);
+					if (newToggle != tLink.isEndAction) {
+						Undo.RecordObject (monitor, "Is Player Objective");
+						tLink.isEndAction = newToggle;
+					}
 					scrollPosition = EditorGUILayout.BeginScrollView (scrollPosition);
 					{
 						foreach (Link link in tLink.links.ToArray()) {

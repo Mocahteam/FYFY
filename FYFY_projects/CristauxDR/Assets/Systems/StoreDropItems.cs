@@ -26,11 +26,11 @@ public class StoreDropItems : FSystem {
 						// move item to inventory
 						GameObjectManager.setGameObjectState (item.linkedWith, true);
 						GameObjectManager.setGameObjectState (go, false);
-						cm.trace("store", TraceHandler.Source.PLAYER);
+						cm.trace("store", MonitoringManager.Source.PLAYER);
 					}
 				}
 				if (!heroFound)
-					cm.trace("store", TraceHandler.Source.PLAYER, true);
+					cm.trace("store", MonitoringManager.Source.PLAYER, true);
 			}
 
 			// Parse all active GO dropable
@@ -51,7 +51,7 @@ public class StoreDropItems : FSystem {
 				// Try to access Monitor component of linked GO
 				ComponentMonitoring cm = item.linkedWith.GetComponent<ComponentMonitoring>();
 				if (cm != null)
-					cm.trace("drop", TraceHandler.Source.PLAYER);
+					cm.trace("drop", MonitoringManager.Source.PLAYER);
 			}
 		}
 	}

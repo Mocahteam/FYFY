@@ -161,7 +161,7 @@ namespace monitoring{
 						}
 
 						if (linksFound) {
-							TraceHandler.trace (performedBy, isTry, prefix + actionName + "_" + this.id);
+							XmlHandler.addTrace (performedBy, isTry, prefix + actionName + "_" + this.id);
 						} else {
 							string debug = "";
 							foreach (string link in linksConcerned)
