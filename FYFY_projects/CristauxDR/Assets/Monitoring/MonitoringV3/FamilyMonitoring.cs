@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using petriNetV2;
 
-namespace monitorV3{
+namespace monitoring{
 	/// <summary>
 	/// Composant à attacher à une famille pour gérer sa représentation par un rdp
 	/// </summary>

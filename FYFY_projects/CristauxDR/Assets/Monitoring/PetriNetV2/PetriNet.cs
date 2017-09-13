@@ -5,7 +5,7 @@ using System;
 
 
 
-namespace petriNetV2{
+namespace monitoring{
 	
 	[Serializable]
 	public class PetriNet{

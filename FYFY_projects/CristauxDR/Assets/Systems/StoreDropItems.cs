@@ -3,9 +3,10 @@ using UnityEngine.UI;
 using FYFY;
 using FYFY_plugins.TriggerManager;
 using FYFY_plugins.PointerManager;
+using monitoring;
 
 public class StoreDropItems : FSystem {
-	private Family inGameObjects = FamilyManager.getFamily(new AllOfComponents(typeof(Triggered3D), typeof(PointerOver), typeof(Takable)), new AllOfProperties(PropertyMatcher.PROPERTY.ENABLED));
+	private Family inGameObjects = FamilyManager.getFamily(new AllOfComponents(typeof(Triggered3D), typeof(PointerOver), typeof(Takable), typeof(ComponentMonitoring)), new AllOfProperties(PropertyMatcher.PROPERTY.ENABLED));
 	private Family dropButton = FamilyManager.getFamily(new AllOfComponents(typeof(PointerOver), typeof(Image)), new AnyOfTags("DropButton"), new AnyOfLayers(5)); // Layer 5 == UI
 	private Family hero = FamilyManager.getFamily(new AllOfComponents(typeof(Animator), typeof(Rigidbody), typeof(Controllable)));
 
@@ -16,14 +17,20 @@ public class StoreDropItems : FSystem {
 			foreach (GameObject go in inGameObjects) {
 				Takable item = go.GetComponent<Takable> ();
 				Triggered3D triggered = go.GetComponent<Triggered3D> ();
+				ComponentMonitoring cm = go.GetComponent<ComponentMonitoring> ();
 				// check if collision occurs with hero
+				bool heroFound = false;
 				foreach (GameObject target in triggered.Targets) {
 					if (target.name == "HeroSprite") {
+						heroFound = true;
 						// move item to inventory
 						GameObjectManager.setGameObjectState (item.linkedWith, true);
 						GameObjectManager.setGameObjectState (go, false);
+						cm.trace("store", TraceHandler.Source.PLAYER);
 					}
 				}
+				if (!heroFound)
+					cm.trace("store", TraceHandler.Source.PLAYER, true);
 			}
 
 			// Parse all active GO dropable
@@ -41,6 +48,10 @@ public class StoreDropItems : FSystem {
 					Transform heroPos = theHero.GetComponent<Transform> ();
 					itemPos.position = new Vector3 (heroPos.position.x, itemPos.position.y, heroPos.position.z);
 				}
+				// Try to access Monitor component of linked GO
+				ComponentMonitoring cm = item.linkedWith.GetComponent<ComponentMonitoring>();
+				if (cm != null)
+					cm.trace("drop", TraceHandler.Source.PLAYER);
 			}
 		}
 	}

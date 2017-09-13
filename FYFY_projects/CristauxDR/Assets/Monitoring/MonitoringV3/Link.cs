@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using petriNetV2;
 
-namespace monitorV3{
+namespace monitoring{
 	/// <summary>
 	/// Classe contenant les informations d'une contrainte
 	/// </summary>
@@ -37,8 +36,8 @@ namespace monitorV3{
 			List<string> places = new List<string> ();
 			if (linkedObject != null){
 				foreach (ComponentMonitoring m in linkedObject.GetComponents<ComponentMonitoring> ()) {
-					if (m.petriNet != null){
-						foreach (string newItem in m.petriNet.getPlacesNames ())
+					if (m.PetriNet != null && m.PnmlFile != null){
+						foreach (string newItem in m.PetriNet.getPlacesNames ())
 							places.Add (newItem+" ("+m.PnmlFile.name+")");
 					}
 				}
@@ -49,11 +48,11 @@ namespace monitorV3{
 		public Node getPlaceFromLinkedObject (int i){
 			if (linkedObject != null) {
 				foreach (ComponentMonitoring m in linkedObject.GetComponents<ComponentMonitoring> ()) {
-					if (m.petriNet != null) {
-						if (m.petriNet.places.Count <= i)
-							i -= m.petriNet.places.Count;
+					if (m.PetriNet != null) {
+						if (m.PetriNet.places.Count <= i)
+							i -= m.PetriNet.places.Count;
 						else
-							return m.petriNet.places[i];
+							return m.PetriNet.places[i];
 					}
 				}
 			}

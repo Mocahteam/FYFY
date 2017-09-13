@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using petriNetV2;
 
 
-namespace monitorV3{
+namespace monitoring{
 	/// <summary>
 	/// 	Links on transition
 	/// </summary>

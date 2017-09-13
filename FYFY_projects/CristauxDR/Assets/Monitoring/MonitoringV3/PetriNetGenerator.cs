@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using System.IO;
-using petriNetV2;
 using System;
 using System.Linq;
 
 
-namespace monitorV3{
+namespace monitoring{
 	public class PetriNetGenerator : MonoBehaviour {
 
         public string filename;
@@ -32,9 +31,9 @@ namespace monitorV3{
 			// Fill final PN
 			foreach (ComponentMonitoring monitor in FindObjectsOfType<ComponentMonitoring> ()) {
                 // Check if PN exists
-				if (monitor.petriNet != null) {
+				if (monitor.PetriNet != null) {
 					// Make a copy of local PN in order to organise it spatially without changing original PN
-					PetriNet tmpPN = new PetriNet(monitor.petriNet, monitor.gameObject.name);
+					PetriNet tmpPN = new PetriNet(monitor.PetriNet, monitor.gameObject.name);
 					tmpPN.addWidth (offsetX);
 					petriNet.addSubNet (tmpPN);
                     
@@ -52,29 +51,32 @@ namespace monitorV3{
                             {
 								if (curLink.linkedObject != null) {
 									// Make a copy of linked place and prefix its name with its game object name
-									Node linkedPlace_copy = new Node (curLink.getPlaceFromLinkedObject (curLink.placeId));
-									linkedPlace_copy.label = curLink.linkedObject.name + "_" + linkedPlace_copy.label;
-									// Define arc type
-									ArcType arcType = curLink.type == 2 ? Arc.stringToArcType (Arc.optType.ElementAt (curLink.flagsType)) : ArcType.regular;
-									// Create arc between Transition and linked place (depends on Get/Produce/Require diffusion state)
-									petriNet.arcs.Add (curLink.type != 1 ? new Arc (linkedPlace_copy, curTransition_copy, arcType, curLink.weight) : new Arc (curTransition_copy, linkedPlace_copy, arcType, curLink.weight));
+									Node linkedPlace = curLink.getPlaceFromLinkedObject (curLink.placeId);
+									if (linkedPlace != null) {
+										Node linkedPlace_copy = new Node (linkedPlace);
+										linkedPlace_copy.label = curLink.linkedObject.name + "_" + linkedPlace_copy.label;
+										// Define arc type
+										ArcType arcType = curLink.type == 2 ? Arc.stringToArcType (Arc.optType.ElementAt (curLink.flagsType)) : ArcType.regular;
+										// Create arc between Transition and linked place (depends on Get/Produce/Require diffusion state)
+										petriNet.arcs.Add (curLink.type != 1 ? new Arc (linkedPlace_copy, curTransition_copy, arcType, curLink.weight) : new Arc (curTransition_copy, linkedPlace_copy, arcType, curLink.weight));
+									}
 								}
                             }
                         }
                         else
                         {
-                            AriParser arip = new AriParser();
-                            if (arip.validAri(transitionLink))
+							ExpressionParser expr_parser = new ExpressionParser();
+                            if (expr_parser.isValid(transitionLink))
                             {
 								// Logic expression is valid
 
 								// Distribute expression
-	                            string[] ari = arip.getDistribution(transitionLink.logic);
+								string[] exp = expr_parser.getDistribution(transitionLink.logic);
 
 	                            int or = 0;
 
 								// Parse distributed expression
-								foreach (string token in ari)
+								foreach (string token in exp)
 	                            {
 									// Check if current token is an operator
 	                                if (!token.Equals("+") && !token.Equals("*"))
@@ -83,12 +85,15 @@ namespace monitorV3{
 										Link curLink = transitionLink.getLabeledLink(token);
 										if (curLink.linkedObject != null) {
 											// Make a copy of linked place and prefix its name with its game object name
-											Node linkedPlace_copy = new Node (curLink.getPlaceFromLinkedObject (curLink.placeId));
-											linkedPlace_copy.label = curLink.linkedObject.name + "_" + linkedPlace_copy.label;
-											// Define arc type
-											ArcType arcType = curLink.type == 2 ? Arc.stringToArcType (Arc.optType.ElementAt (curLink.flagsType)) : ArcType.regular;
-											// Create arc between Transition and linked place (depends on Get/Produce/Require diffusion state)
-											petriNet.arcs.Add (curLink.type != 1 ? new Arc (linkedPlace_copy, curTransition_copy, arcType, curLink.weight) : new Arc (curTransition_copy, linkedPlace_copy, arcType, curLink.weight));
+											Node linkedPlace = curLink.getPlaceFromLinkedObject (curLink.placeId);
+											if (linkedPlace != null) {
+												Node linkedPlace_copy = new Node (linkedPlace);
+												linkedPlace_copy.label = curLink.linkedObject.name + "_" + linkedPlace_copy.label;
+												// Define arc type
+												ArcType arcType = curLink.type == 2 ? Arc.stringToArcType (Arc.optType.ElementAt (curLink.flagsType)) : ArcType.regular;
+												// Create arc between Transition and linked place (depends on Get/Produce/Require diffusion state)
+												petriNet.arcs.Add (curLink.type != 1 ? new Arc (linkedPlace_copy, curTransition_copy, arcType, curLink.weight) : new Arc (curTransition_copy, linkedPlace_copy, arcType, curLink.weight));
+											}
 										}
 	                                }
 	                                else if (token.Equals("+"))
@@ -99,7 +104,7 @@ namespace monitorV3{
 										// Add offset to position
 										curTransition_copy.position.x += offsetX;
 										curTransition_copy.position.y += 50;
-										curTransition_copy = new Node("or" + (or++) + "_" + monitor.gameObject.name + "_" + oldTransition.label, curTransition_copy.id, curTransition_copy.offset, curTransition_copy.initialMarking, curTransition_copy.position);
+										curTransition_copy = new Node("or" + (or++) + "_" + oldTransition.label, curTransition_copy.id, curTransition_copy.offset, curTransition_copy.initialMarking, curTransition_copy.position);
 										// Add this new transition to PN
 	                                    petriNet.transitions.Add(curTransition_copy);
 										// Duplicate arcs from old transition
@@ -118,12 +123,10 @@ namespace monitorV3{
 								}
 							}
 							else
-							{
-								Debug.LogError("PetriNetGenerator: Logic expression not valid");
-							}
+								Debug.LogError("Error!!! PetriNetGenerator: Logic expression not valid");
                         }
                     }
-					offsetX += monitor.petriNet.getWidth ()+50; // Add spaces between PN
+					offsetX += monitor.PetriNet.getWidth ()+50; // Add spaces between PN
 				}
 			}
 				

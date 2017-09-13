@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-namespace petriNetV2{
+namespace monitoring{
 	
 	[Serializable]
 	public class Node  {

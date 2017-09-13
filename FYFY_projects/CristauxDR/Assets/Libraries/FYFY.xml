@@ -143,6 +143,14 @@
             	Check if two families are equals.
             </summary>
         </member>
+        <member name="M:FYFY.Family.First">
+            <summary>
+            	Get the first Game Object included into the family
+            </summary>
+            <returns>
+            	The first GameObject or null if the family is empty.
+            </returns>
+        </member>
         <member name="P:FYFY.Family.Count">
             <summary>
             	Gets the number of <c>GameObjects</c> belonging to this <see cref="T:FYFY.Family"/>.

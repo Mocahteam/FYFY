@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Xml.Linq;
 using System.Linq;
 
-namespace petriNetV2{
+namespace monitoring{
 
 	/*
 	 * See XDocument class documentation
