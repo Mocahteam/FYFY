@@ -175,7 +175,6 @@ namespace monitoring {
 					EditorGUILayout.BeginHorizontal();
 					ObjectSelectedFlag = EditorGUILayout.Popup("Select Game Object:", ObjectSelectedFlag, go_labels.ToArray());
 					if (GUILayout.Button ("X", GUILayout.Width (20))) {
-						//Debug.Log("flagObjetSelectionne "+flagObjetSelectionne+" id detruit "+ objetsSuivis[flagObjetSelectionne].GetComponent<suiviV3.SuiviComposant>().id);
 						Undo.DestroyObjectImmediate (monitors [ObjectSelectedFlag]);
 						ObjectSelectedFlag = 0;
 					}

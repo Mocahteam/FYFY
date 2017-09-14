@@ -19,7 +19,7 @@ namespace monitoring{
 
 		public PetriNet ()
 		{
-			id = 0;//suiviV1.IDGenerator.genID (); //TODO id dans PN ou dans composant ? plus simple dans composant...
+			id = 0;
 			transitions = new List<Node> ();
 			places = new List<Node> ();
 			arcs = new List<Arc> ();
@@ -32,11 +32,6 @@ namespace monitoring{
             PetriNet pn = PnmlParser.loadFromPath(file, id);
             pn.attachID(id);
             return pn;
-			/*label = tmpNet.label;
-			id = tmpNet.id;
-			transitions = tmpNet.transitions;
-			places = tmpNet.places;
-			arcs = tmpNet.arcs;*/
 		}
 
 		//Copy contructor
@@ -80,7 +75,7 @@ namespace monitoring{
 			}	
 		}
 
-        internal void attachID(int id)
+		public void attachID(int id)
         {
             this.id = id;
             foreach (Node transition in transitions)

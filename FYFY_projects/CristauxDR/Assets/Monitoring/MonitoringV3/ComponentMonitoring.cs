@@ -10,6 +10,7 @@ namespace monitoring{
 	/// Add monitoring functionalities to a Game Object
 	/// </summary>
 	[Serializable]
+	[ExecuteInEditMode]
     public class ComponentMonitoring : MonoBehaviour
     {
         [HideInInspector]
@@ -47,18 +48,10 @@ namespace monitoring{
 		[HideInInspector] 
 		public List<TransitionLink> transitionLinks = new List<TransitionLink>();
 
-        //Fonctions utilitaires :
-        public int getID(){
-			id = IDGenerator.genID ();
-			return id;
-		}
-
         public TransitionLink getTransitionLinkByTransitionLabel(String label)
         {
-			//Debug.Log("tc count : "+transitionLinks.Count);
             foreach(TransitionLink tc in transitionLinks)
             {
-                //Debug.Log("getByLabel : "+tc.label);
                 if (tc.transition.label.Equals(label))
                     return tc;
             }
@@ -154,7 +147,7 @@ namespace monitoring{
 
 								if (groupAndByOr [i].SequenceEqual (linksConcerned_sorted)) {
 									if (i > 0)
-										prefix = "or" + (i - 1) + "_";
+										prefix = "or" + (i - 1) + "_"+prefix;
 									linksFound = true;
 								}
 							}
@@ -186,6 +179,16 @@ namespace monitoring{
 			} else {
 				TraceAborted customStack = new TraceAborted ("Action \"" + actionName + "\" is not monitored by \"" + this.gameObject.name + "\" Game Object.", exceptionStackTrace);
 				Debug.LogException (customStack);
+			}
+		}
+
+		void Awake(){
+			if (id == -1 || !IDGenerator.isUnique (this)) {
+				// get new unique id
+				id = IDGenerator.genID();
+				if (petriNet != null)
+					// update id of petrinet
+					petriNet.attachID(id);
 			}
 		}
     }

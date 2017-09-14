@@ -129,7 +129,6 @@ namespace monitoring{
 			}
 
 			int cptNodes = pn.places.Count + pn.transitions.Count;
-//			Debug.Log (pn.arcs);
 			foreach(Arc arc in pn.arcs){
 				xelemList.Add ( 
 					new XElement(ns+"arc",new XAttribute("id",++cptNodes),new XAttribute("source",arc.source.label+"_"+ arc.source.id),new XAttribute("target",arc.target.label+"_"+arc.target.id),

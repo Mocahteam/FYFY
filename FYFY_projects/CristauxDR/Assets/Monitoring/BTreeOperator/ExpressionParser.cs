@@ -58,18 +58,13 @@ namespace monitoring {
 			foreach (char c in ari) {
 				
 				if (!char.IsWhiteSpace (c)) {
-					
-					//Debug.Log ("precedent : " + precedent + " c :  " + c);
 					if (c == '(') {
-						//Debug.Log ("parenthèse ouvrante");
 						po++;
 					}
 					if (c == ')') {
-						//Debug.Log ("parenthèse fermante");
 						pf++;
 					}
 					if (((precedent == '(' || precedent == '*' || precedent == '+') && (c == '*' || c == '+')) || ((precedent == '*' || precedent == '+') && (c == ')' || c == '+' || c == '*'))) {
-						//Debug.Log ("BadOp");
 						badOp = true;
 					}
 					precedent = c;
@@ -217,16 +212,6 @@ namespace monitoring {
 			}
 
 			return tmpIndex;
-		}
-
-		string printList(List<string> str){
-			return printList (str.ToArray ());
-		}
-		string printList(string[] str){
-			string strDebug = "";
-			foreach (string s in str)
-				strDebug += s + " ";
-			return strDebug;
 		}
 	}
 }

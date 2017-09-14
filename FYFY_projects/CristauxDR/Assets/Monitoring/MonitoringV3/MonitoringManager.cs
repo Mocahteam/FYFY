@@ -49,7 +49,7 @@ namespace monitoring{
 						Node curTransition_copy = new Node(transitionLink.transition);
 						curTransition_copy.label = monitor.gameObject.name+"_"+curTransition_copy.label;
 						// Add this transition to Specifications
-						XmlHandler.addSpecif(curTransition_copy.label, transitionLink.isSystemAction, transitionLink.isEndAction);
+						XmlHandler.addSpecif(curTransition_copy.label+"_"+monitor.id, transitionLink.isSystemAction, transitionLink.isEndAction);
                         Node oldTransition = curTransition_copy;
                         if (isNullOrWhiteSpace(transitionLink.logic))
                         {
@@ -115,7 +115,7 @@ namespace monitoring{
 										// Add this new transition to PN
 	                                    petriNet.transitions.Add(curTransition_copy);
 										// and to specifications
-										XmlHandler.addSpecif(curTransition_copy.label, transitionLink.isSystemAction, transitionLink.isEndAction);
+										XmlHandler.addSpecif(curTransition_copy.label+"_"+monitor.id, transitionLink.isSystemAction, transitionLink.isEndAction);
 										// Duplicate arcs from old transition
 	                                    foreach (Arc a in tmpPN.getConcernedArcs(oldTransition))
 	                                    {
