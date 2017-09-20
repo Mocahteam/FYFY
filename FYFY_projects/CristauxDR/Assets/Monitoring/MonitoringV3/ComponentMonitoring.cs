@@ -72,12 +72,10 @@ namespace monitoring{
 				if (place != null)
 					place.initialMarking = (int)initialValue;
 				else {
-					InitFailed init = new InitFailed("Place \"" + name + "\" is not known into associated Petri Net.", exceptionStackTrace);
-					Debug.LogException (init);
+					throw new InitFailed("Place \"" + name + "\" is not known into associated Petri Net.", exceptionStackTrace);
 				}
 			} else {
-				InitFailed init = new InitFailed("No Petri Net defined.", exceptionStackTrace);
-				Debug.LogException (init);
+				throw new InitFailed("No Petri Net defined.", exceptionStackTrace);
 			}
 		}
 		/// <summary>
@@ -130,8 +128,7 @@ namespace monitoring{
 							}
 							availableCombination = availableCombination + "\n";
 						}
-						TraceAborted customStack = new TraceAborted ("Distributed logic expression for \"" + actionName + "\" action in \"" + this.gameObject.name + "\" Game Object contains \"+\" operator. You have to specify which links are concerned to perform this game action. " + availableCombination, exceptionStackTrace);
-						Debug.LogException (customStack);
+						throw new TraceAborted ("Distributed logic expression for \"" + actionName + "\" action in \"" + this.gameObject.name + "\" Game Object contains \"+\" operator. You have to specify which links are concerned to perform this game action. " + availableCombination, exceptionStackTrace);
 					} else {
 						string prefix = this.gameObject.name + "_";
 						bool linksFound = false;
@@ -168,17 +165,14 @@ namespace monitoring{
 								}
 								availableCombination = availableCombination + "\n";
 							}
-							TraceAborted customStack = new TraceAborted (debug + " not found into distributed logic expression for \"" + actionName + "\" action in \"" + this.gameObject.name + "\" Game Object. " + availableCombination, exceptionStackTrace);
-							Debug.LogException (customStack);
+							throw new TraceAborted (debug + " not found into distributed logic expression for \"" + actionName + "\" action in \"" + this.gameObject.name + "\" Game Object. " + availableCombination, exceptionStackTrace);
 						}
 					}
 				} else {
-					TraceAborted customStack = new TraceAborted ("Logic expression for \"" + actionName + "\" action in \"" + this.gameObject.name + "\" Game Object is not valid.", exceptionStackTrace);
-					Debug.LogException (customStack);
+					throw new TraceAborted ("Logic expression for \"" + actionName + "\" action in \"" + this.gameObject.name + "\" Game Object is not valid.", exceptionStackTrace);
 				}
 			} else {
-				TraceAborted customStack = new TraceAborted ("Action \"" + actionName + "\" is not monitored by \"" + this.gameObject.name + "\" Game Object.", exceptionStackTrace);
-				Debug.LogException (customStack);
+				throw new TraceAborted ("Action \"" + actionName + "\" is not monitored by \"" + this.gameObject.name + "\" Game Object.", exceptionStackTrace);
 			}
 		}
 

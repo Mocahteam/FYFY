@@ -15,7 +15,7 @@ namespace FYFY {
 
 		void IGameObjectManagerAction.perform() {
 			if(GameObjectManager._gameObjectWrappers.ContainsKey(_gameObjectId) == false){
-				throw new UnknownGameObjectException(_exceptionStackTrace);
+				throw new UnknownGameObjectException("You try to unbind a GameObject which is not already binded to FYFY.", _exceptionStackTrace);
 			}
 
 			GameObjectManager._gameObjectWrappers.Remove(_gameObjectId);

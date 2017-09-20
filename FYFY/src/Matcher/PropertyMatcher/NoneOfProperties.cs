@@ -11,14 +11,18 @@
 		}
 
 		internal override bool matches(GameObjectWrapper gameObjectWrapper){
-			UnityEngine.GameObject gameObject = gameObjectWrapper._gameObject;
+			// Prevent user error if a GameObject is destroyed while it is still binded. It's a mistake, the user has to unbind game objects before destroying them.
+			if (gameObjectWrapper._gameObject != null){
+				UnityEngine.GameObject gameObject = gameObjectWrapper._gameObject;
 
-			for(int i = 0; i < _properties.Length; ++i){
-				if(hasProperty(gameObject, _properties[i]) == true){
-					return false;
+				for(int i = 0; i < _properties.Length; ++i){
+					if(hasProperty(gameObject, _properties[i]) == true){
+						return false;
+					}
 				}
-			}
-			return true;
+				return true;
+			} else
+				return false;
 		}
 	}
 }

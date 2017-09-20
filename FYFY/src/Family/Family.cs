@@ -55,8 +55,13 @@ namespace FYFY {
 		/// 	The enumerator.
 		/// </returns>
 		public IEnumerator<GameObject> GetEnumerator(){
-			foreach(int gameObjectId in _gameObjectIds)
-				yield return GameObjectManager._gameObjectWrappers[gameObjectId]._gameObject;
+			foreach(int gameObjectId in _gameObjectIds){
+				GameObject go = GameObjectManager._gameObjectWrappers[gameObjectId]._gameObject;
+				if (go != null)
+					yield return go;
+				else
+					Debug.LogWarning("Family includes null values, this means you forget to unbind game objects before destroying them. See \"FYFY.GameObjectManager.unbind(GameObject gameObject)\".");
+			}
 		}
 
 		/// <summary>
@@ -96,6 +101,20 @@ namespace FYFY {
 			if (_matchers.Length != other._matchers.Length)
 				return false;
 			return this.IncludedInto(other) && other.IncludedInto(this);
+		}
+		
+		/// <summary>
+		///		Get the first Game Object included into the family
+		/// </summary>
+		/// <returns>
+		/// 	The first GameObject or null if the family is empty.
+		/// </returns>
+		public GameObject First(){
+			IEnumerator<GameObject> goEnum = GetEnumerator();
+			if (goEnum.MoveNext())
+				return goEnum.Current;
+			else
+				return null;
 		}
 		
 		// Check if "this" is included into "other"

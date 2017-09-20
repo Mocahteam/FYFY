@@ -11,11 +11,14 @@
 		}
 
 		internal override bool matches(GameObjectWrapper gameObjectWrapper){
-			int gameObjectLayer = gameObjectWrapper._gameObject.layer;
+			// Prevent user error if a GameObject is destroyed while it is still binded. It's a mistake, the user has to unbind game objects before destroying them.
+			if (gameObjectWrapper._gameObject != null){
+				int gameObjectLayer = gameObjectWrapper._gameObject.layer;
 
-			for(int i = 0; i < _layers.Length; ++i){
-				if(gameObjectLayer == _layers[i]){
-					return true;
+				for(int i = 0; i < _layers.Length; ++i){
+					if(gameObjectLayer == _layers[i]){
+						return true;
+					}
 				}
 			}
 			return false;

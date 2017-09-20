@@ -58,6 +58,11 @@
             	Initializes a new instance of the <see cref="T:FYFY.DestroyedComponentException"/> class.
             </summary>
         </member>
+        <member name="M:FYFY.DestroyedComponentException.#ctor(System.String,System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.DestroyedComponentException"/> class.
+            </summary>
+        </member>
         <member name="T:FYFY.DestroyedGameObjectException">
             <summary>
             	Exception used when you try to access to a <c>GameObject</c> that has been destroyed.
@@ -66,6 +71,26 @@
         <member name="M:FYFY.DestroyedGameObjectException.#ctor(System.String)">
             <summary>
             	Initializes a new instance of the <see cref="T:FYFY.DestroyedGameObjectException"/> class.
+            </summary>
+        </member>
+        <member name="M:FYFY.DestroyedGameObjectException.#ctor(System.String,System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.FyfyException"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY.FyfyException">
+            <summary>
+            	Default exception used when a problem occurs with <c>Fyfy</c>.
+            </summary>
+        </member>
+        <member name="M:FYFY.FyfyException.#ctor(System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.FyfyException"/> class.
+            </summary>
+        </member>
+        <member name="M:FYFY.FyfyException.#ctor(System.String,System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.FyfyException"/> class.
             </summary>
         </member>
         <member name="T:FYFY.UnknownComponentException">
@@ -78,6 +103,11 @@
             	Initializes a new instance of the <see cref="T:FYFY.UnknownComponentException"/> class.
             </summary>
         </member>
+        <member name="M:FYFY.UnknownComponentException.#ctor(System.String,System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.UnknownComponentException"/> class.
+            </summary>
+        </member>
         <member name="T:FYFY.UnknownGameObjectException">
             <summary>
             	Exception used when you try to access to a <c>GameObject</c> that is unknown to <c>FYFY</c>.
@@ -86,6 +116,11 @@
         <member name="M:FYFY.UnknownGameObjectException.#ctor(System.String)">
             <summary>
             	Initializes a new instance of the <see cref="T:FYFY.UnknownGameObjectException"/> class.
+            </summary>
+        </member>
+        <member name="M:FYFY.UnknownGameObjectException.#ctor(System.String,System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.FyfyException"/> class.
             </summary>
         </member>
         <member name="T:FYFY.Family">

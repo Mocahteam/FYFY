@@ -22,7 +22,6 @@ namespace FYFY {
 	/// 	</para>
 	/// </remarks>
 	public static class GameObjectManager {
-		internal static readonly Dictionary<string, GameObject> _prefabResources        = new Dictionary<string, GameObject>();     // indexed by prefab name
 		internal static readonly Dictionary<int, GameObjectWrapper> _gameObjectWrappers = new Dictionary<int, GameObjectWrapper>(); // indexed by gameobject's id
 		internal static readonly Queue<IGameObjectManagerAction> _delayedActions        = new Queue<IGameObjectManagerAction>();
 		internal static readonly HashSet<int> _unbindedGameObjectIds                    = new HashSet<int>();                       // unbindGO
@@ -73,7 +72,7 @@ namespace FYFY {
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
 			
 			if(gameObject == null) { // The GO has been destroyed !!!
-				throw new ArgumentNullException(exceptionStackTrace);
+				throw new FYFY.ArgumentNullException(exceptionStackTrace);
 			}
 
 			// Bind the gameobject and all its children.
@@ -90,7 +89,7 @@ namespace FYFY {
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
 
 			if(gameObject == null) {
-				throw new ArgumentNullException(exceptionStackTrace);
+				throw new FYFY.ArgumentNullException(exceptionStackTrace);
 			}
 			
 			// Unbind the gameobject and all its children.
@@ -107,7 +106,7 @@ namespace FYFY {
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
 
 			if(gameObject == null) {
-				throw new ArgumentNullException(exceptionStackTrace);
+				throw new FYFY.ArgumentNullException(exceptionStackTrace);
 			}
 			
 			_delayedActions.Enqueue(new SetGameObjectState(gameObject, enabled, exceptionStackTrace));
@@ -130,7 +129,7 @@ namespace FYFY {
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
 
 			if(gameObject == null) {
-				throw new ArgumentNullException(exceptionStackTrace);
+				throw new FYFY.ArgumentNullException(exceptionStackTrace);
 			}
 
 			_delayedActions.Enqueue(new SetGameObjectParent(gameObject, parent, worldPositionStays, exceptionStackTrace));
@@ -144,7 +143,7 @@ namespace FYFY {
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
 
 			if(gameObject == null) {
-				throw new ArgumentNullException(exceptionStackTrace);
+				throw new FYFY.ArgumentNullException(exceptionStackTrace);
 			}
 
 			_delayedActions.Enqueue(new SetGameObjectLayer(gameObject, layer, exceptionStackTrace));
@@ -158,7 +157,7 @@ namespace FYFY {
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
 
 			if(gameObject == null || tag == null){
-				throw new ArgumentNullException(exceptionStackTrace);
+				throw new FYFY.ArgumentNullException(exceptionStackTrace);
 			}
 
 			_delayedActions.Enqueue(new SetGameObjectTag(gameObject, tag, exceptionStackTrace));
@@ -181,7 +180,7 @@ namespace FYFY {
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
 
 			if(gameObject == null) {
-				throw new ArgumentNullException(exceptionStackTrace);
+				throw new FYFY.ArgumentNullException(exceptionStackTrace);
 			}
 
 			_delayedActions.Enqueue(new AddComponent<T>(gameObject, componentValues, exceptionStackTrace));
@@ -204,12 +203,11 @@ namespace FYFY {
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
 
 			if(gameObject == null || componentType == null) {
-				throw new ArgumentNullException(exceptionStackTrace);
+				throw new FYFY.ArgumentNullException(exceptionStackTrace);
 			}
 
 			if (componentType.IsSubclassOf(typeof(Component)) == false) {
-				Debug.LogWarning("Can't add '" + componentType + "' to " + gameObject.name + " because a '" + componentType + "' isn't a Component!");
-				return;
+				throw new FyfyException("The type \"" + componentType + "\" must be convertible to \"UnityEngine.Component\" in order to use it with this function", exceptionStackTrace);
 			}
 
 			_delayedActions.Enqueue(new AddComponent(gameObject, componentType, componentValues, exceptionStackTrace));
@@ -229,13 +227,12 @@ namespace FYFY {
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
 
 			if(gameObject == null) {
-				throw new ArgumentNullException(exceptionStackTrace);
+				throw new FYFY.ArgumentNullException(exceptionStackTrace);
 			}
 		
 			System.Type componentType = typeof(T);
 			if (componentType == typeof(Transform)) {
-				Debug.Log("Removing 'Transform' from " + gameObject.name + " is not allowed!");
-				return;
+				throw new FyfyException("Removing \"Transform\" Component is not allowed!", exceptionStackTrace);
 			}
 
 			_delayedActions.Enqueue(new RemoveComponent<T>(gameObject, exceptionStackTrace));
@@ -249,14 +246,13 @@ namespace FYFY {
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
 
 			if(component == null) {
-				throw new ArgumentNullException(exceptionStackTrace);
+				throw new FYFY.ArgumentNullException(exceptionStackTrace);
 			}
 
 			GameObject gameObject = component.gameObject;
 			System.Type componentType = component.GetType();
 			if (componentType == typeof(Transform)) {
-				Debug.Log("Removing 'Transform' from " + gameObject.name + " is not allowed!");
-				return;
+				throw new FyfyException("Removing \"Transform\" Component is not allowed!", exceptionStackTrace);
 			}
 
 			_delayedActions.Enqueue(new RemoveComponent(gameObject, component, exceptionStackTrace));

@@ -8,5 +8,11 @@
 		/// </summary>
 		public UnknownComponentException(string stackTrace = null) : base("Component is unknown to FYFY but you are trying to access it with FYFY functions.", stackTrace) {
 		}
+		
+		/// <summary>
+		/// 	Initializes a new instance of the <see cref="FYFY.UnknownComponentException"/> class.
+		/// </summary>
+		public UnknownComponentException(string message, string stackTrace): base(message, stackTrace){
+		}
 	}
 }

@@ -35,7 +35,7 @@
 
 		internal PropertyMatcher(params PROPERTY[] properties) {
 			if(properties.Length == 0) {
-				throw new System.ArgumentException();
+				throw new System.ArgumentException("It is not allowed to provide a PropertyMatcher without at least one property defined.");
 			}
 
 			System.Array.Sort(properties);

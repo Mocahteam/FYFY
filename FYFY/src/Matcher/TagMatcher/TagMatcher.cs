@@ -12,7 +12,7 @@ namespace FYFY {
 
 		internal TagMatcher(params string[] tags) {
 			if(tags.Length == 0) {
-				throw new System.ArgumentNullException();
+				throw new System.ArgumentNullException("It is not allowed to provide a TagMatcher without at least one tag defined.");
 			}
 			
 			System.Array.Sort(tags);
@@ -21,7 +21,7 @@ namespace FYFY {
 			for(int i = 1; i < tags.Length; ++i) {
 				string tag = tags[i];
 				if (tag == null) {
-					throw new System.ArgumentNullException();
+					throw new System.ArgumentNullException("One of the tags is null");
 				}
 
 				descriptor.AppendFormat("/{0}", tag);

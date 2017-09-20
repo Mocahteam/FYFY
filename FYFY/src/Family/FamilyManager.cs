@@ -38,6 +38,7 @@ namespace FYFY {
 		/// 	Matchers.
 		/// </param>
 		public static Family getFamily(params Matcher[] matchers){
+			
 			int mLength = matchers.Length;
 			if (mLength == 0) {
 				throw new System.ArgumentException("It is not allowed to get family without at least one matcher.");
@@ -47,7 +48,7 @@ namespace FYFY {
 			for (int i = 0; i < mLength; ++i) {
 				Matcher matcher = matchers[i];
 				if(matcher == null) {
-					throw new System.ArgumentNullException();
+					throw new System.ArgumentNullException("One of the matchers is null, family recovery aborted.");
 				}
 				matchersDescriptors[i] = matcher._descriptor;
 			}
@@ -78,15 +79,18 @@ namespace FYFY {
 			GameObjectWrapper gameObjectWrapper = GameObjectManager._gameObjectWrappers[gameObjectId];
 			UnityEngine.GameObject gameObject = gameObjectWrapper._gameObject;
 
-			foreach(Family family in FamilyManager._families.Values) {
-				if(family.matches(gameObjectWrapper)) {
-					if(family._gameObjectIds.Add(gameObjectId) && family._entryCallbacks != null) {
-						// execute family's entry callbacks on the GameObject if added
-						family._entryCallbacks(gameObject);
+			// Prevent user error if a GameObject is destroyed while it is still binded. It's a mistake, the user has to unbind game objects before destroying them.
+			if (gameObject != null){
+				foreach(Family family in FamilyManager._families.Values) {
+					if(family.matches(gameObjectWrapper)) {
+						if(family._gameObjectIds.Add(gameObjectId) && family._entryCallbacks != null) {
+							// execute family's entry callbacks on the GameObject if added
+							family._entryCallbacks(gameObject);
+						}
+					} else if(family._gameObjectIds.Remove(gameObjectId) && family._exitCallbacks != null) {
+						// execute family's exit callbacks on the GameObject if removed
+						family._exitCallbacks(gameObjectId);
 					}
-				} else if(family._gameObjectIds.Remove(gameObjectId) && family._exitCallbacks != null) {
-					// execute family's exit callbacks on the GameObject if removed
-					family._exitCallbacks(gameObjectId);
 				}
 			}
 		}

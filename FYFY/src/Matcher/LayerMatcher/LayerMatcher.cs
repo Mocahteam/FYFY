@@ -10,7 +10,7 @@
 
 		internal LayerMatcher(params int[] layers) {
 			if(layers.Length == 0) {
-				throw new System.ArgumentException();
+				throw new System.ArgumentException("It is not allowed to provide a LayerMatcher without at least one layer defined.");
 			}
 
 			System.Array.Sort(layers);

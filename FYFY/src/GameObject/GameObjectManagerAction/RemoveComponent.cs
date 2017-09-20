@@ -12,24 +12,23 @@ namespace FYFY {
 
 		void IGameObjectManagerAction.perform() {
 			if(_gameObject == null) {
-				throw new DestroyedGameObjectException(_exceptionStackTrace);
+				throw new DestroyedGameObjectException("You try to remove a Component from a GameObject that will be destroyed during this frame. In a same frame, you must not destroy a GameObject and ask Fyfy to perform an action on it.", _exceptionStackTrace);
 			}
 
 			int gameObjectId = _gameObject.GetInstanceID();
 			if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false){
-				throw new UnknownGameObjectException(_exceptionStackTrace);
+				throw new UnknownGameObjectException("You try to remove a Component from a GameObject which is not already binded to FYFY.", _exceptionStackTrace);
 			}
 
 			T component = _gameObject.GetComponent<T>();
 			System.Type componentType = typeof(T);
 			if (component == null) {
-				Debug.LogWarning("Can't remove '" + componentType + "' from " + _gameObject.name + " because a '" + componentType + "' is'nt attached to the game object!");
-				return;
+				throw new FyfyException("Can't remove \"" + componentType + "\" from \"" + _gameObject.name + "\" GameObject because no component of this type is attached to the game object.", _exceptionStackTrace);
 			}
 
 			uint componentTypeId = TypeManager.getTypeId(componentType);
 			if(GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Contains(componentTypeId) == false) {
-				throw new UnknownComponentException();
+				throw new UnknownComponentException("You try to remove a component not registered by Fyfy. You should use \"FYFY.GameObjectManager.AddComponent\" instead of \"UnityEngine.GameObject.AddComponent\" to add a new component to a GameObject.", _exceptionStackTrace);
 			}
 
 			Object.DestroyImmediate(component);
@@ -55,22 +54,22 @@ namespace FYFY {
 
 		void IGameObjectManagerAction.perform() {
 			if(_gameObject == null) {
-				throw new DestroyedGameObjectException(_exceptionStackTrace);
+				throw new DestroyedGameObjectException("You try to remove a Component from a GameObject that will be destroyed during this frame. In a same frame, you must not destroy a GameObject and ask Fyfy to perform an action on it.", _exceptionStackTrace);
 			}
 
 			int gameObjectId = _gameObject.GetInstanceID();
 			if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false){
-				throw new UnknownGameObjectException(_exceptionStackTrace);
+				throw new UnknownGameObjectException("You try to remove a Component from a GameObject which is not already binded to FYFY.", _exceptionStackTrace);
 			}
 
 			if(_component == null) {
-				throw new DestroyedComponentException(_exceptionStackTrace);
+				throw new DestroyedComponentException("You try to remove a Component that will be destroyed during this frame. In a same frame, your must not destroy a Component and ask Fyfy to perform an action on it.", _exceptionStackTrace);
 			}
 			
 			System.Type componentType = _component.GetType();
 			uint componentTypeId = TypeManager.getTypeId(componentType);
 			if(GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Contains(componentTypeId) == false) {
-				throw new UnknownComponentException();
+				throw new UnknownComponentException("You try to remove a component not registered by Fyfy. You should use \"FYFY.GameObjectManager.AddComponent\" instead of \"UnityEngine.GameObject.AddComponent\" to add a new component to a GameObject.", _exceptionStackTrace);
 			}
 
 			Object.DestroyImmediate(_component);

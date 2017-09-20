@@ -11,14 +11,14 @@
 		internal ComponentMatcher(params System.Type[] componentTypes) {
 			int ctLength = componentTypes.Length;
 			if(ctLength == 0) {
-				throw new System.ArgumentException();
+				throw new System.ArgumentException("It is not allowed to provide a ComponentMatcher without at least one Component type defined.");
 			}
 
 			uint[] componentTypeIds = new uint[ctLength];
 			for(int i = 0; i < ctLength; ++i) {
 				System.Type componentType = componentTypes[i];
 				if(componentType == null) {
-					throw new System.ArgumentNullException();
+					throw new System.ArgumentNullException("One of the Component type is null");
 				}
 
 				componentTypeIds[i] = TypeManager.getTypeId(componentType);

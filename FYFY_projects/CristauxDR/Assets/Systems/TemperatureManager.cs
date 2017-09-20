@@ -21,6 +21,8 @@ public class TemperatureManager : FSystem {
 	private ComponentMonitoring iceMonitor = null;
 	private GameObject puddle_GO = null;
 
+	private bool inTransition = false;
+
 
 	public TemperatureManager (){
 		temp_GO = temperature.First ();
@@ -60,8 +62,10 @@ public class TemperatureManager : FSystem {
 			float newTemp = temp.current + epsilon * step;
 			if (temp.current <= 0 && newTemp > 0) {
 				// melting
-				if (temp.current < 0)
-					iceMonitor.trace("meltingStart", MonitoringManager.Source.SYSTEM);
+				if (!inTransition) {
+					iceMonitor.trace ("meltingStart", MonitoringManager.Source.SYSTEM);
+					inTransition = true;
+				}
 				// Check if animation is over
 				bool endOfAnim = false;
 				foreach (GameObject iceCube in iceCubes) {
@@ -79,16 +83,18 @@ public class TemperatureManager : FSystem {
 				if (endOfAnim) {
 					temp.current = newTemp;
 					iceMonitor.trace("meltingEnd", MonitoringManager.Source.SYSTEM);
+					inTransition = false;
 				}
 				else
 					temp.current = 0;
 			} else if (temp.current >= 0 && newTemp < 0) {
 				// solidification
-				if (temp.current > 0) {	
+				if (!inTransition) {	
 					if (!boiler.isOn)
 						iceMonitor.trace("solidifyingStart", MonitoringManager.Source.SYSTEM, false, "l4");
 					else
 						iceMonitor.trace("solidifyingStart", MonitoringManager.Source.SYSTEM, false, "l5");
+					inTransition = true;
 				}
 					
 				iceCollider_GO.GetComponent<BoxCollider> ().enabled = true;
@@ -111,6 +117,7 @@ public class TemperatureManager : FSystem {
 					else
 						iceMonitor.trace("solidifyingEnd", MonitoringManager.Source.SYSTEM, false, "l3");
 					temp.current = newTemp;
+					inTransition = false;
 				}
 				else
 					temp.current = 0;

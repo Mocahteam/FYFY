@@ -165,32 +165,44 @@ namespace FYFY {
 			// Create all systems
 			for (int i = 0; i < _fixedUpdateSystemDescriptions.Length; ++i) {
 				SystemDescription systemDescription = _fixedUpdateSystemDescriptions[i];
-				FSystem system = this.createSystemInstance(systemDescription);
+				try{
+					FSystem system = this.createSystemInstance(systemDescription);
 
-				if(system != null) {
-					FSystemManager._fixedUpdateSystems.Add(system);	
-				} else {
-					UnityEngine.Debug.LogError("FSystems in FixedUpdate : " + systemDescription._typeFullName + " class doesnt exist.");
+					if(system != null) {
+						FSystemManager._fixedUpdateSystems.Add(system);	
+					} else {
+						UnityEngine.Debug.LogError(systemDescription._typeFullName + " class doesn't exist, hooking up this FSystem to FixedUpdate context aborted. Check your MainLoop Game Object.");
+					}
+				}catch(System.Exception e){
+					UnityEngine.Debug.LogException(e);
 				}
 			}
 			for (int i = 0; i < _updateSystemDescriptions.Length; ++i) {
 				SystemDescription systemDescription = _updateSystemDescriptions[i];
-				FSystem system = this.createSystemInstance(systemDescription);
+				try{
+					FSystem system = this.createSystemInstance(systemDescription);
 
-				if(system != null) {
-					FSystemManager._updateSystems.Add(system);
-				} else {
-					UnityEngine.Debug.LogError("FSystems in Update : " + systemDescription._typeFullName + " class doesnt exist.");
+					if(system != null) {
+						FSystemManager._updateSystems.Add(system);
+					} else {
+						UnityEngine.Debug.LogError(systemDescription._typeFullName + " class doesn't exist, hooking up this FSystem to Update context aborted. Check your MainLoop Game Object.");
+					}
+				} catch (System.Exception e){
+					UnityEngine.Debug.LogException(e);
 				}
 			}
 			for (int i = 0; i < _lateUpdateSystemDescriptions.Length; ++i) {
 				SystemDescription systemDescription = _lateUpdateSystemDescriptions[i];
-				FSystem system = this.createSystemInstance(systemDescription);
-				
-				if(system != null) {
-					FSystemManager._lateUpdateSystems.Add(system);
-				} else {
-					UnityEngine.Debug.LogError("FSystems in LateUpdate : " + systemDescription._typeFullName + " class doesnt exist.");
+				try{
+					FSystem system = this.createSystemInstance(systemDescription);
+					
+					if(system != null) {
+						FSystemManager._lateUpdateSystems.Add(system);
+					} else {
+						UnityEngine.Debug.LogError(systemDescription._typeFullName + " class doesn't exist, hooking up this FSystem to LateUpdate context aborted. Check your MainLoop Game Object.");
+					}
+				} catch (System.Exception e){
+					UnityEngine.Debug.LogException(e);
 				}
 			}
 
@@ -210,7 +222,11 @@ namespace FYFY {
 			while (GameObjectManager._delayedActions.Count != 0) {
 				// During the action perform (and so the Unity callbacks), the current action is always present on the queue top.
 				// This is used in TriggerManager && CollisionManager dlls.
-				GameObjectManager._delayedActions.Peek().perform();
+				try{
+					GameObjectManager._delayedActions.Peek().perform();
+				} catch (System.Exception e){
+					UnityEngine.Debug.LogException(e);
+				}
 				GameObjectManager._delayedActions.Dequeue();
 			}
 			
@@ -241,8 +257,14 @@ namespace FYFY {
 			_stopwatch.Reset ();
 			_stopwatch.Start ();
 			foreach(FSystem system in FSystemManager._fixedUpdateSystems)
-				if(system.Pause == false)
-					system.process(_familiesUpdateCount);
+				if(system.Pause == false){
+					try{
+						system.process(_familiesUpdateCount);
+					}
+					catch (System.Exception e){
+						UnityEngine.Debug.LogException(e);
+					}
+				}
 			_stopwatch.Stop ();
 			fixedUpdateStats = _stopwatch.ElapsedMilliseconds;
 		}
@@ -257,8 +279,13 @@ namespace FYFY {
 			_stopwatch.Reset ();
 			_stopwatch.Start ();
 			foreach(FSystem system in FSystemManager._updateSystems)
-				if(system.Pause == false)
-					system.process(_familiesUpdateCount);
+				if(system.Pause == false){
+					try{
+						system.process(_familiesUpdateCount);
+					} catch (System.Exception e){
+						UnityEngine.Debug.LogException(e);
+					}
+				}
 			_stopwatch.Stop ();
 			updateStats = _stopwatch.ElapsedMilliseconds;
 		}
@@ -273,8 +300,13 @@ namespace FYFY {
 			_stopwatch.Reset ();
 			_stopwatch.Start ();
 			foreach(FSystem system in FSystemManager._lateUpdateSystems)
-				if(system.Pause == false)
-					system.process(_familiesUpdateCount);
+				if(system.Pause == false){
+					try{
+						system.process(_familiesUpdateCount);
+					} catch (System.Exception e){
+						UnityEngine.Debug.LogException(e);
+					}
+				}
 			_stopwatch.Stop ();
 			lateUpdateStats = _stopwatch.ElapsedMilliseconds;
 
