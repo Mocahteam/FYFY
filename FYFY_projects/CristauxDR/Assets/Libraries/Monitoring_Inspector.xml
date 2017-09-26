@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Monitoring_Inspector</name>
+    </assembly>
+    <members>
+        <member name="T:FYFY_plugins.Monitoring.EditionView">
+            <summary>
+            	Custom UI for editing monitoring.
+            </summary>
+        </member>
+    </members>
+</doc>

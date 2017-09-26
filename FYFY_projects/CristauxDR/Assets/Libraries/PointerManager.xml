@@ -17,12 +17,6 @@
             	Component allowing <c>GameObject</c> to be sensitive to the pointer.
             	Add automatically a <see cref="T:FYFY_plugins.PointerManager.PointerOver">component</see> when the pointer points the <c>GameObject</c>.
             </summary>
-            <remarks>
-            	<para>
-            		This component works only on objects that aren't on Ignore Raycast layer 
-            		and which have a collider marked as Trigger (with <c>Physics.queriesHitTriggers</c> true).
-            	</para>
-            </remarks>
         </member>
         <member name="M:FYFY_plugins.PointerManager.PointerSensitive.OnPointerEnter(UnityEngine.EventSystems.PointerEventData)">
             <summary>

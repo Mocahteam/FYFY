@@ -6,12 +6,6 @@ namespace FYFY_plugins.PointerManager {
 	/// 	Component allowing <c>GameObject</c> to be sensitive to the pointer.
 	/// 	Add automatically a <see cref="FYFY_plugins.PointerManager.PointerOver">component</see> when the pointer points the <c>GameObject</c>.
 	/// </summary>
-	/// <remarks>
-	/// 	<para>
-	///			This component works only on objects that aren't on Ignore Raycast layer 
-	///			and which have a collider marked as Trigger (with <c>Physics.queriesHitTriggers</c> true).
-	///		</para>
-	/// </remarks>
 
 	// Overlay of the Unity Pointer System.
 	// It's a tricky component with non FYFY conventional design.

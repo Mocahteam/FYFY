@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using FYFY;
 using System.Collections.Generic;
-using monitoring;
+using FYFY_plugins.Monitoring;
 
 public class TemperatureManager : FSystem {
 	private Family temperature = FamilyManager.getFamily(new AllOfComponents(typeof(Temperature)));

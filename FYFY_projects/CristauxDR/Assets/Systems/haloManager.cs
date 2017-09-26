@@ -1,35 +1,31 @@
 ﻿using UnityEngine;
 using FYFY;
 using FYFY_plugins.TriggerManager;
+using System.Collections.Generic;
 
 public class haloManager : FSystem {
+	// only hero can produce generation of Triggered3D component thanks to Unity Physics layers
 	public Family halos = FamilyManager.getFamily(new AllOfComponents(typeof(Triggered3D)), new AnyOfComponents(typeof(SpriteRenderer), typeof(MeshRenderer)), new AnyOfTags("Interactable"));
+	private Dictionary<int, GameObject> id2GO = new Dictionary<int, GameObject>();
 
-	// Use this to update member variables when system pause. 
-	// Advice: avoid to update your families inside this function.
-	protected override void onPause(int currentFrame) {
+	public haloManager (){
+		halos.addEntryCallback (playerCloseTo);
+		halos.addExitCallback (playerFarFrom);
 	}
 
-	// Use this to update member variables when system resume.
-	// Advice: avoid to update your families inside this function.
-	protected override void onResume(int currentFrame){
+	private void playerCloseTo (GameObject go){
+		Renderer rend = go.GetComponent<Renderer> ();
+		rend.material.color = new Color(1f, 0.9f, 0f);
+		id2GO.Add (go.GetInstanceID(), go);
 	}
 
-	// Use to process your families.
-	protected override void onProcess(int familiesUpdateCount) {
-		foreach (GameObject go in halos) {
-			Renderer rend = go.GetComponent<Renderer> ();
-
-			Triggered3D triggered = go.GetComponent<Triggered3D> ();
-			bool heroFound = false;
-			foreach (GameObject target in triggered.Targets) {
-				if (target.name == "HeroSprite") {
-					heroFound = true;
-					rend.material.color = new Color(1f, 0.9f, 0f);
-				}
-			}
-			if (!heroFound) {
+	private void playerFarFrom (int goId){
+		GameObject go;
+		if (id2GO.TryGetValue(goId, out go)){
+			if (go != null) {
+				Renderer rend = go.GetComponent<Renderer> ();
 				rend.material.color = Color.white;
+				id2GO.Remove(goId);
 			}
 		}
 	}

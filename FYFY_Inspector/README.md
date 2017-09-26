@@ -31,7 +31,9 @@ Usage
 -----
 
 To use the library inside an Unity project, you just have to drop it and 
-`FYFY.dll` in the `Assets` folder of your project.
+`FYFY.dll` in the `Assets` folder of your project. Select only `Editor`
+platfom for `FYFY_Inspector.dll`.
+
 
 Directories list
 ----------------

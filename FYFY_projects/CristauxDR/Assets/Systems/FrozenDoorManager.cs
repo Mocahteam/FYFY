@@ -20,20 +20,22 @@ public class FrozenDoorManager : FSystem {
 	// Use to process your families.
 	protected override void onProcess(int familiesUpdateCount) {
 		if (Input.GetMouseButtonDown (0)) {
-			foreach (GameObject go in doors) {
-				Door door = go.GetComponent<Door> ();
+			// Only one GO is under pointer
+			GameObject door_GO = doors.First();
+			if (door_GO != null) {
+				Door door = door_GO.GetComponent<Door> ();
+				// Check constraints on the door
 				if (door.constraint == null || door.constraint.activeInHierarchy) {
-					Animator anim = go.GetComponentInParent<Animator> ();
-					Triggered3D triggered = go.GetComponent<Triggered3D> ();
-					foreach (GameObject target in triggered.Targets) {
-						if (target.name == "HeroSprite") {
-							foreach (GameObject boiler in boilers) {
-								Boiler boilerC = boiler.GetComponent<Boiler> ();
-								if (boilerC.isOn) {
-									door.isOpen = !door.isOpen;
-									anim.SetBool ("isOpen", door.isOpen);
-								}
-							}
+					Animator anim = door_GO.GetComponentInParent<Animator> ();
+					// Check if hero is near to exit (only hero can produce this component thanks to Unity Physics layers)
+					Triggered3D triggered = door_GO.GetComponent<Triggered3D> ();
+					if (triggered != null) {
+						// Check if boiler is on
+						GameObject boiler_GO = boilers.First();
+						Boiler boilerC = boiler_GO.GetComponent<Boiler> ();
+						if (boilerC.isOn) {
+							door.isOpen = !door.isOpen;
+							anim.SetBool ("isOpen", door.isOpen);
 						}
 					}
 				}

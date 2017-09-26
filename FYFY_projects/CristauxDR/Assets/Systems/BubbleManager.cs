@@ -62,44 +62,38 @@ public class BubbleManager : FSystem {
 	protected override void onProcess(int familiesUpdateCount) {
 		if (bubble_GO != null) {
 			if (!hintLever) {
-				// check collision with hero
+				// parse all levers near to hero (only hero can produce Triggered3D component thanks to Unity Physics layers)
 				foreach (GameObject go in levers) {
 					Triggered3D triggered = go.GetComponent<Triggered3D> ();
-					foreach (GameObject target in triggered.Targets) {
-						if (target == hero_GO) {
-							GameObjectManager.setGameObjectState(bubble_GO, true);
-							TextMesh text = bubble_GO.GetComponentInChildren<TextMesh> ();
-							text.text = "Voilà des\nintérupteurs sur\nlequel il est écrit\n+2";
-							startDisplaying = Time.timeSinceLevelLoad;
-							hintLever = true;
-						}
-					}
+					GameObjectManager.setGameObjectState(bubble_GO, true);
+					TextMesh text = bubble_GO.GetComponentInChildren<TextMesh> ();
+					text.text = "Voilà des\nintérupteurs sur\nlequel il est écrit\n+2";
+					startDisplaying = Time.timeSinceLevelLoad;
+					hintLever = true;
 				}
 			}
 
 			if (!hintBoiler) {
+				// Check if boiler is near to hero (only hero can produce Triggered3D component thanks to Unity Physics layers)
 				Triggered3D triggered = boiler_GO.GetComponent<Triggered3D> ();
-				foreach (GameObject target in triggered.Targets) {
-					if (target == hero_GO) {
-						GameObjectManager.setGameObjectState(bubble_GO, true);
-						TextMesh text = bubble_GO.GetComponentInChildren<TextMesh> ();
-						text.text = "Une chaudière !\nC'est dommage,\nelle a l'air éteinte.";
-						startDisplaying = Time.timeSinceLevelLoad;
-						hintBoiler = true;
-					}
+				if (triggered != null){
+					GameObjectManager.setGameObjectState(bubble_GO, true);
+					TextMesh text = bubble_GO.GetComponentInChildren<TextMesh> ();
+					text.text = "Une chaudière !\nC'est dommage,\nelle a l'air éteinte.";
+					startDisplaying = Time.timeSinceLevelLoad;
+					hintBoiler = true;
 				}
 			}
 
 			if (!hintDoor) {
+				// Check if door is near to hero (only hero can produce Triggered3D component thanks to Unity Physics layers)
 				Triggered3D triggered = door_GO.GetComponent<Triggered3D> ();
-				foreach (GameObject target in triggered.Targets) {
-					if (target == hero_GO) {
-						GameObjectManager.setGameObjectState(bubble_GO, true);
-						TextMesh text = bubble_GO.GetComponentInChildren<TextMesh> ();
-						text.text = "Cette porte a\nbesoin d'une\nclé pour être\nouverte !";
-						startDisplaying = Time.timeSinceLevelLoad;
-						hintDoor = true;
-					}
+				if (triggered != null){
+					GameObjectManager.setGameObjectState(bubble_GO, true);
+					TextMesh text = bubble_GO.GetComponentInChildren<TextMesh> ();
+					text.text = "Cette porte a\nbesoin d'une\nclé pour être\nouverte !";
+					startDisplaying = Time.timeSinceLevelLoad;
+					hintDoor = true;
 				}
 			}
 
@@ -119,53 +113,26 @@ public class BubbleManager : FSystem {
 			}
 
 			if (!hintKey || !hintMatchstick) {
-				// Parse all active GO takable in game
+				// Parse all active GO takable in game and near to player (only hero can produce Triggered3D component thanks to Unity Physics layers)
 				foreach (GameObject go in inGameObjects) {
 					if (!hintKey && go.name == "Key") {
-						Triggered3D triggered = go.GetComponent<Triggered3D> ();
-						// check if collision occurs with hero
-						foreach (GameObject target in triggered.Targets) {
-							if (target == hero_GO) {
-								GameObjectManager.setGameObjectState (bubble_GO, true);
-								TextMesh text = bubble_GO.GetComponentInChildren<TextMesh> ();
-								text.text = "Une clé, ça peut\nêtre utile !";
-								startDisplaying = Time.timeSinceLevelLoad;
-								hintKey = true;
-							}
-						}
+						GameObjectManager.setGameObjectState (bubble_GO, true);
+						TextMesh text = bubble_GO.GetComponentInChildren<TextMesh> ();
+						text.text = "Une clé, ça peut\nêtre utile !";
+						startDisplaying = Time.timeSinceLevelLoad;
+						hintKey = true;
 					}
 					if (!hintMatchstick && go.name == "Matchstick") {
-						Triggered3D triggered = go.GetComponent<Triggered3D> ();
-						// check if collision occurs with hero
-						foreach (GameObject target in triggered.Targets) {
-							if (target == hero_GO) {
-								GameObjectManager.setGameObjectState (bubble_GO, true);
-								TextMesh text = bubble_GO.GetComponentInChildren<TextMesh> ();
-								text.text = "Des allumettes :\nidéal pour faire\nun feu !";
-								startDisplaying = Time.timeSinceLevelLoad;
-								hintMatchstick = true;
-							}
-						}
-					}
-				}
-
-
-
-				InCollision3D collision = iceWall_GO.GetComponent<InCollision3D> ();
-				if (collision != null) {
-					foreach (GameObject target in collision.Targets) {
-						if (target == hero_GO) {
-							GameObjectManager.setGameObjectState (bubble_GO, true);
-							TextMesh text = bubble_GO.GetComponentInChildren<TextMesh> ();
-							text.text = "Oh zut, le\npassage est\nbloqué par un\nmur de glace !";
-							startDisplaying = Time.timeSinceLevelLoad;
-							hintIceWall = true;
-						}
+						GameObjectManager.setGameObjectState (bubble_GO, true);
+						TextMesh text = bubble_GO.GetComponentInChildren<TextMesh> ();
+						text.text = "Des allumettes :\nidéal pour faire\nun feu !";
+						startDisplaying = Time.timeSinceLevelLoad;
+						hintMatchstick = true;
 					}
 				}
 			}
 
-			if (bubble_GO.activeSelf && startDisplaying + 5 < Time.timeSinceLevelLoad) {
+			if (bubble_GO.activeSelf && startDisplaying + 4 < Time.timeSinceLevelLoad) {
 				GameObjectManager.setGameObjectState (bubble_GO, false);
 			}
 		}

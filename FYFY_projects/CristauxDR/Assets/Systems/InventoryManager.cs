@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using FYFY;
 using FYFY_plugins.PointerManager;
 using System.Collections.Generic;
-using monitoring;
+using FYFY_plugins.Monitoring;
 
 public class InventoryManager : FSystem {
 	private Family inInventoryObjectsFocused = FamilyManager.getFamily(new AllOfComponents(typeof(PointerOver), typeof(Takable)), new AllOfProperties(PropertyMatcher.PROPERTY.ENABLED), new AnyOfLayers(5)); // Layer 5 == UI
@@ -54,32 +54,37 @@ public class InventoryManager : FSystem {
 	// Use to process your families.
 	protected override void onProcess(int familiesUpdateCount) {
 		if (Input.GetMouseButtonDown (0)) {
-			// Parse all active GO takable in inventory under Mouse Pointer
-			foreach (GameObject go in inInventoryObjectsFocused) {
+			// Only one GO is under pointer
+			GameObject focused_GO = inInventoryObjectsFocused.First();
+			if (focused_GO != null){
 				// Get ingame linked GO
-				GameObject inGame = go.GetComponent<Takable>().linkedWith;
+				GameObject inGame = focused_GO.GetComponent<Takable>().linkedWith;
 				// Get its monitor
 				ComponentMonitoring cm = null;
 				if (inGame != null)
 					cm = inGame.GetComponent<ComponentMonitoring>();
 
 				bool alreadySelected = false;
-				// Reset all selected items
-				foreach (GameObject item in itemSelected) {
+				// Reset selected items, only one selection is possible
+				GameObject item = itemSelected.First();
+				if (item != null){
 					GameObjectManager.removeComponent<CurrentSelection> (item);
-					if (item == go.transform.parent.gameObject) {
+					if (item == focused_GO.transform.parent.gameObject) {
 						alreadySelected = true;
 						if (cm != null)
 							// already selected => player deselect the item
-							cm.trace("storeBack", MonitoringManager.Source.PLAYER);
-					} else
-						if (cm != null)
+							cm.trace ("storeBack", MonitoringManager.Source.PLAYER);
+					} else {
+						// Get item monitor
+						ComponentMonitoring cmItem = item.transform.GetChild(0).GetComponent<Takable>().linkedWith.GetComponent<ComponentMonitoring>();
+						if (cmItem != null)
 							// player select another item  => System action to storeback current item
-							cm.trace("storeBack", MonitoringManager.Source.SYSTEM);
+							cmItem.trace ("storeBack", MonitoringManager.Source.SYSTEM);
+					}
 				}
 				if (!alreadySelected) {
 					// Select current go
-					GameObjectManager.addComponent<CurrentSelection> (go.transform.parent.gameObject);
+					GameObjectManager.addComponent<CurrentSelection> (focused_GO.transform.parent.gameObject);
 					if (cm != null)
 						// player select a new item
 						cm.trace("get", MonitoringManager.Source.PLAYER);

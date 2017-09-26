@@ -59,7 +59,7 @@ namespace FYFY_plugins.TriggerManager {
 		
 		// Unregister a target
 		internal void unregisterTarget(GameObject target){
-			_targets.Remove(this.gameObject); // remove from dictionary the link with the target
+			_targets.Remove(target); // remove from dictionary the link with the target
 			
 			// Check if at least one target is always defined, if not we have to remove Triggered2D component.
 			if(_targets.Count == 0){

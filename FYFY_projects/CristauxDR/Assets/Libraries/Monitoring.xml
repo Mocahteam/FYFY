@@ -1,0 +1,221 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Monitoring</name>
+    </assembly>
+    <members>
+        <member name="T:FYFY_plugins.Monitoring.ExpressionParser">
+            <summary>Parser of logic expressions.</summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.ExpressionParser.isValid(FYFY_plugins.Monitoring.TransitionLink)">
+            <summary>Check if a transitionLink contains a valid logix expression.</summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.InitFailed">
+            <summary>
+            	Exception used when links associated to an action don't match with logic expression of this action.
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.InitFailed.#ctor">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY_plugins.Monitoring.InitFailed"/> class.
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.InitFailed.#ctor(System.String,System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY_plugins.Monitoring.InitFailed"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.TraceAborted">
+            <summary>
+            	Exception used when links associated to an action don't match with logic expression of this action.
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.TraceAborted.#ctor">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY_plugins.Monitoring.TraceAborted"/> class.
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.TraceAborted.#ctor(System.String,System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY_plugins.Monitoring.TraceAborted"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.ComponentMonitoring">
+            <summary>
+            	Add monitoring functionalities to a Game Object
+            </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.ComponentMonitoring.PnmlFile">
+            <summary> Pnml File associated to the monitor </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.ComponentMonitoring.comments">
+            <summary> Comments of this monitor </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.ComponentMonitoring.id">
+            <summary> Component id </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.ComponentMonitoring.transitionLinks">
+            <summary> List of transitions influenced by links. </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.ComponentMonitoring.getTransitionLinkByTransitionLabel(System.String)">
+            <summary> Look for a transition matching with label influenced by links </summary>
+            <param name="label">The label of the transition to find.</param>
+            <return> If a transition with appropriate label exists, returns this transition and links. Returns null otherwise. </return>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.ComponentMonitoring.initState(System.String,System.UInt32)">
+            <summary>
+            This function enables you to match Petri Net initial marking with families content on start. Use this function only into systems' constructor.
+            </summary>
+            <param name="stateName">State name you want to initialize, this name has to match with a place defined into associated Petri Net <see cref="F:FYFY_plugins.Monitoring.ComponentMonitoring.PnmlFile"/>.</param>
+            <param name="initialValue">The initial positive or null value.</param>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.ComponentMonitoring.trace(System.String,System.String,System.Boolean,System.String[])">
+            <summary>
+            	Trace game action.
+            </summary>
+            <param name="actionName">
+            	Action name you want to trace, this name has to match with a transition defined into associated Petri Net <see cref="F:FYFY_plugins.Monitoring.ComponentMonitoring.PnmlFile"/>.
+            </param>
+            <param name="performedBy">
+            	Specify who perform this action, the player or the system. <see cref="T:FYFY_plugins.Monitoring.MonitoringManager.Source"/>
+            </param>
+            <param name="isTry">
+            	true means the player try to perform the action and the system refuse to perform it. False means the system accept to perform player's action.
+            </param>
+            <param name="linksConcerned">
+            	links label concerned by this action. Very important if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use: l0 and l3 OR l1 and l3 =&gt;
+            		<code>this.trace(..., "l0", "l3");</code> OR <code>this.trace(..., "l1", "l3");</code>
+            </param>
+        </member>
+        <member name="P:FYFY_plugins.Monitoring.ComponentMonitoring.PetriNet">
+            <summary> PetriNet getter and setter. Set the PetriNet implies reset transitionLinks. </summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.FamilyMonitoring">
+            <summary>
+            	Add monitoring functionalities to a Family
+            </summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.Link">
+            <summary>
+            Contains Link data
+            </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Link.label">
+            <summary>Link label used in logic expression.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Link.type">
+            <summary>The type of this link encoded as an int: 0 means Get, 1 means Produce, 2 means Require.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Link.flagsType">
+            <summary>The flag type of this link encoded as an int: 0 means "at least", 1 means "less than".</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Link.weight">
+            <summary>Link weight.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Link.placeId">
+            <summary>Place Id associated to this link.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Link.scroll">
+            <summary>The current scrolling value for this link.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Link.linkedObject">
+            <summary>The Game Object associated to this link.</summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.Link.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:FYFY_plugins.Monitoring.Link"/> class.</summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.Link.getPlacesNameFromLinkedObject">
+            <summary>Returns the list of places' name included into the linked Game Object.</summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.MonitoringManager">
+            <summary>
+            	This component trigger the building of PetriNets and Specification on Start and write traces when the game is over.
+            </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.MonitoringManager.filename">
+            <summary>The file name to save PetriNet, Specifications and logs.</summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.MonitoringManager.Source">
+            <summary>Define the different source that can trigger a game action.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.MonitoringManager.Source.SYSTEM">
+            <summary></summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.MonitoringManager.Source.PLAYER">
+            <summary></summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.TransitionLink">
+            <summary>
+            	Links on transition
+            </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.TransitionLink.links">
+            <summary>List of links associated to this transition.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.TransitionLink.transition">
+            <summary>The transition linked.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.TransitionLink.isSystemAction">
+            <summary>Define if this transition is a system action.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.TransitionLink.isEndAction">
+            <summary>Define if this transition is an end action.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.TransitionLink.logic">
+            <summary>The logic expression for this transition.</summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.Arc.ToString">
+            <summary>Returns a string that represents the current Arc.</summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.Node">
+            <summary>Defines a node of the PetriNet. It could be a place or a trasition.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Node.label">
+            <summary>The label of this node.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Node.initialMarking">
+            <summary>
+            	If Node is a place, contains the initial marking of this place.
+            	If Node is a transition, contains -1
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.Node.ToString">
+            <summary>Returns a string that represents the current Node.</summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.PetriNet">
+            <summary>
+            	Store the PetriNet structure used by its monitor.
+            </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.PetriNet.places">
+            <summary>List of places of this PetriNet.</summary> 
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.PetriNet.loadFromFile(System.String,System.Int32)">
+            <summary>Parse and load pnml file.</summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.PetriNet.getTransitionsNames">
+            <summary>Returns the name of transitions defined into the PetriNet.</summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.PetriNet.getPlacesNames">
+            <summary>Returns the name of places defined into the PetriNet.</summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.PetriNet.ToString">
+            <summary>Returns a string that represents the current PetriNet.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.PnmlParser.ns">
+            <summary>
+            Namespace defined to read pnml file format
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.PnmlParser.loadFromPath(System.String)">
+            <summary>
+            Create a PetriNet class whithin data filled from a pnml file 
+            </summary>
+            <returns>PetriNet or null if doesn't exists</returns>
+            <param name="path">Full path of the pnml file</param>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.XmlHandler.addTrace(System.String,System.Boolean,System.String)">
+            Add a new trace
+        </member>
+    </members>
+</doc>

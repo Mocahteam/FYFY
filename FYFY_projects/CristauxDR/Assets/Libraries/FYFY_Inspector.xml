@@ -17,13 +17,13 @@
         <member name="M:FYFY_Inspector.MainLoopInspector.OnInspectorGUI">
             <summary></summary>
         </member>
-        <member name="T:SystemsMonitor">
+        <member name="T:FYFY_Inspector.SystemsMonitor">
             <summary>Display curves to show systems' load</summary>
         </member>
-        <member name="M:SystemsMonitor.#ctor(System.Int32)">
+        <member name="M:FYFY_Inspector.SystemsMonitor.#ctor(System.Int32)">
             <summary>Constructor</summary>
         </member>
-        <member name="M:SystemsMonitor.Draw(System.Single[],System.Single[],System.Single[],System.Single)">
+        <member name="M:FYFY_Inspector.SystemsMonitor.Draw(System.Single[],System.Single[],System.Single[],System.Single)">
             <summary>Draw lines</summary>
         </member>
     </members>
