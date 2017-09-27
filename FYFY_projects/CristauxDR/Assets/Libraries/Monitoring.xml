@@ -73,19 +73,10 @@
             <summary>
             	Trace game action.
             </summary>
-            <param name="actionName">
-            	Action name you want to trace, this name has to match with a transition defined into associated Petri Net <see cref="F:FYFY_plugins.Monitoring.ComponentMonitoring.PnmlFile"/>.
-            </param>
-            <param name="performedBy">
-            	Specify who perform this action, the player or the system. <see cref="T:FYFY_plugins.Monitoring.MonitoringManager.Source"/>
-            </param>
-            <param name="isTry">
-            	true means the player try to perform the action and the system refuse to perform it. False means the system accept to perform player's action.
-            </param>
-            <param name="linksConcerned">
-            	links label concerned by this action. Very important if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use: l0 and l3 OR l1 and l3 =&gt;
-            		<code>this.trace(..., "l0", "l3");</code> OR <code>this.trace(..., "l1", "l3");</code>
-            </param>
+            <param name="actionName">Action name you want to trace, this name has to match with a transition defined into associated Petri Net <see cref="F:FYFY_plugins.Monitoring.ComponentMonitoring.PnmlFile"/>.</param>
+            <param name="performedBy">Specify who perform this action, the player or the system. <see cref="T:FYFY_plugins.Monitoring.MonitoringManager.Source"/></param>
+            <param name="isTry">true means the player try to perform the action and the system refuse to perform it. False means the system accept to perform player's action.</param>
+            <param name="linksConcerned">links label concerned by this action. Very important if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use: l0 and l3 OR l1 and l3 =&gt; <code>this.trace(..., "l0", "l3");</code> OR <code>this.trace(..., "l1", "l3");</code></param>
         </member>
         <member name="P:FYFY_plugins.Monitoring.ComponentMonitoring.PetriNet">
             <summary> PetriNet getter and setter. Set the PetriNet implies reset transitionLinks. </summary>

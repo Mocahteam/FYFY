@@ -15,10 +15,15 @@ namespace FYFY_plugins.Monitoring{
 
 	[Serializable]
 	internal class Arc {
+		[SerializeField]
 		internal Node source;
+		[SerializeField]
 		internal Node target;
+		[SerializeField]
 		internal ArcType type;
+		[SerializeField]
 		internal int weight;
+		[SerializeField]
 		internal static string[] optType = new string[] {"test", "inhibitor"};
 
 		internal Arc (Node source,Node target, ArcType type, int weight)

@@ -10,6 +10,7 @@ namespace FYFY_plugins.Monitoring{
 	public class Node  {
 
 		//Datas set to match pnml format
+		[SerializeField]
 		internal int id;
 		/// <summary>The label of this node.</summary>
 		public string label;
@@ -18,7 +19,9 @@ namespace FYFY_plugins.Monitoring{
 		///		If Node is a transition, contains -1
 		/// </summary>
 		public int initialMarking;
+		[SerializeField]
 		internal Vector2 offset;
+		[SerializeField]
 		internal Vector2 position;
 
 		internal Node(string label,int id, Vector2 offset, int initialMarking,Vector2 position){

@@ -12,12 +12,15 @@ namespace FYFY_plugins.Monitoring{
 	/// </summary>
 	[Serializable]
 	public class PetriNet{
-		
+		[SerializeField]
 		internal string label;
+		[SerializeField]
 		internal int id;
+		[SerializeField]
 		internal List<Node> transitions;
 		/// <summary>List of places of this PetriNet.</summary> 
 		public List<Node> places;
+		[SerializeField]
 		internal List<Arc> arcs;
 
 		internal PetriNet ()

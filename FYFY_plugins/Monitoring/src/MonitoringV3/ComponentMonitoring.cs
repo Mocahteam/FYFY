@@ -29,6 +29,10 @@ namespace FYFY_plugins.Monitoring{
 		[HideInInspector]
 		[SerializeField]
 		private PetriNet petriNet;
+
+		/// <summary> List of transitions influenced by links. </summary>
+		[HideInInspector] 
+		public List<TransitionLink> transitionLinks = new List<TransitionLink>();
 		
 		/// <summary> PetriNet getter and setter. Set the PetriNet implies reset transitionLinks. </summary>
 		[HideInInspector]
@@ -50,10 +54,6 @@ namespace FYFY_plugins.Monitoring{
 				}
 			}
 		}
-
-		/// <summary> List of transitions influenced by links. </summary>
-		[HideInInspector] 
-		public List<TransitionLink> transitionLinks = new List<TransitionLink>();
 
 		/// <summary> Look for a transition matching with label influenced by links </summary>
 		/// <param name="label">The label of the transition to find.</param>
@@ -91,19 +91,10 @@ namespace FYFY_plugins.Monitoring{
 		/// <summary>
 		/// 	Trace game action.
 		/// </summary>
-		/// <param name="actionName">
-		/// 	Action name you want to trace, this name has to match with a transition defined into associated Petri Net <see cref="PnmlFile"/>.
-		/// </param>
-		/// <param name="performedBy">
-		/// 	Specify who perform this action, the player or the system. <see cref="MonitoringManager.Source"/>
-		/// </param>
-		/// <param name="isTry">
-		/// 	true means the player try to perform the action and the system refuse to perform it. False means the system accept to perform player's action.
-		/// </param>
-		/// <param name="linksConcerned">
-		/// 	links label concerned by this action. Very important if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use: l0 and l3 OR l1 and l3 =>
-		/// 		<code>this.trace(..., "l0", "l3");</code> OR <code>this.trace(..., "l1", "l3");</code>
-		/// </param>
+		/// <param name="actionName">Action name you want to trace, this name has to match with a transition defined into associated Petri Net <see cref="PnmlFile"/>.</param>
+		/// <param name="performedBy">Specify who perform this action, the player or the system. <see cref="MonitoringManager.Source"/></param>
+		/// <param name="isTry">true means the player try to perform the action and the system refuse to perform it. False means the system accept to perform player's action.</param>
+		/// <param name="linksConcerned">links label concerned by this action. Very important if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use: l0 and l3 OR l1 and l3 => <code>this.trace(..., "l0", "l3");</code> OR <code>this.trace(..., "l1", "l3");</code></param>
 		public void trace(string actionName, string performedBy, bool isTry = false, params string[] linksConcerned)
 		{
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame (1, true);										// get caller stackFrame with informations
