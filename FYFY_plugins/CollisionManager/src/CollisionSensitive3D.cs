@@ -38,7 +38,8 @@ namespace FYFY_plugins.CollisionManager {
 
 		private void OnCollisionStay(Collision coll) {
 			GameObject target = coll.gameObject;
-			_collisions[target] = coll;
+			if (_targets.ContainsKey(target))
+				_collisions[target] = coll;
 		}
 
 		// Not fired when this GameObject or the target is destroyed.
@@ -50,9 +51,10 @@ namespace FYFY_plugins.CollisionManager {
 
 			// Effects in CollisionSensitive3DTarget.OnDestroy
 			Object.Destroy(cst);
-			_targets.Remove(target);
-			_collisions.Remove(target);
 			
+			_collisions.Remove(target);
+			_targets.Remove(target);
+			manageInCollision();
 		}
 
 		private void OnDestroy() {
@@ -67,20 +69,15 @@ namespace FYFY_plugins.CollisionManager {
 			}
 		}
 		
-		// Unregister a target
-		internal void unregisterTarget(GameObject target){
-			// remove from dictionary the links with the target
-			_collisions.Remove(this.gameObject);
-			_targets.Remove(this.gameObject);
-			
+		private void manageInCollision(){
 			// Check if at least one target is always defined, if not we have to remove InCollision3D component.
-			if(_targets.Count == 0){
+			if(_targets.Count == 0 && _inCollision){
 				_inCollision = false;
 				Transform[] parents = this.gameObject.GetComponentsInParent<Transform>(true); // this.gameobject.transform is include
 
 				// We check if there is an UnbindGameObject action on my gameobject or on my parents.
-				// If not, we have to use FYFY to remove InCollision3D in order to keep families synchronized.
 				// If so, we can't use FYFY because "remove" action will be queued after unbind and will not be able to proceed (unknown game object). Then we have to remove InCollision3D component thanks to classic Unity function.
+				// If not, we have to use FYFY to remove InCollision3D in order to keep families synchronized.
 				foreach(IGameObjectManagerAction action in GameObjectManager._delayedActions) {
 					if(action.GetType() == typeof(UnbindGameObject)) {
 						GameObject go = (action as UnbindGameObject)._gameObject;
@@ -99,6 +96,14 @@ namespace FYFY_plugins.CollisionManager {
 				// See MainLoop.preprocess for details.
 				GameObjectManager.removeComponent<InCollision3D>(this.gameObject);
 			}
+		}
+		
+		// Unregister a target
+		internal void unregisterTarget(GameObject target){
+			// remove from dictionary the links with the target
+			_collisions.Remove(this.gameObject);
+			_targets.Remove(this.gameObject);
+			manageInCollision();
 		}
 		
 		internal GameObject[] getTargets() {

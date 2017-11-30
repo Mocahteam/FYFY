@@ -42,7 +42,10 @@ namespace FYFY_plugins.TriggerManager {
 
 			// Effects in TriggerSensitive3DTarget.OnDestroy
 			Object.Destroy(tst);
+			
 			_targets.Remove(target);
+			
+			manageTriggered();
 		}
 
 		private void OnDestroy() {
@@ -57,12 +60,9 @@ namespace FYFY_plugins.TriggerManager {
 			}
 		}
 		
-		// Unregister a target
-		internal void unregisterTarget(GameObject target){
-			_targets.Remove(target); // remove from dictionary the link with the target
-			
+		private void manageTriggered(){
 			// Check if at least one target is always defined, if not we have to remove Triggered3D component.
-			if(_targets.Count == 0){
+			if(_targets.Count == 0 && _inCollision){
 				_inCollision = false;
 				Transform[] parents = this.gameObject.GetComponentsInParent<Transform>(true); // this.gameobject.transform is include
 
@@ -87,6 +87,12 @@ namespace FYFY_plugins.TriggerManager {
 				// See MainLoop.preprocess for details.
 				GameObjectManager.removeComponent<Triggered3D>(this.gameObject);
 			}
+		}
+		
+		// Unregister a target
+		internal void unregisterTarget(GameObject target){
+			_targets.Remove(target); // remove from dictionary the link with the target
+			manageTriggered();
 		}
 		
 		internal GameObject[] getTargets() {

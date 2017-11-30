@@ -350,7 +350,7 @@ namespace FYFY_plugins.Monitoring {
 					flagTransition = EditorGUILayout.Popup ("Action: ", flagTransition, labelsBuilt.ToArray ());
 
 					TransitionLink tLink = monitor.transitionLinks [flagTransition];
-					bool newToggle = EditorGUILayout.ToggleLeft ("Not a player action (triggered by game simlation)", tLink.isSystemAction);
+					bool newToggle = EditorGUILayout.ToggleLeft ("Not a player action (triggered by game simulation)", tLink.isSystemAction);
 					if (newToggle != tLink.isSystemAction) {
 						Undo.RecordObject (monitor, "Is Player Action");
 						tLink.isSystemAction = newToggle;
