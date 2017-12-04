@@ -101,8 +101,8 @@ namespace FYFY_plugins.CollisionManager {
 		// Unregister a target
 		internal void unregisterTarget(GameObject target){
 			// remove from dictionary the links with the target
-			_collisions.Remove(this.gameObject);
-			_targets.Remove(this.gameObject);
+			_collisions.Remove(target);
+			_targets.Remove(target);
 			manageInCollision();
 		}
 		
