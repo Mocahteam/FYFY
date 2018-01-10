@@ -132,9 +132,11 @@ namespace FYFY_plugins.Monitoring{
 		/// <summary>Returns the name of transitions defined into the PetriNet.</summary>
 		public string[] getTransitionsNames(){
 			List<string> listeLabelsTransitions = new List<String>();
-
 			foreach (Node transition in transitions) {
-				listeLabelsTransitions.Add (transition.label);
+				if (transition.overridedLabel != null && !transition.overridedLabel.Equals(""))
+					listeLabelsTransitions.Add (transition.overridedLabel);
+				else
+					listeLabelsTransitions.Add (transition.label);
 			}
 		
 			return listeLabelsTransitions.ToArray ();
@@ -145,7 +147,10 @@ namespace FYFY_plugins.Monitoring{
 			List<string> listeLabelsPlaces = new List<String>();
 
 			foreach (Node place in places) {
-				listeLabelsPlaces.Add (place.label);
+				if (place.overridedLabel != null && !place.overridedLabel.Equals(""))
+					listeLabelsPlaces.Add (place.overridedLabel);
+				else
+					listeLabelsPlaces.Add (place.label);
 			}
 
 			return listeLabelsPlaces.ToArray ();

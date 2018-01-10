@@ -113,9 +113,9 @@ namespace FYFY_plugins.Monitoring {
 	    {
 	        go_labels = new List<string>();
 			// Get all Game Objects with monitoring component
-			monitors = FindObjectsOfType(typeof(ComponentMonitoring)) as ComponentMonitoring[];
+			monitors = Resources.FindObjectsOfTypeAll(typeof(ComponentMonitoring)) as ComponentMonitoring[];
 			// Remove GO used to monitor families (child of Main_Loop GO)
-			FamilyMonitoring[] families_monitored = FindObjectsOfType(typeof(FamilyMonitoring)) as FamilyMonitoring[];
+			FamilyMonitoring[] families_monitored = Resources.FindObjectsOfTypeAll(typeof(FamilyMonitoring)) as FamilyMonitoring[];
 	        List<ComponentMonitoring> tmpList = monitors.ToList();
 			foreach (FamilyMonitoring fmonitored in families_monitored)
 	            tmpList.Remove(fmonitored);
@@ -161,7 +161,10 @@ namespace FYFY_plugins.Monitoring {
 	            {
 					// Forbid to drag and drop child of MainLoop
 					if (!tmp.transform.IsChildOf (mainLoop.transform)) {
+						bool isActive = tmp.activeSelf;
+						if (!isActive) tmp.SetActive(true); // enable G0 in order to process Awake into ComponentMonitoring and compute ID
 						ComponentMonitoring monitor = Undo.AddComponent<ComponentMonitoring> (tmp);
+						if (!isActive) tmp.SetActive(false); // reset default state
 						//monitor.hideFlags = HideFlags.HideInInspector;
 						loadMonitoredGo (monitor);
 					} else {
@@ -238,7 +241,9 @@ namespace FYFY_plugins.Monitoring {
 	                    EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 	                    if (GUILayout.Button("Add monitor to this family"))
 	                    {
-							GameObject go = (new GameObject(families[ObjectSelectedFlag].equivMonitor, typeof(FamilyMonitoring)));
+							GameObject go = new GameObject(families[ObjectSelectedFlag].equivMonitor);
+							FamilyMonitoring fm = go.AddComponent<FamilyMonitoring>();
+							fm.familyName = families[ObjectSelectedFlag].familyName;
 	                        go.transform.parent = mainLoop.transform;
 	                        //go.GetComponent<FamilyMonitoring>().hideFlags = HideFlags.HideInInspector;
 							Undo.RegisterCreatedObjectUndo(go, "Add monitor to family");
@@ -318,6 +323,7 @@ namespace FYFY_plugins.Monitoring {
 					EditorGUILayout.LabelField ("This Petri Net doesn't contain places.");
 				else {
 					foreach (Node place in monitor.PetriNet.places) {
+						EditorGUILayout.BeginHorizontal ();
 						// Add input field to change initial marking
 						EditorGUIUtility.labelWidth = 150;
 						int newMarking = EditorGUILayout.IntField (place.label, place.initialMarking, GUILayout.MaxWidth (175));
@@ -326,6 +332,15 @@ namespace FYFY_plugins.Monitoring {
 							Undo.RecordObject (monitor, "Update Initial state");
 							place.initialMarking = newMarking;
 						}
+						// Add override field
+						//EditorGUIUtility.labelWidth = 150;
+						string newLabel = EditorGUILayout.TextField ("Override name:", place.overridedLabel/*, GUILayout.MaxWidth (300)*/);
+						//EditorGUIUtility.labelWidth = 0; // reset default value
+						if (newLabel != place.overridedLabel) {
+							Undo.RecordObject (monitor, "Update Override Label");
+							place.overridedLabel = newLabel;
+						}
+						EditorGUILayout.EndHorizontal ();
 					}
 				}
 				EditorGUI.indentLevel -= 1;
@@ -344,12 +359,21 @@ namespace FYFY_plugins.Monitoring {
 					// Build explicit labels
 					List<string> labelsBuilt = new List<string> ();
 
-					foreach (TransitionLink tc in monitor.transitionLinks)
+					foreach (TransitionLink tc in monitor.transitionLinks){
 						labelsBuilt.Add (tc.transition.label + " (links: " + tc.links.Count + ")");
+					}
 
 					flagTransition = EditorGUILayout.Popup ("Action: ", flagTransition, labelsBuilt.ToArray ());
 
 					TransitionLink tLink = monitor.transitionLinks [flagTransition];
+					
+					// Add override field
+					string newTrLabel = EditorGUILayout.TextField ("Override name:", tLink.transition.overridedLabel);
+					if (newTrLabel != tLink.transition.overridedLabel) {
+						Undo.RecordObject (monitor, "Update Override Label");
+						tLink.transition.overridedLabel = newTrLabel;
+					}
+					
 					bool newToggle = EditorGUILayout.ToggleLeft ("Not a player action (triggered by game simulation)", tLink.isSystemAction);
 					if (newToggle != tLink.isSystemAction) {
 						Undo.RecordObject (monitor, "Is Player Action");
@@ -529,7 +553,7 @@ namespace FYFY_plugins.Monitoring {
 					string newExpr = EditorGUILayout.TextField ("Logic expression of links:", tLink.logic);
 					GUIStyle skin = new GUIStyle (GUI.skin.label);
 					skin.normal.textColor = new Color (0.4f, 0.4f, 0.4f, 1); // soft grey
-					EditorGUILayout.LabelField ("Exemple: (l0+l2)*l3; Default: *", skin);
+					EditorGUILayout.LabelField ("Example: (l0+l2)*l3; Default: *", skin);
 					if (newExpr != tLink.logic) {
 						Undo.RecordObject (monitor, "Update logic expression");
 						tLink.logic = newExpr;

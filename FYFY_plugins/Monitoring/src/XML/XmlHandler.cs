@@ -14,14 +14,13 @@ namespace FYFY_plugins.Monitoring {
 		private static List<XElement> xSpecifList = new List<XElement>();
 
 		/// Add a new trace
-		internal static void addTrace(string performedBy, bool isTry, string trace)
+		internal static void addTrace(string performedBy, string trace)
 	    {
 	        xTraceList.Add(
 				new XElement("transition", 
 				new XAttribute("time", GetTimestamp(DateTime.Now)),
 		        new XAttribute("action", trace),
-	            new XAttribute("origin", performedBy),
-				new XAttribute("try", isTry.ToString()))
+	            new XAttribute("origin", performedBy))
 	        );
 	    }
 

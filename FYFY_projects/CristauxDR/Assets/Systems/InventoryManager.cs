@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using FYFY_plugins.Monitoring;
 
 public class InventoryManager : FSystem {
-	private Family inInventoryObjectsFocused = FamilyManager.getFamily(new AllOfComponents(typeof(PointerOver), typeof(Takable)), new AllOfProperties(PropertyMatcher.PROPERTY.ENABLED), new AnyOfLayers(5)); // Layer 5 == UI
+	private Family inInventoryObjectsFocused = FamilyManager.getFamily(new AllOfComponents(typeof(PointerOver), typeof(ComponentMonitoring)), new AllOfProperties(PropertyMatcher.PROPERTY.ENABLED), new AnyOfLayers(5)); // Layer 5 == UI
 	private Family highlightable = FamilyManager.getFamily(new AllOfComponents(typeof(PointerOver), typeof(Image)), new AnyOfLayers(5)); // Layer 5 == UI
-	private Family itemSelected = FamilyManager.getFamily(new AllOfComponents(typeof(CurrentSelection)), new AllOfProperties(PropertyMatcher.PROPERTY.HAS_CHILD));
+	private Family itemSelected = FamilyManager.getFamily(new AllOfComponents(typeof(CurrentSelection), typeof(ComponentMonitoring)));
 	private Dictionary<int, GameObject> goId2GO = new Dictionary<int, GameObject> ();
 
 	public InventoryManager () {
@@ -34,7 +34,7 @@ public class InventoryManager : FSystem {
 	}
 
 	void onNewItemSelected(GameObject newItem){
-		GameObject child = newItem.transform.GetChild (1).gameObject; // get second child
+		GameObject child = newItem.transform.parent.GetChild (1).gameObject; // get second child
 		if (!child.activeInHierarchy)
 			child.SetActive (true);
 		if (!goId2GO.ContainsKey(newItem.GetInstanceID ()))
@@ -43,7 +43,7 @@ public class InventoryManager : FSystem {
 
 	void onOldItemSelected (int oldItemId){
 		if (goId2GO.ContainsKey(oldItemId) && goId2GO [oldItemId] != null) {
-			GameObject child = goId2GO [oldItemId].transform.GetChild (1).gameObject; // get second child
+			GameObject child = goId2GO [oldItemId].transform.parent.GetChild (1).gameObject; // get second child
 			if (child.activeInHierarchy)
 				child.SetActive (false);
 		} else
@@ -57,37 +57,29 @@ public class InventoryManager : FSystem {
 			// Only one GO is under pointer
 			GameObject focused_GO = inInventoryObjectsFocused.First();
 			if (focused_GO != null){
-				// Get ingame linked GO
-				GameObject inGame = focused_GO.GetComponent<Takable>().linkedWith;
-				// Get its monitor
-				ComponentMonitoring cm = null;
-				if (inGame != null)
-					cm = inGame.GetComponent<ComponentMonitoring>();
-
 				bool alreadySelected = false;
 				// Reset selected items, only one selection is possible
 				GameObject item = itemSelected.First();
 				if (item != null){
 					GameObjectManager.removeComponent<CurrentSelection> (item);
-					if (item == focused_GO.transform.parent.gameObject) {
+					// Get item monitor
+					ComponentMonitoring cmItem = item.GetComponent<ComponentMonitoring>();
+					if (item.GetInstanceID() == focused_GO.GetInstanceID()) {
 						alreadySelected = true;
-						if (cm != null)
-							// already selected => player deselect the item
-							cm.trace ("storeBack", MonitoringManager.Source.PLAYER);
+						// already selected => player deselect the item
+						cmItem.trace ("turnOff", MonitoringManager.Source.PLAYER);
 					} else {
-						// Get item monitor
-						ComponentMonitoring cmItem = item.transform.GetChild(0).GetComponent<Takable>().linkedWith.GetComponent<ComponentMonitoring>();
-						if (cmItem != null)
-							// player select another item  => System action to storeback current item
-							cmItem.trace ("storeBack", MonitoringManager.Source.SYSTEM);
+						// player select another item  => System action to storeback current item
+						cmItem.trace ("turnOff", MonitoringManager.Source.SYSTEM);
 					}
 				}
 				if (!alreadySelected) {
 					// Select current go
-					GameObjectManager.addComponent<CurrentSelection> (focused_GO.transform.parent.gameObject);
-					if (cm != null)
-						// player select a new item
-						cm.trace("get", MonitoringManager.Source.PLAYER);
+					GameObjectManager.addComponent<CurrentSelection> (focused_GO);
+					// Get its monitor
+					ComponentMonitoring cm = focused_GO.GetComponent<ComponentMonitoring>();
+					// player select a new item
+					cm.trace("turnOn", MonitoringManager.Source.PLAYER);
 				}
 			}
 		}

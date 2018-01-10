@@ -12,6 +12,9 @@ namespace FYFY_plugins.Monitoring{
     {
 		// TODO: add this boolean to automatically include ComponentMonitoring in all GameObjects of this family
         //public bool suiviGlobal = true;
-
+		
+		/// <summary> Name of the family. </summary>
+		[HideInInspector] 
+		public string familyName;
 	}
 }

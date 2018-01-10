@@ -13,7 +13,7 @@ namespace FYFY_plugins.Monitoring
             List<int> inscrits = new List<int>();
 
 			// Get all used ids
-            foreach (ComponentMonitoring go in UnityEngine.Object.FindObjectsOfType<ComponentMonitoring>())
+            foreach (ComponentMonitoring go in Resources.FindObjectsOfTypeAll<ComponentMonitoring>())
             {
                 if (go.id != -1)
                     inscrits.Add(go.id);
@@ -33,7 +33,7 @@ namespace FYFY_plugins.Monitoring
 		internal static bool isUnique(ComponentMonitoring monitor)
         {
 			// Look for an other monitor component with the same id
-            foreach (ComponentMonitoring go in UnityEngine.Object.FindObjectsOfType<ComponentMonitoring>())
+            foreach (ComponentMonitoring go in Resources.FindObjectsOfTypeAll<ComponentMonitoring>())
 				if (go.id != -1 && go != monitor)
 					if (go.id == monitor.id)
 						return false;

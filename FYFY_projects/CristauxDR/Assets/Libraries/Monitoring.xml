@@ -75,8 +75,8 @@
             </summary>
             <param name="actionName">Action name you want to trace, this name has to match with a transition defined into associated Petri Net <see cref="F:FYFY_plugins.Monitoring.ComponentMonitoring.PnmlFile"/>.</param>
             <param name="performedBy">Specify who perform this action, the player or the system. <see cref="T:FYFY_plugins.Monitoring.MonitoringManager.Source"/></param>
-            <param name="isTry">true means the player try to perform the action and the system refuse to perform it. False means the system accept to perform player's action.</param>
-            <param name="linksConcerned">links label concerned by this action. Very important if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use: l0 and l3 OR l1 and l3 =&gt; <code>this.trace(..., "l0", "l3");</code> OR <code>this.trace(..., "l1", "l3");</code></param>
+            <param name="processLinks">Set to false if the logic expression associated to the action include "+" operators and the action performed by the player is not allowed by the system. In this case fourth parameters will not be processed. True (default) means fourth parameter will be analysed.</param>
+            <param name="linksConcerned">links label concerned by this action. Very important if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to build the trace: l0 and l3 OR l1 and l3 =&gt; <code>this.trace(..., "l0", "l3");</code> OR <code>this.trace(..., "l1", "l3");</code></param>
         </member>
         <member name="P:FYFY_plugins.Monitoring.ComponentMonitoring.PetriNet">
             <summary> PetriNet getter and setter. Set the PetriNet implies reset transitionLinks. </summary>
@@ -85,6 +85,9 @@
             <summary>
             	Add monitoring functionalities to a Family
             </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.FamilyMonitoring.familyName">
+            <summary> Name of the family. </summary>
         </member>
         <member name="T:FYFY_plugins.Monitoring.Link">
             <summary>
@@ -159,10 +162,13 @@
             <summary>Returns a string that represents the current Arc.</summary>
         </member>
         <member name="T:FYFY_plugins.Monitoring.Node">
-            <summary>Defines a node of the PetriNet. It could be a place or a trasition.</summary>
+            <summary>Defines a node of the PetriNet. It could be a place or a transition.</summary>
         </member>
         <member name="F:FYFY_plugins.Monitoring.Node.label">
             <summary>The label of this node.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Node.overridedLabel">
+            <summary>The overrided label of this node.</summary>
         </member>
         <member name="F:FYFY_plugins.Monitoring.Node.initialMarking">
             <summary>
@@ -205,7 +211,7 @@
             <returns>PetriNet or null if doesn't exists</returns>
             <param name="path">Full path of the pnml file</param>
         </member>
-        <member name="M:FYFY_plugins.Monitoring.XmlHandler.addTrace(System.String,System.Boolean,System.String)">
+        <member name="M:FYFY_plugins.Monitoring.XmlHandler.addTrace(System.String,System.String)">
             Add a new trace
         </member>
     </members>

@@ -5,15 +5,17 @@ using System;
 
 namespace FYFY_plugins.Monitoring{
 	
-	/// <summary>Defines a node of the PetriNet. It could be a place or a trasition.</summary>
+	/// <summary>Defines a node of the PetriNet. It could be a place or a transition.</summary>
 	[Serializable]
 	public class Node  {
 
-		//Datas set to match pnml format
+		//Data set to match pnml format
 		[SerializeField]
 		internal int id;
 		/// <summary>The label of this node.</summary>
 		public string label;
+		/// <summary>The overrided label of this node.</summary>
+		public string overridedLabel;
 		/// <summary>
 		///		If Node is a place, contains the initial marking of this place.
 		///		If Node is a transition, contains -1
@@ -27,6 +29,7 @@ namespace FYFY_plugins.Monitoring{
 		internal Node(string label,int id, Vector2 offset, int initialMarking,Vector2 position){
 
 			this.label = label;
+			this.overridedLabel = "";
             this.id = id;
 			this.offset = offset;
 			this.initialMarking = initialMarking;
@@ -36,6 +39,7 @@ namespace FYFY_plugins.Monitoring{
         {
 
             this.label = label;
+			this.overridedLabel = "";
             this.offset = offset;
             this.initialMarking = initialMarking;
             this.position = position;
@@ -43,6 +47,7 @@ namespace FYFY_plugins.Monitoring{
         //Copy constructor
         internal Node(Node old){
 			label = old.label;
+			overridedLabel = old.overridedLabel;
             id = old.id;
 			offset = old.offset;
 			initialMarking = old.initialMarking;

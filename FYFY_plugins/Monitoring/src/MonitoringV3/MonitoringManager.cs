@@ -41,7 +41,7 @@ namespace FYFY_plugins.Monitoring{
 			float offsetX = 0;
 
 			// Fill final PN
-			foreach (ComponentMonitoring monitor in FindObjectsOfType<ComponentMonitoring> ()) {
+			foreach (ComponentMonitoring monitor in Resources.FindObjectsOfTypeAll<ComponentMonitoring> ()) {
                 // Check if PN exists
 				if (monitor.PetriNet != null) {
 					// Make a copy of local PN in order to organise it spatially without changing original PN
@@ -54,10 +54,16 @@ namespace FYFY_plugins.Monitoring{
                     {
 						// Make a copy of current transition and prefix its name with its game object name
 						Node curTransition_copy = new Node(transitionLink.transition);
+						string publicLabel = curTransition_copy.label+" ";
+						if (curTransition_copy.overridedLabel != null && !curTransition_copy.overridedLabel.Equals(""))
+							publicLabel = curTransition_copy.overridedLabel+" ";
+						if (monitor is FamilyMonitoring)
+							publicLabel = publicLabel+((FamilyMonitoring)monitor).familyName;
+						else
+							publicLabel = publicLabel+monitor.gameObject.name;
 						curTransition_copy.label = monitor.gameObject.name+"_"+curTransition_copy.label;
-						string publicLabel = curTransition_copy.label+" "+monitor.gameObject.name;
 						// Add this transition to Specifications
-						XmlHandler.addSpecif(curTransition_copy.label+"_"+monitor.id, pubicLabel, transitionLink.isSystemAction, transitionLink.isEndAction);
+						XmlHandler.addSpecif(curTransition_copy.label+"_"+monitor.id, publicLabel, transitionLink.isSystemAction, transitionLink.isEndAction);
                         Node oldTransition = curTransition_copy;
                         if (isNullOrWhiteSpace(transitionLink.logic))
                         {
@@ -123,7 +129,7 @@ namespace FYFY_plugins.Monitoring{
 										// Add this new transition to PN
 	                                    petriNet.transitions.Add(curTransition_copy);
 										// and to specifications
-										XmlHandler.addSpecif(curTransition_copy.label+"_"+monitor.id, transitionLink.isSystemAction, transitionLink.isEndAction);
+										XmlHandler.addSpecif(curTransition_copy.label+"_"+monitor.id, publicLabel, transitionLink.isSystemAction, transitionLink.isEndAction);
 										// Duplicate arcs from old transition
 	                                    foreach (Arc a in tmpPN.getConcernedArcs(oldTransition))
 	                                    {

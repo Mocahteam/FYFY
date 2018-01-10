@@ -9,14 +9,16 @@ public class MovingSystem : FSystem {
 	private Animator anim = null;
 
 	public MovingSystem (){
-		// Get hero
-		GameObject hero_GO = hero.First();
-		if (hero_GO == null)
-			Debug.Log ("MovingSystem: Warning!!! no hero in this scene on start.");
-		else {
-			rb = hero_GO.GetComponent<Rigidbody> ();
-			control = hero_GO.GetComponent<Controllable> ();
-			anim = hero_GO.GetComponent<Animator> ();
+		if (Application.isPlaying) {
+			// Get hero
+			GameObject hero_GO = hero.First ();
+			if (hero_GO == null)
+				Debug.Log ("MovingSystem: Warning!!! no hero in this scene on start.");
+			else {
+				rb = hero_GO.GetComponent<Rigidbody> ();
+				control = hero_GO.GetComponent<Controllable> ();
+				anim = hero_GO.GetComponent<Animator> ();
+			}
 		}
 	}
 

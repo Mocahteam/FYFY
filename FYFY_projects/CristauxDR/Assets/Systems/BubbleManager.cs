@@ -26,36 +26,28 @@ public class BubbleManager : FSystem {
 	private float startDisplaying = 0;
 
 	public BubbleManager(){
-		// Get the bubble (only one)
-		IEnumerator<GameObject> goEnum = bubble_F.GetEnumerator();
-		if (goEnum.MoveNext())
-			bubble_GO = goEnum.Current;
-		else
-			Debug.Log("BubbleManager: Warning!!! no bubble in this scene on start.");
-		// Get the hero (only one)
-		goEnum = hero_F.GetEnumerator();
-		if (goEnum.MoveNext())
-			hero_GO = goEnum.Current;
-		else
-			Debug.Log("BubbleManager: Warning!!! no hero in this scene on start.");
-		// Get the boiler (only one)
-		goEnum = boiler_F.GetEnumerator();
-		if (goEnum.MoveNext())
-			boiler_GO = goEnum.Current;
-		else
-			Debug.Log("BubbleManager: Warning!!! no boiler in this scene on start.");
-		// Get the ice collider (only one)
-		goEnum = iceWall_F.GetEnumerator();
-		if (goEnum.MoveNext())
-			iceWall_GO = goEnum.Current;
-		else
-			Debug.Log("BubbleManager: Warning!!! no ice collider in this scene on start.");
-		// Get the door (only one)
-		goEnum = door_F.GetEnumerator();
-		if (goEnum.MoveNext())
-			door_GO = goEnum.Current;
-		else
-			Debug.Log("BubbleManager: Warning!!! no door in this scene on start.");
+		if (Application.isPlaying) {
+			// Get the bubble (only one)
+			bubble_GO = bubble_F.First ();
+			if (bubble_GO == null)
+				Debug.Log ("BubbleManager: Warning!!! no bubble in this scene on start.");
+			// Get the hero (only one)
+			hero_GO = hero_F.First ();
+			if (hero_GO == null)
+				Debug.Log ("BubbleManager: Warning!!! no hero in this scene on start.");
+			// Get the boiler (only one)
+			boiler_GO = boiler_F.First ();
+			if (boiler_GO == null)
+				Debug.Log ("BubbleManager: Warning!!! no boiler in this scene on start.");
+			// Get the ice collider (only one)
+			iceWall_GO = iceWall_F.First ();
+			if (iceWall_GO == null)
+				Debug.Log ("BubbleManager: Warning!!! no ice collider in this scene on start.");
+			// Get the door (only one)
+			door_GO = door_F.First ();
+			if (door_GO == null)
+				Debug.Log ("BubbleManager: Warning!!! no door in this scene on start.");
+		}
 	}
 
 	// Use to process your families.
@@ -63,11 +55,10 @@ public class BubbleManager : FSystem {
 		if (bubble_GO != null) {
 			if (!hintLever) {
 				// parse all levers near to hero (only hero can produce Triggered3D component thanks to Unity Physics layers)
-				foreach (GameObject go in levers) {
-					Triggered3D triggered = go.GetComponent<Triggered3D> ();
+				if (levers.Count > 0) {
 					GameObjectManager.setGameObjectState(bubble_GO, true);
 					TextMesh text = bubble_GO.GetComponentInChildren<TextMesh> ();
-					text.text = "Voilà des\nintérupteurs sur\nlequel il est écrit\n+2";
+					text.text = "+2 is written\non theses levers";
 					startDisplaying = Time.timeSinceLevelLoad;
 					hintLever = true;
 				}
@@ -79,7 +70,7 @@ public class BubbleManager : FSystem {
 				if (triggered != null){
 					GameObjectManager.setGameObjectState(bubble_GO, true);
 					TextMesh text = bubble_GO.GetComponentInChildren<TextMesh> ();
-					text.text = "Une chaudière !\nC'est dommage,\nelle a l'air éteinte.";
+					text.text = "Wow a boiler!\nIt is turned off.";
 					startDisplaying = Time.timeSinceLevelLoad;
 					hintBoiler = true;
 				}
@@ -91,7 +82,7 @@ public class BubbleManager : FSystem {
 				if (triggered != null){
 					GameObjectManager.setGameObjectState(bubble_GO, true);
 					TextMesh text = bubble_GO.GetComponentInChildren<TextMesh> ();
-					text.text = "Cette porte a\nbesoin d'une\nclé pour être\nouverte !";
+					text.text = "This door is locked\nI need a key!";
 					startDisplaying = Time.timeSinceLevelLoad;
 					hintDoor = true;
 				}
@@ -104,7 +95,7 @@ public class BubbleManager : FSystem {
 						if (target == hero_GO) {
 							GameObjectManager.setGameObjectState (bubble_GO, true);
 							TextMesh text = bubble_GO.GetComponentInChildren<TextMesh> ();
-							text.text = "Oh zut, le\npassage est\nbloqué par un\nmur de glace !";
+							text.text = "Damn! The path\nis blocked by an\nice wall!";
 							startDisplaying = Time.timeSinceLevelLoad;
 							hintIceWall = true;
 						}
@@ -118,14 +109,14 @@ public class BubbleManager : FSystem {
 					if (!hintKey && go.name == "Key") {
 						GameObjectManager.setGameObjectState (bubble_GO, true);
 						TextMesh text = bubble_GO.GetComponentInChildren<TextMesh> ();
-						text.text = "Une clé, ça peut\nêtre utile !";
+						text.text = "A key, It can\nbe useful!";
 						startDisplaying = Time.timeSinceLevelLoad;
 						hintKey = true;
 					}
 					if (!hintMatchstick && go.name == "Matchstick") {
 						GameObjectManager.setGameObjectState (bubble_GO, true);
 						TextMesh text = bubble_GO.GetComponentInChildren<TextMesh> ();
-						text.text = "Des allumettes :\nidéal pour faire\nun feu !";
+						text.text = "Some matchsticks:\nuseful to make\na fire!";
 						startDisplaying = Time.timeSinceLevelLoad;
 						hintMatchstick = true;
 					}

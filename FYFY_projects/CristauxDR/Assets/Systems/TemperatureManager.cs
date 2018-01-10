@@ -25,17 +25,29 @@ public class TemperatureManager : FSystem {
 
 
 	public TemperatureManager (){
-		temp_GO = temperature.First ();
-		if (temp_GO != null)
-			temp = temp_GO.GetComponent<Temperature> ();
-		boiler_GO = boilers.First ();
-		if (boiler_GO != null)
-			boiler = boiler_GO.GetComponent<Boiler> ();
-		iceCollider_GO = iceCollider.First ();
-		iceMonitor_GO = iceMonitor_F.First ();
-		if (iceMonitor_GO != null)
-			iceMonitor = iceMonitor_GO.GetComponent<ComponentMonitoring> ();
-		puddle_GO = puddle.First ();
+		if (Application.isPlaying) {
+			temp_GO = temperature.First ();
+			if (temp_GO != null)
+				temp = temp_GO.GetComponent<Temperature> ();
+			else
+				Debug.Log ("TemperatureManager: Warning!!! no temperature in this scene on start.");
+			boiler_GO = boilers.First ();
+			if (boiler_GO != null)
+				boiler = boiler_GO.GetComponent<Boiler> ();
+			else
+				Debug.Log ("TemperatureManager: Warning!!! no boiler in this scene on start.");
+			iceCollider_GO = iceCollider.First ();
+			if (iceCollider_GO == null)
+				Debug.Log ("TemperatureManager: Warning!!! no iceCollider in this scene on start.");
+			iceMonitor_GO = iceMonitor_F.First ();
+			if (iceMonitor_GO != null)
+				iceMonitor = iceMonitor_GO.GetComponent<ComponentMonitoring> ();
+			else
+				Debug.Log ("TemperatureManager: Warning!!! no iceMonitor in this scene on start.");
+			puddle_GO = puddle.First ();
+			if (puddle_GO == null)
+				Debug.Log ("TemperatureManager: Warning!!! no puddle in this scene on start.");
+		}
 	}
 
 	// Use to process your families.
@@ -91,9 +103,9 @@ public class TemperatureManager : FSystem {
 				// solidification
 				if (!inTransition) {	
 					if (!boiler.isOn)
-						iceMonitor.trace("solidifyingStart", MonitoringManager.Source.SYSTEM, false, "l4");
+						iceMonitor.trace("solidifyingStart", MonitoringManager.Source.SYSTEM, true, "l9");
 					else
-						iceMonitor.trace("solidifyingStart", MonitoringManager.Source.SYSTEM, false, "l5");
+						iceMonitor.trace("solidifyingStart", MonitoringManager.Source.SYSTEM, true, "l10");
 					inTransition = true;
 				}
 					
@@ -113,9 +125,9 @@ public class TemperatureManager : FSystem {
 				}
 				if (endOfAnim) {
 					if (!boiler.isOn)
-						iceMonitor.trace("solidifyingEnd", MonitoringManager.Source.SYSTEM, false, "l2");
+						iceMonitor.trace("solidifyingEnd", MonitoringManager.Source.SYSTEM, true, "l7");
 					else
-						iceMonitor.trace("solidifyingEnd", MonitoringManager.Source.SYSTEM, false, "l3");
+						iceMonitor.trace("solidifyingEnd", MonitoringManager.Source.SYSTEM, true, "l8");
 					temp.current = newTemp;
 					inTransition = false;
 				}
