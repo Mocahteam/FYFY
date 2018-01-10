@@ -7,7 +7,6 @@ namespace FYFY_plugins.PointerManager {
 	/// <remarks>
 	/// 	Automatically added or removed by the relative <see cref="FYFY_plugins.PointerManager.PointerSensitive">component</see>.
 	/// </remarks>
-	[DisallowMultipleComponent]
 	[RequireComponent(typeof(PointerSensitive))]
 	[AddComponentMenu("")]
 	public class PointerOver : MonoBehaviour {
