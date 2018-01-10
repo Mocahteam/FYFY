@@ -49,10 +49,11 @@ namespace FYFY_plugins.Monitoring {
 	        return value.ToString("yyyyMMddHHmmssffff");
 	    }
 
-		internal static void addSpecif(string label, bool isSystem, bool isEnd)
+		internal static void addSpecif(string id, string label, bool isSystem, bool isEnd)
 		{
 			xSpecifList.Add(new XElement("transition",
-				new XAttribute("id", label),
+				new XAttribute("id", id),
+				new XAttribute("label", label),
 				new XAttribute("system", isSystem.ToString()),
 				new XAttribute("end", isEnd.ToString()))
 			);

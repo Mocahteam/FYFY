@@ -137,16 +137,23 @@ namespace FYFY_plugins.Monitoring{
 							// If logic expression is empty or contains only AND operators, linksConcerned parameter is not useful because there is no ambiguity on this transition.
 							linksFound = true;
 						else {
-							// Look for links concerned into distributed logic expression
-							List<string> linksConcerned_sorted = linksConcerned.ToList ();
-							linksConcerned_sorted.Sort ();
-							for (int i = 0; i < groupAndByOr.Count; i++) {
-								groupAndByOr [i].Sort ();
+							if (isTry){
+								// isTry means game simulation refuses to perform this action, then no OR statement are satisfied. So we trace the first one
+								prefix = "or0_"+prefix;
+								linksFound = true;
+							} else {
+								// Look for links concerned into distributed logic expression
+								List<string> linksConcerned_sorted = linksConcerned.ToList ();
+								linksConcerned_sorted.Sort ();
+								for (int i = 0; i < groupAndByOr.Count; i++) {
+									groupAndByOr [i].Sort ();
 
-								if (groupAndByOr [i].SequenceEqual (linksConcerned_sorted)) {
-									if (i > 0)
-										prefix = "or" + (i - 1) + "_"+prefix;
-									linksFound = true;
+									if (groupAndByOr [i].SequenceEqual (linksConcerned_sorted)) {
+										if (i > 0)
+											prefix = "or" + (i - 1) + "_"+prefix;
+										linksFound = true;
+										break;
+									}
 								}
 							}
 						}

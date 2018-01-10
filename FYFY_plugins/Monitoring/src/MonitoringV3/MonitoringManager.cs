@@ -55,8 +55,9 @@ namespace FYFY_plugins.Monitoring{
 						// Make a copy of current transition and prefix its name with its game object name
 						Node curTransition_copy = new Node(transitionLink.transition);
 						curTransition_copy.label = monitor.gameObject.name+"_"+curTransition_copy.label;
+						string publicLabel = curTransition_copy.label+" "+monitor.gameObject.name;
 						// Add this transition to Specifications
-						XmlHandler.addSpecif(curTransition_copy.label+"_"+monitor.id, transitionLink.isSystemAction, transitionLink.isEndAction);
+						XmlHandler.addSpecif(curTransition_copy.label+"_"+monitor.id, pubicLabel, transitionLink.isSystemAction, transitionLink.isEndAction);
                         Node oldTransition = curTransition_copy;
                         if (isNullOrWhiteSpace(transitionLink.logic))
                         {
