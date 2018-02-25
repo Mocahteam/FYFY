@@ -12,11 +12,11 @@ namespace FYFY_plugins.TriggerManager {
 
 	//
 	// Allow to set a gameObject as a target of a collision in order to solve a Unity problem:
-	//		When a gameobject was deleted as it was a target of a collision (registered in the 
-	// 		source), the collision exit event is not fired in the gameobject source, so we can't
-	//		unregister it of the source.
-	//		This component solves the problem by implementing an OnDestroy callback (called by
-	//		Unity) to unregister it when it was destroyed.
+	//		When a gameobject was deleted/disabled as it was a target of a collision (registered
+	//		in the source), the collision exit event is not fired in the gameobject source, so
+	//		we can't unregister it of the source.
+	//		This component solves the problem by implementing an OnDestroy and OnDisable callback
+	//		(called by Unity) to unregister it when it was destroyed/disabled.
 	//
 	[AddComponentMenu("")]
 	public class TriggerSensitive2DTarget : MonoBehaviour {
@@ -34,6 +34,11 @@ namespace FYFY_plugins.TriggerManager {
 		private void OnDestroy(){
 			if(_source != null)
 				_source.unregisterTarget(this.gameObject);
+		}
+		
+		// Ask to destroy this component
+		private void OnDisable() {
+			Object.Destroy(this);
 		}
 	}
 }

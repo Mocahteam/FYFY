@@ -16,57 +16,106 @@ namespace FYFY_plugins.CollisionManager {
 		private Dictionary<GameObject, CollisionSensitive3DTarget> _targets = new Dictionary<GameObject, CollisionSensitive3DTarget>();
 
 		private bool _inCollision = false;
+		
+		private bool _needUpdateCollider = false;
 
 		private void OnCollisionEnter(Collision coll) {
-			GameObject target = coll.gameObject;
-			if (_targets.ContainsKey(target))
-				return;
-			// We don't want that FYFY treates CollisionSensitive3DTarget component so we add component with classic Unity function.
-			CollisionSensitive3DTarget cst = target.gameObject.AddComponent<CollisionSensitive3DTarget>();
-			cst._source = this;
+			if (this.isActiveAndEnabled){
+				GameObject target = coll.gameObject;
+				if (_targets.ContainsKey(target))
+					return;
+				// We don't want that FYFY treates CollisionSensitive3DTarget component so we add component with classic Unity function.
+				CollisionSensitive3DTarget cst = target.gameObject.AddComponent<CollisionSensitive3DTarget>();
+				cst._source = this;
 
-			_collisions.Add(target, coll);
-			_targets.Add(target, cst);
+				_collisions.Add(target, coll);
+				_targets.Add(target, cst);
 
-			if(_inCollision == false) {
-				// This action will be treated immediatly after all the collisions
-				// (next preprocess operation is done before the next simulation step).
-				GameObjectManager.addComponent<InCollision3D>(this.gameObject);
-				_inCollision = true;
+				if(_inCollision == false) {
+					// This action will be treated immediatly after all the collisions
+					// (next preprocess operation is done before the next simulation step).
+					GameObjectManager.addComponent<InCollision3D>(this.gameObject);
+					_inCollision = true;
+				}
 			}
 		}
 
 		private void OnCollisionStay(Collision coll) {
-			GameObject target = coll.gameObject;
-			if (_targets.ContainsKey(target))
-				_collisions[target] = coll;
+			if (this.isActiveAndEnabled){
+				GameObject target = coll.gameObject;
+				if (_targets.ContainsKey(target))
+					_collisions[target] = coll;
+			}
 		}
 
 		// Not fired when this GameObject or the target is destroyed.
 		private void OnCollisionExit(Collision coll) {
-			GameObject target = coll.gameObject;
-			if (!_targets.ContainsKey(target))
-				return;
-			CollisionSensitive3DTarget cst = _targets[target];
+			if (this.isActiveAndEnabled){
+				GameObject target = coll.gameObject;
+				if (!_targets.ContainsKey(target))
+					return;
+				CollisionSensitive3DTarget cst = _targets[target];
 
-			// Effects in CollisionSensitive3DTarget.OnDestroy
-			Object.Destroy(cst);
-			
-			_collisions.Remove(target);
-			_targets.Remove(target);
+				// Effects in CollisionSensitive3DTarget.OnDestroy
+				Object.Destroy(cst);
+				
+				_collisions.Remove(target);
+				_targets.Remove(target);
+				manageInCollision();
+			}
+		}
+		
+		// Manage missing required components (Collider and RigidBody). 
+		private void Update(){
+			Collider coll = this.gameObject.GetComponent<Collider>();
+			// If no Collider in this => we reset CollisionSensitiveTargets
+			if (coll == null || !coll.enabled)
+				resetCollision();
+			else{
+				// Parse all targets and check if they contain a Collider
+				foreach (KeyValuePair<GameObject, CollisionSensitive3DTarget> entry in _targets) {
+					Collider coll_target = entry.Key.GetComponent<Collider>();
+					// If no Collider on target => we remove its CollisionSensitiveTarget
+					if (coll_target == null || !coll_target.enabled)
+						Object.Destroy(entry.Value);
+					// If no RigidBody attached both Colliders => we remove this CollisionSensitiveTarget
+					else if (coll.attachedRigidbody == null && coll_target.attachedRigidbody == null)
+						Object.Destroy(entry.Value);
+				}
+			}
 			manageInCollision();
 		}
 
 		private void OnDestroy() {
+			resetCollision();
+		}
+		
+		private void OnDisable() {
+			resetCollision();
+			// In case of this component is inactive and GameObject is still active we will have to force update collider to process again when this component will be re-enabled
+			if (!this.isActiveAndEnabled && this.gameObject.activeSelf)
+				_needUpdateCollider = true;
+		}
+		
+		private void OnEnable(){
+			if (_needUpdateCollider){
+				// Disable and Enable Collider to force OnCollisionEnter events
+				Collider coll = GetComponent<Collider> ();
+				if (coll != null && coll.enabled) {
+					coll.enabled = false;
+					coll.enabled = true;
+				}
+				_needUpdateCollider = false;
+			}
+		}
+		
+		private void resetCollision(){
 			// Ask to destroy CollisionSensitive3DTarget component for each target
 			foreach(CollisionSensitive3DTarget cst in _targets.Values) {
 				Object.Destroy(cst);
 			}
 			
-			if (_inCollision){
-				InCollision3D component = GetComponent<InCollision3D>();
-				Object.Destroy(component);
-			}
+			manageInCollision();
 		}
 		
 		private void manageInCollision(){
