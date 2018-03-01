@@ -56,11 +56,13 @@ namespace FYFY {
 		/// </returns>
 		public IEnumerator<GameObject> GetEnumerator(){
 			foreach(int gameObjectId in _gameObjectIds){
-				GameObject go = GameObjectManager._gameObjectWrappers[gameObjectId]._gameObject;
-				if (go != null)
-					yield return go;
-				else
-					Debug.LogWarning("Family includes null values, this means you forget to unbind game objects before destroying them. See \"FYFY.GameObjectManager.unbind(GameObject gameObject)\".");
+				GameObjectWrapper gow;
+				if (GameObjectManager._gameObjectWrappers.TryGetValue(gameObjectId, out gow)){
+					if (gow._gameObject != null)
+						yield return gow._gameObject;
+					else
+						Debug.LogWarning("Family includes null values, this means you forget to unbind game objects before destroying them. See \"FYFY.GameObjectManager.unbind(GameObject gameObject)\".");
+				}
 			}
 		}
 

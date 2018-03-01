@@ -76,20 +76,22 @@ namespace FYFY {
 		}
 
 		internal static void updateAfterGameObjectModified(int gameObjectId){
-			GameObjectWrapper gameObjectWrapper = GameObjectManager._gameObjectWrappers[gameObjectId];
-			UnityEngine.GameObject gameObject = gameObjectWrapper._gameObject;
+			if (GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId)){
+				GameObjectWrapper gameObjectWrapper = GameObjectManager._gameObjectWrappers[gameObjectId];
+				UnityEngine.GameObject gameObject = gameObjectWrapper._gameObject;
 
-			// Prevent user error if a GameObject is destroyed while it is still binded. It's a mistake, the user has to unbind game objects before destroying them.
-			if (gameObject != null){
-				foreach(Family family in FamilyManager._families.Values) {
-					if(family.matches(gameObjectWrapper)) {
-						if(family._gameObjectIds.Add(gameObjectId) && family._entryCallbacks != null) {
-							// execute family's entry callbacks on the GameObject if added
-							family._entryCallbacks(gameObject);
+				// Prevent user error if a GameObject is destroyed while it is still binded. It's a mistake, the user has to unbind game objects before destroying them.
+				if (gameObject != null){
+					foreach(Family family in FamilyManager._families.Values) {
+						if(family.matches(gameObjectWrapper)) {
+							if(family._gameObjectIds.Add(gameObjectId) && family._entryCallbacks != null) {
+								// execute family's entry callbacks on the GameObject if added
+								family._entryCallbacks(gameObject);
+							}
+						} else if(family._gameObjectIds.Remove(gameObjectId) && family._exitCallbacks != null) {
+							// execute family's exit callbacks on the GameObject if removed
+							family._exitCallbacks(gameObjectId);
 						}
-					} else if(family._gameObjectIds.Remove(gameObjectId) && family._exitCallbacks != null) {
-						// execute family's exit callbacks on the GameObject if removed
-						family._exitCallbacks(gameObjectId);
 					}
 				}
 			}

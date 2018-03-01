@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("TriggerManager")]   // ugly
 [assembly: InternalsVisibleTo("CollisionManager")] // ugly
+[assembly: InternalsVisibleTo("PointerManager")] // ugly
 
 namespace FYFY {
 	/// <summary>
@@ -176,8 +177,17 @@ namespace FYFY {
 		/// 	The component type to add.
 		/// </typeparam>
 		public static void addComponent<T>(GameObject gameObject, object componentValues = null) where T : Component {
-			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
-			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
+			addComponent<T>(gameObject, false, componentValues);
+		}
+		
+		// used in pluggins (TriggerSensitive / CollisionSensitive / PointerOver)
+		internal static void addComponent<T>(GameObject gameObject, bool internalCall, object componentValues = null) where T : Component {
+			string exceptionStackTrace = "";
+			if (!internalCall){
+				// We need to take the second frame before current frame because user pass through the public call this adds one more indirect call
+				System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(2, true);                                  // get caller stackFrame with informations
+				exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
+			}
 
 			if(gameObject == null) {
 				throw new FYFY.ArgumentNullException(exceptionStackTrace);
@@ -223,8 +233,17 @@ namespace FYFY {
 		/// 	The component type to remove.
 		/// </typeparam>
 		public static void removeComponent<T>(GameObject gameObject) where T : Component {
-			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
-			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
+			removeComponent<T>(gameObject, false);
+		}
+		
+		// used in pluggins (TriggerSensitive / CollisionSensitive / PointerOver)
+		internal static void removeComponent<T>(GameObject gameObject, bool internalCall) where T : Component {
+			string exceptionStackTrace = "";
+			if (!internalCall){
+				// We need to take the second frame before current frame because user pass through the public call this adds one more indirect call
+				System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(2, true);                                  // get caller stackFrame with informations
+				exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ") "+stackFrame.GetMethod(); // to point where this function was called
+			}
 
 			if(gameObject == null) {
 				throw new FYFY.ArgumentNullException(exceptionStackTrace);
@@ -256,6 +275,22 @@ namespace FYFY {
 			}
 
 			_delayedActions.Enqueue(new RemoveComponent(gameObject, component, exceptionStackTrace));
+		}
+		
+		// used in pluggins (TriggerSensitive / CollisionSensitive / PointerOver)
+		internal static bool containUnbindActionFor(Transform[] goTransforms){
+			foreach(IGameObjectManagerAction action in _delayedActions) {
+				if(action.GetType() == typeof(UnbindGameObject)) {
+					GameObject go = (action as UnbindGameObject)._gameObject;
+					foreach(Transform t in goTransforms) {
+						if(t.gameObject == go) {
+							// We find an unbind action for one of the game object of the set
+							return true;
+						}
+					}
+				}
+			}
+			return false;
 		}
 	}
 }

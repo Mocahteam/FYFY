@@ -68,12 +68,18 @@ namespace FYFY {
 
 		void IGameObjectManagerAction.perform() {
 			if(_gameObject == null) {
-				throw new DestroyedGameObjectException("You try to update a GameObject that will be destroyed during this frame. In a same frame, your must not destroy a GameObject and ask Fyfy to perform an action on it.", _exceptionStackTrace);
+				if (_exceptionStackTrace != "")
+					throw new DestroyedGameObjectException("You try to update a GameObject that will be destroyed during this frame. In a same frame, your must not destroy a GameObject and ask Fyfy to perform an action on it.", _exceptionStackTrace);
+				else
+					return;
 			}
 
 			int gameObjectId = _gameObject.GetInstanceID();
 			if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false){
-				throw new UnknownGameObjectException("You try to update a GameObject which is not already binded to FYFY.", _exceptionStackTrace);
+				if (_exceptionStackTrace != "")
+					throw new UnknownGameObjectException("You try to update a GameObject which is not already binded to FYFY.", _exceptionStackTrace);
+				else
+					return;
 			}
 
 			// Check if the component added is the first one in the GO of this type, if true update wrapper
@@ -99,8 +105,10 @@ namespace FYFY {
 					}
 				}
 			} else {
-				// In case of AddComponent fail, UnityEngine log a message to explain. I don't find a solution to intersept this message and rebuild it with appropriate stacktrace. In consequence we suggest to look for this log for more detail
-				throw new FyfyException("AddComponent fails, please see above default log message for more details.", _exceptionStackTrace);
+				if (_exceptionStackTrace != ""){
+					// In case of AddComponent fail, UnityEngine log a message to explain. I don't find a solution to intersept this message and rebuild it with appropriate stacktrace. In consequence we suggest to look for this log for more detail
+					throw new FyfyException("AddComponent fails, please see above default log message for more details.", _exceptionStackTrace);
+				}
 			}
 		}
 	}
