@@ -30,6 +30,8 @@ namespace FYFY {
 
 		internal static int _sceneBuildIndex = -1; // used in MainLoop LateUpdate
 		internal static string _sceneName = null;  // used in MainLoop LateUpdate
+		
+		internal static HashSet<GameObject> _ddolObjects = new HashSet<GameObject>(); // used to manage DontDestroyOnLoad mechanism => used in MainLoop Start
 
 		/// <summary>
 		/// 	Gets the number of <c>GameObjects</c> of the scene known by FYFY.
@@ -60,6 +62,19 @@ namespace FYFY {
 		/// </param>
 		public static void loadScene(string sceneName) {
 			_sceneName = sceneName;
+		}
+
+		/// <summary>
+		/// 	Makes the game object target not be destroyed automatically when loading a new scene and rebind it automatically with FYFY.
+		/// </summary>
+		/// <param name="target">
+		/// 	The game object to configure.
+		/// </param>
+		public static void dontDestroyOnLoadAndRebind(GameObject target) {
+			Object.DontDestroyOnLoad(target);
+			if (!_ddolObjects.Contains(target)){
+				_ddolObjects.Add(target);
+			}
 		}
 
 		/// <summary>

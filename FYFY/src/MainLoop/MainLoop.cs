@@ -150,6 +150,15 @@ namespace FYFY {
 					}
 				}
 			}
+			// Bind all game object tagged as DontDestroyOnLoad
+			foreach (GameObject ddol_go in GameObjectManager._ddolObjects) {
+				if (ddol_go != null){
+					foreach (Transform childTransform in ddol_go.GetComponentsInChildren<Transform>(true)) { // include itself
+						sceneGameObjects.Add (childTransform.gameObject);
+					}
+				}
+			}
+			
 			foreach(GameObject gameObject in sceneGameObjects) {
 				HashSet<uint> componentTypeIds = new HashSet<uint>();
 				foreach(Component c in gameObject.GetComponents<Component>()) {
@@ -159,7 +168,9 @@ namespace FYFY {
 				}
 
 				GameObjectWrapper gameObjectWrapper = new GameObjectWrapper(gameObject, componentTypeIds);
-				GameObjectManager._gameObjectWrappers.Add(gameObject.GetInstanceID(), gameObjectWrapper);
+				if (!GameObjectManager._gameObjectWrappers.ContainsKey(gameObject.GetInstanceID())){
+					GameObjectManager._gameObjectWrappers.Add(gameObject.GetInstanceID(), gameObjectWrapper);
+				}
 			}
 
 			// Create all systems
