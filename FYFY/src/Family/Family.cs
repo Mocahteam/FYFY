@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FYFY {
 	/// <summary>
-	/// 	<c>Family</c> is a container of <c>GameObjects</c> which respect contraints specified by <see cref="FYFY.Matcher"/>.
+	/// 	<c>Family</c> is a container of <c>GameObjects</c> which respect constraints specified by <see cref="FYFY.Matcher"/>.
 	/// </summary>
 	/// <remarks>
 	/// 	<para>The family is updated before each <c>FixedUpdate</c>, <c>Update</c>, <c>LateUpdate</c> blocks of the <see cref="FYFY.MainLoop"/>.</para>
@@ -26,23 +26,64 @@ namespace FYFY {
 		/// 	Show game objects included into this family
 		/// </summary>
 		public bool showContent = false;
-
-		internal readonly HashSet<int> _gameObjectIds;
-		internal readonly Matcher[] _matchers;
+		
+		private Dictionary<int, int> _gameObjectIdToCacheId; // store for each GameObject id its ref inside cache
+		private List<GameObject> _cashedGameObjects;
+		private int _count;
+		
+		private Matcher[] _matchers;
 		internal EntryCallback _entryCallbacks; // callback dissociated from the system so executed even if the system is paused
 		internal ExitCallback _exitCallbacks;   // callback dissociated from the system so executed even if the system is paused
 
 		internal Family(Matcher[] matchers){
-			_gameObjectIds = new HashSet<int>();
+			_gameObjectIdToCacheId = new Dictionary<int, int>();
+			_cashedGameObjects = new List<GameObject>();
+			_count = 0;
 			_matchers = matchers;
 			_entryCallbacks = null;
 			_exitCallbacks = null;
 		}
+		
+		internal bool Add (int gameObjectId, GameObject gameObject){
+			// Check if this GameObjectId is already known
+			if (contains(gameObjectId))
+				return false;
+			// Add the GameObject at the end of the cache
+			_cashedGameObjects.Add(gameObject);
+			// Add entry into dictionary to store GameObject position into the cache
+			_gameObjectIdToCacheId.Add(gameObjectId, _count-1);
+			_count++;
+			return true;
+		}
 
+		internal bool Remove (int gameObjectId){
+			// Check if this GameObjectId is not known
+			if (!contains(gameObjectId))
+				return false;
+			// Get position into caches
+			int cachePos = _gameObjectIdToCacheId[gameObjectId];
+			if (cachePos < _count){
+				_gameObjectIdToCacheId.Remove(gameObjectId);
+				// If we don't remove the last element we copy the last element into this new hole and we remove the last element
+				if (cachePos < _count-1){
+					if (_cashedGameObjects[_count-1] != null){
+						_cashedGameObjects[cachePos] = _cashedGameObjects[_count-1];
+						// Update cache position of this GameObject
+						_gameObjectIdToCacheId[_cashedGameObjects[cachePos].GetInstanceID()] = cachePos;
+					}
+				}
+				_cashedGameObjects.RemoveAt(_count-1);
+			} else {
+				throw new System.Exception("No GameObject cached for this gameObjectId.");
+			}
+			_count--;
+			return true;
+		}
+		
 		/// <summary>
 		/// 	Gets the number of <c>GameObjects</c> belonging to this <see cref="FYFY.Family"/>.
 		/// </summary>
-		public int Count { get { return _gameObjectIds.Count; } }
+		public int Count { get { return _count; } }
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator(){
 			return this.GetEnumerator();
@@ -55,15 +96,23 @@ namespace FYFY {
 		/// 	The enumerator.
 		/// </returns>
 		public IEnumerator<GameObject> GetEnumerator(){
-			foreach(int gameObjectId in _gameObjectIds){
-				GameObjectWrapper gow;
-				if (GameObjectManager._gameObjectWrappers.TryGetValue(gameObjectId, out gow)){
-					if (gow._gameObject != null)
-						yield return gow._gameObject;
-					else
-						Debug.LogWarning("Family includes null values, this means you forget to unbind game objects before destroying them. See \"FYFY.GameObjectManager.unbind(GameObject gameObject)\".");
-				}
+			foreach(GameObject go in _cashedGameObjects){
+				if (go)
+					yield return go;
+				else
+					Debug.LogWarning("Family includes null values, this means you forget to unbind game objects before destroying them. See \"FYFY.GameObjectManager.unbind(GameObject gameObject)\".");
 			}
+		}
+		
+		/// <summary>
+		/// 	Gets the GameObject at the specified index <see cref="FYFY.Family"/>.
+		///		Warning: this function can return null if a Game Object is Destroyed without beeing unbinded, you still have to unbind Game Object before destroying them.
+		/// </summary>
+		/// <returns>
+		/// 	The GameObject at the specified index.
+		/// </returns>
+		public GameObject getAt(int index){
+			return _cashedGameObjects[index];
 		}
 
 		/// <summary>
@@ -73,7 +122,7 @@ namespace FYFY {
 		/// 	The Game object identifier.
 		/// </param>
 		public bool contains(int gameObjectId) {
-			return _gameObjectIds.Contains(gameObjectId);
+			return _gameObjectIdToCacheId.ContainsKey(gameObjectId);
 		}
 
 		/// <summary>

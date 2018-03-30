@@ -57,7 +57,7 @@ namespace FYFY {
 			string familyDescriptor = string.Join("/", matchersDescriptors);
 
 			Family family;
-			// If it doesn't exist yet, create it and add it in the families dictionnary.
+			// If it doesn't exist yet, create it and add it in the families dictionary.
 			if(_families.TryGetValue(familyDescriptor, out family) == false) { 
 				family = new Family(matchers);
 				_families.Add(familyDescriptor, family);
@@ -68,7 +68,7 @@ namespace FYFY {
 					GameObjectWrapper gameObjectWrapper = valuePair.Value;
 
 					if(family.matches(gameObjectWrapper)) {
-						family._gameObjectIds.Add(gameObjectId);
+						family.Add(gameObjectId, gameObjectWrapper._gameObject);
 					}
 				}
 			}
@@ -84,11 +84,11 @@ namespace FYFY {
 				if (gameObject != null){
 					foreach(Family family in FamilyManager._families.Values) {
 						if(family.matches(gameObjectWrapper)) {
-							if(family._gameObjectIds.Add(gameObjectId) && family._entryCallbacks != null) {
+							if(family.Add(gameObjectId, gameObject) && family._entryCallbacks != null) {
 								// execute family's entry callbacks on the GameObject if added
 								family._entryCallbacks(gameObject);
 							}
-						} else if(family._gameObjectIds.Remove(gameObjectId) && family._exitCallbacks != null) {
+						} else if(family.Remove(gameObjectId) && family._exitCallbacks != null) {
 							// execute family's exit callbacks on the GameObject if removed
 							family._exitCallbacks(gameObjectId);
 						}
@@ -99,7 +99,7 @@ namespace FYFY {
 
 		internal static void updateAfterGameObjectUnbinded(int gameObjectId){
 			foreach(Family family in FamilyManager._families.Values) {
-				if (family._gameObjectIds.Remove(gameObjectId) && family._exitCallbacks != null) {
+				if (family.Remove(gameObjectId) && family._exitCallbacks != null) {
 					// execute family's exit callbacks on the GameObject if removed
 					family._exitCallbacks(gameObjectId);
 				}
