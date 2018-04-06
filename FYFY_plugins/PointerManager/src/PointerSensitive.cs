@@ -14,6 +14,8 @@ namespace FYFY_plugins.PointerManager {
 	[DisallowMultipleComponent]
 	public class PointerSensitive : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
 		
+		private int _cpt = 0;
+		
 		private void OnDisable(){
 			removePointerOver();
 		}
@@ -42,9 +44,9 @@ namespace FYFY_plugins.PointerManager {
 				removePointerOver();
 		}
 		
-		//////////////////////////////////////////////////////////
-		// OnMouseEnter/Exit is useful with colliders and GUI's //
-		//////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////
+		// OnMouseEnter/Exit is useful with collider and GUI //
+		///////////////////////////////////////////////////////
 		// Called when the mouse enters the GameObject.
 		// Callback automatically called by Unity.
 		private void OnMouseEnter() {
@@ -60,7 +62,7 @@ namespace FYFY_plugins.PointerManager {
 		
 		private void removePointerOver(){
 			// Check this GameObject contains a PointerOver
-			if (this.gameObject.GetComponent<PointerOver>() != null){
+			if (_cpt == 1 && this.gameObject.GetComponent<PointerOver>() != null){
 				// We check if there is an UnbindGameObject action on my gameobject or on my parents.
 				// If not, we have to use FYFY to remove PointerOver in order to keep families synchronized.
 				// If so, we can't use FYFY because "remove" action will be queued after unbind and will not be able to proceed (unknown game object). Then we have to remove PointerOver component thanks to classic Unity function.
@@ -76,11 +78,12 @@ namespace FYFY_plugins.PointerManager {
 					GameObjectManager.removeComponent<PointerOver>(this.gameObject, true);
 				}
 			}
+			_cpt--;
 		}
 		
 		private void addPointerOver(){
 			// Check this GameObject doesn't contain a PointerOver
-			if (this.gameObject.GetComponent<PointerOver>() == null){
+			if (_cpt == 0 && this.gameObject.GetComponent<PointerOver>() == null){
 				// We check if there is an UnbindGameObject action on my gameobject or on my parents.
 				// If not, we have to use FYFY to add PointerOver in order to keep families synchronized.
 				// If so, we don't add this action because it will be queued after unbind and will not be able to proceed (unknown game object).
@@ -90,6 +93,7 @@ namespace FYFY_plugins.PointerManager {
 					FYFY.GameObjectManager.addComponent<PointerOver>(this.gameObject);
 				}
 			}
+			_cpt++;
 		}
 	}
 }

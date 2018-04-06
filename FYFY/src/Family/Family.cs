@@ -51,7 +51,7 @@ namespace FYFY {
 			// Add the GameObject at the end of the cache
 			_cashedGameObjects.Add(gameObject);
 			// Add entry into dictionary to store GameObject position into the cache
-			_gameObjectIdToCacheId.Add(gameObjectId, _count-1);
+			_gameObjectIdToCacheId.Add(gameObjectId, _count);
 			_count++;
 			return true;
 		}
