@@ -13,7 +13,6 @@ namespace FYFY_Inspector {
 	/// </summary>
 	[CustomEditor(typeof(FYFY.MainLoop))]
 	public class MainLoopInspector : Editor {
-		internal static MainLoopInspector _mainLoopInspector;
 
 		private SerializedProperty _fixedUpdateSystemDescriptions;
 		private SerializedProperty _updateSystemDescriptions;
@@ -29,17 +28,7 @@ namespace FYFY_Inspector {
 		private const int HISTORY_DATA_LENGTH = 100;
 		private Queue<float> _fixedUpdateStatsHistory;
 		private Queue<float> _updateStatsHistory;
-		private Queue<float> _lateUpdateStatsHistory;
-
-		// Called in Edit and Game mode by default.
-		private void Awake(){
-			_mainLoopInspector = this;
-		}
-
-		// Called in Edit and Game mode by default.
-		private void OnDestroy(){
-			_mainLoopInspector = null;
-		}				
+		private Queue<float> _lateUpdateStatsHistory;			
 
 		// string elision if the area content is too small
 		private string findFittableString(string originalString, Rect textArea){
