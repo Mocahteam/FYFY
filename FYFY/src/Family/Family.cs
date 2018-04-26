@@ -62,17 +62,24 @@ namespace FYFY {
 				return false;
 			// Get position into caches
 			int cachePos = _gameObjectIdToCacheId[gameObjectId];
+			_gameObjectIdToCacheId.Remove(gameObjectId);
 			if (cachePos < _count){
-				_gameObjectIdToCacheId.Remove(gameObjectId);
-				// If we don't remove the last element we copy the last element into this new hole and we remove the last element
-				if (cachePos < _count-1){
-					if (_cashedGameObjects[_count-1] != null){
-						_cashedGameObjects[cachePos] = _cashedGameObjects[_count-1];
-						// Update cache position of this GameObject
-						_gameObjectIdToCacheId[_cashedGameObjects[cachePos].GetInstanceID()] = cachePos;
+				// If we don't remove the last element we copy this last element into this new hole and we remove the last element
+				if (cachePos < _count-1 && _cashedGameObjects[_count-1] != null){
+					_cashedGameObjects[cachePos] = _cashedGameObjects[_count-1];
+					// Update cache position of this GameObject
+					_gameObjectIdToCacheId[_cashedGameObjects[cachePos].GetInstanceID()] = cachePos;
+					_cashedGameObjects.RemoveAt(_count-1);
+				} else {
+					_cashedGameObjects.RemoveAt(cachePos);
+					// Parse dictionary and reduce each position by 1 between [cachePos, _count-1[ => _count-1 due to removing just before
+					List <int> keys = new List<int>(_gameObjectIdToCacheId.Keys);
+					foreach (int key in keys){
+						if (_gameObjectIdToCacheId[key] > cachePos){
+							_gameObjectIdToCacheId[key] = _gameObjectIdToCacheId[key]-1;
+						}
 					}
 				}
-				_cashedGameObjects.RemoveAt(_count-1);
 			} else {
 				throw new System.Exception("No GameObject cached for this gameObjectId.");
 			}
