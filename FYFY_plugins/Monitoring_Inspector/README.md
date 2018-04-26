@@ -16,10 +16,10 @@ Build
 Once the requirements have been installed, use the following command in order
 to compile the library:
 
-	<path-to-msbuild>\MSBuild.exe PointerManager.csproj
+	<path-to-msbuild>\MSBuild.exe Monitoring_Inspector.csproj
 
 If Unity3D is not installed in a standard location, you have to define the
-`UnityEnginePath` and `UnityEditorPath` properties inside the `PointerManager.csproj`
+`UnityEnginePath` and `UnityEditorPath` properties inside the `Monitoring_Inspector.csproj`
 file. Similarly, you have to define the `FYFYPath` property if FYFY is not
 build in its common directory.
 

@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Runtime.CompilerServices;
 
-
+[assembly: InternalsVisibleTo("Monitoring_Inspector")]   // ugly
 
 namespace FYFY_plugins.Monitoring{
 	

@@ -95,8 +95,11 @@ namespace FYFY_plugins.Monitoring{
 		/// <param name="performedBy">Specify who perform this action, the player or the system. <see cref="MonitoringManager.Source"/></param>
 		/// <param name="processLinks">Set to false if the logic expression associated to the action include "+" operators and the action performed by the player is not allowed by the system. In this case fourth parameters will not be processed. True (default) means fourth parameter will be analysed.</param>
 		/// <param name="linksConcerned">links label concerned by this action. Very important if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to build the trace: l0 and l3 OR l1 and l3 => <code>this.trace(..., "l0", "l3");</code> OR <code>this.trace(..., "l1", "l3");</code></param>
-		public void trace(string actionName, string performedBy, bool processLinks = true, params string[] linksConcerned)
+		/// <return> labels found for this game action if in game analysis is enabled (see: MonitoringManager). return empty Array else </return>
+		public string[] trace(string actionName, string performedBy, bool processLinks = true, params string[] linksConcerned)
 		{
+			string[] labels = new string[] {};
+
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame (1, true);										// get caller stackFrame with informations
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName () + ":" + stackFrame.GetFileLineNumber ().ToString () + ")";	// to point where this function was called
 
@@ -159,7 +162,7 @@ namespace FYFY_plugins.Monitoring{
 						}
 
 						if (linksFound) {
-							XmlHandler.addTrace (performedBy, prefix + actionName + "_" + this.id);
+							labels = MonitoringManager.processTrace (prefix + actionName + "_" + this.id, performedBy);
 						} else {
 							string debug = "";
 							foreach (string link in linksConcerned)
@@ -182,6 +185,7 @@ namespace FYFY_plugins.Monitoring{
 			} else {
 				throw new TraceAborted ("Action \"" + actionName + "\" is not monitored by \"" + this.gameObject.name + "\" Game Object.", exceptionStackTrace);
 			}
+			return labels;
 		}
 
 		void Awake(){

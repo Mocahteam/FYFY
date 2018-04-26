@@ -1,5 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Diagnostics;
 using UnityEngine;
 
 using System.IO;
@@ -11,7 +15,9 @@ namespace FYFY_plugins.Monitoring{
 	/// <summary>
 	///		This component trigger the building of PetriNets and Specification on Start and write traces when the game is over.
 	/// </summary>
+	[ExecuteInEditMode] // Awake, Start... will be call in edit mode
 	public class MonitoringManager : MonoBehaviour {
+		internal static MonitoringManager _monitoringManager = null; // singleton => only one Monitoring Manager (see Awake)
 
 		/// <summary>Define the different source that can trigger a game action.</summary>
 		public static class Source {
@@ -20,156 +26,171 @@ namespace FYFY_plugins.Monitoring{
 			/// <summary></summary>
 			public static string PLAYER = "player";
 		};
+			
+		private TcpListener serverSocket = null;
+		private TcpClient clientSocket = null;
+		private NetworkStream networkStream = null;
+		private Process LaalysProcess = null;
+		private EventHandler LaalysEH = null;
 
 		/// <summary>The file name to save PetriNet, Specifications and logs.</summary>
-        public string filename;
+        public string fileName;
+		/// <summary>Is analysis run in game?</summary>
+		public bool inGameAnalysis;
+		/// <summary>Full Petri net to use if in game analysis is enabled</summary>
+		public string fullPetriNetPath;
+		/// <summary>Filtered Petri net to use if in game analysis is enabled</summary>
+		public string filteredPetriNetPath;
+		/// <summary>Specification to use if in game analysis is enabled</summary>
+		public string featuresPath;
+		/// <summary>Path to the jar file of Laalys</summary>
+		public string laalysPath;
 
-        void Start()
-        {
-            GeneratePNandSpecifs ();
-        }
+		/// <summary>Ask to Laalys to provide the next action to perform</summary>
+		public static string[] getNextActionToPerform(){
+			if (_monitoringManager != null) {
+				return _monitoringManager.analyseTrace ("NextActionToPerform", null);
+			}
+			return new string[] {};
+		}
 
-        void OnDestroy()
-        {
-            XmlHandler.saveTraces(filename);
-        }
+		internal static string[] processTrace(string actionName, string performedBy){
+			string[] labels = new string[] {};
+			XmlHandler.addTrace (actionName, performedBy);
+			if (_monitoringManager != null) {
+				labels = _monitoringManager.analyseTrace (actionName, performedBy);
+			}
+			return labels;
+		}
 
-        private void GeneratePNandSpecifs () {
-			// Build final PetriNet
-			PetriNet petriNet = new PetriNet ();
+		internal string [] analyseTrace (string actionName, string performedBy){
+			string[] labels = new string[] {};
 
-			float offsetX = 0;
-
-			// Fill final PN
-			foreach (ComponentMonitoring monitor in Resources.FindObjectsOfTypeAll<ComponentMonitoring> ()) {
-                // Check if PN exists
-				if (monitor.PetriNet != null) {
-					// Make a copy of local PN in order to organise it spatially without changing original PN
-					PetriNet tmpPN = new PetriNet(monitor.PetriNet, monitor.gameObject.name);
-					tmpPN.addWidth (offsetX);
-					petriNet.addSubNet (tmpPN);
-                    
-                    // Process links
-                    foreach (TransitionLink transitionLink in monitor.transitionLinks)
-                    {
-						// Make a copy of current transition and prefix its name with its game object name
-						Node curTransition_copy = new Node(transitionLink.transition);
-						string publicLabel = curTransition_copy.label+" ";
-						if (curTransition_copy.overridedLabel != null && !curTransition_copy.overridedLabel.Equals(""))
-							publicLabel = curTransition_copy.overridedLabel+" ";
-						if (monitor is FamilyMonitoring)
-							publicLabel = publicLabel+((FamilyMonitoring)monitor).familyName;
-						else
-							publicLabel = publicLabel+monitor.gameObject.name;
-						curTransition_copy.label = monitor.gameObject.name+"_"+curTransition_copy.label;
-						// Add this transition to Specifications
-						XmlHandler.addSpecif(curTransition_copy.label+"_"+monitor.id, publicLabel, transitionLink.isSystemAction, transitionLink.isEndAction);
-                        Node oldTransition = curTransition_copy;
-                        if (isNullOrWhiteSpace(transitionLink.logic))
-                        {
-							// Default : And of all link
-							foreach(Link curLink in transitionLink.links)
-                            {
-								if (curLink.linkedObject != null) {
-									// Make a copy of linked place and prefix its name with its game object name
-									Node linkedPlace = curLink.getPlaceFromLinkedObject (curLink.placeId);
-									if (linkedPlace != null) {
-										Node linkedPlace_copy = new Node (linkedPlace);
-										linkedPlace_copy.label = curLink.linkedObject.name + "_" + linkedPlace_copy.label;
-										// Define arc type
-										ArcType arcType = curLink.type == 2 ? Arc.stringToArcType (Arc.optType.ElementAt (curLink.flagsType)) : ArcType.regular;
-										// Create arc between Transition and linked place (depends on Get/Produce/Require diffusion state)
-										petriNet.arcs.Add (curLink.type != 1 ? new Arc (linkedPlace_copy, curTransition_copy, arcType, curLink.weight) : new Arc (curTransition_copy, linkedPlace_copy, arcType, curLink.weight));
-									}
-								}
-                            }
-                        }
-                        else
-                        {
-							ExpressionParser expr_parser = new ExpressionParser();
-                            if (expr_parser.isValid(transitionLink))
-                            {
-								// Logic expression is valid
-
-								// Distribute expression
-								string[] exp = expr_parser.getDistribution(transitionLink.logic);
-
-	                            int or = 0;
-
-								// Parse distributed expression
-								foreach (string token in exp)
-	                            {
-									// Check if current token is an operator
-	                                if (!token.Equals("+") && !token.Equals("*"))
-	                                {
-										// It's not an operator => we load the link
-										Link curLink = transitionLink.getLabeledLink(token);
-										if (curLink.linkedObject != null) {
-											// Make a copy of linked place and prefix its name with its game object name
-											Node linkedPlace = curLink.getPlaceFromLinkedObject (curLink.placeId);
-											if (linkedPlace != null) {
-												Node linkedPlace_copy = new Node (linkedPlace);
-												linkedPlace_copy.label = curLink.linkedObject.name + "_" + linkedPlace_copy.label;
-												// Define arc type
-												ArcType arcType = curLink.type == 2 ? Arc.stringToArcType (Arc.optType.ElementAt (curLink.flagsType)) : ArcType.regular;
-												// Create arc between Transition and linked place (depends on Get/Produce/Require diffusion state)
-												petriNet.arcs.Add (curLink.type != 1 ? new Arc (linkedPlace_copy, curTransition_copy, arcType, curLink.weight) : new Arc (curTransition_copy, linkedPlace_copy, arcType, curLink.weight));
-											}
-										}
-	                                }
-	                                else if (token.Equals("+"))
-	                                {
-										// We detect OR operator => add a new transition and set it as current node
-
-	                                    // Build new transition, we keep old transition to build links after
-										// Add offset to position
-										curTransition_copy.position.x += offsetX;
-										curTransition_copy.position.y += 50;
-										curTransition_copy = new Node("or" + (or++) + "_" + oldTransition.label, curTransition_copy.id, curTransition_copy.offset, curTransition_copy.initialMarking, curTransition_copy.position);
-										// Add this new transition to PN
-	                                    petriNet.transitions.Add(curTransition_copy);
-										// and to specifications
-										XmlHandler.addSpecif(curTransition_copy.label+"_"+monitor.id, publicLabel, transitionLink.isSystemAction, transitionLink.isEndAction);
-										// Duplicate arcs from old transition
-	                                    foreach (Arc a in tmpPN.getConcernedArcs(oldTransition))
-	                                    {
-	                                        if (a.target.label.Equals(oldTransition.label))
-	                                        {
-												petriNet.arcs.Add(new Arc(a.source, curTransition_copy, a.type, a.weight));
-	                                        }
-	                                        else if (a.source.label.Equals(oldTransition.label))
-	                                        {
-												petriNet.arcs.Add(new Arc(curTransition_copy, a.target, a.type, a.weight));
-	                                        }
-	                                    }
-	                                }
-								}
-							}
-							else
-								Debug.LogError("Petri Net Building aborted: Logic expression of \""+transitionLink.transition.label+"\" action from \""+monitor.gameObject.name+"\" is not valid => \""+transitionLink.logic+"\". Please check it from Monitor edit view.");
-                        }
-                    }
-					offsetX += monitor.PetriNet.getWidth ()+50; // Add spaces between PN
+			if (networkStream != null) {
+				try{
+					// Send data to Laalys
+					byte[] sendBytes;
+					if (performedBy == null || performedBy == "")
+						sendBytes = Encoding.UTF8.GetBytes (actionName);
+					else
+						sendBytes = Encoding.UTF8.GetBytes (actionName+"\t"+performedBy);
+					networkStream.Write (sendBytes, 0, sendBytes.Length);
+					// Wait labels
+					byte[] receiveBytes = new byte[1024];
+					int numberOfBytesRead = 0;
+					string inLinelabels = "";
+					do {
+						numberOfBytesRead = networkStream.Read(receiveBytes, 0, receiveBytes.Length);
+						inLinelabels += Encoding.UTF8.GetString (receiveBytes, 0, numberOfBytesRead);
+					} while (networkStream.DataAvailable);
+					labels = inLinelabels.Split('\t');
+				} catch (Exception e){
+					UnityEngine.Debug.Log (e.Message);
+					UnityEngine.Debug.Log (" >> Close Client Socket");
+					clientSocket.Close ();
+					clientSocket = null;
 				}
 			}
-				
-			PnmlParser.SaveAtPath (petriNet, filename+".pnml");
-			XmlHandler.saveSpecifications(filename);
-        }
+			return labels;
+		}
 
-        private static bool isNullOrWhiteSpace(string str)
-        {
-            return string.IsNullOrEmpty(str) || onlySpaces(str);
-        }
+		void Awake (){
+			// Several instances of MonitoringManager are not allowed
+			if (_monitoringManager != null) {
+				UnityEngine.Debug.Log ("Only one MonitoringManager component could be instantiate in this scene");
+				DestroyImmediate (this);
+				return;
+			}
+			_monitoringManager = this;
 
-        private static bool onlySpaces(string str)
-        {
-           foreach(char c in str)
-            {
-                if (!char.IsWhiteSpace(c))
-                    return false;
-            }
-            return true;
+			if (Application.isPlaying && inGameAnalysis) {
+				try {
+					// Start server
+					serverSocket = new TcpListener (IPAddress.Parse ("127.0.0.1"), 12000);
+					serverSocket.Start ();
+
+					// Launch Laalys
+					if (!File.Exists(laalysPath))
+						UnityEngine.Debug.LogError ("You enabled in game analysis into Monitoring Manager component but you don't defined Laalys path.");
+					else if (fullPetriNetPath == null || fullPetriNetPath == "")
+						UnityEngine.Debug.LogError ("You enabled in game analysis into Monitoring Manager component but you don't defined a full Petri net.");
+					else if (filteredPetriNetPath == null || filteredPetriNetPath == "")
+						UnityEngine.Debug.LogError ("You enabled in game analysis into Monitoring Manager component but you don't defined a filtered Petri net.");
+					else if (featuresPath == null || featuresPath == "")
+						UnityEngine.Debug.LogError ("You enabled in game analysis into Monitoring Manager component but you don't defined a specifications.");
+					else {
+						LaalysProcess = new Process ();
+						LaalysProcess.StartInfo.FileName = "java.exe";
+						LaalysProcess.StartInfo.Arguments = "-jar "+laalysPath+" -fullPn "+fullPetriNetPath+" -filteredPn "+filteredPetriNetPath+" -features "+featuresPath+" -serverIP localhost -serverPort 12000";
+						// Options to capture exit code
+						LaalysProcess.StartInfo.CreateNoWindow = false;
+						LaalysProcess.EnableRaisingEvents = true;
+						LaalysEH = new EventHandler(OnLaalysExit);
+						LaalysProcess.Exited += LaalysEH;
+						// Options to capture standard output stream
+						LaalysProcess.StartInfo.UseShellExecute = false;
+						LaalysProcess.StartInfo.RedirectStandardOutput = true;
+						// Launch Laalys
+						LaalysProcess.Start();
+					}
+				} catch (Exception e) {
+					UnityEngine.Debug.Log (e.Message);
+				}
+			}
+		}
+
+		private void OnLaalysExit(object sender, System.EventArgs e){
+			UnityEngine.Debug.Log (LaalysProcess.ExitCode);
+			if (LaalysProcess.ExitCode < 0) {
+				switch (LaalysProcess.ExitCode) {
+					case -2:
+					case -3:
+						UnityEngine.Debug.LogError ("Laalys Error: in Monitoring Manager component unable to load the \"Full Petri Net Path\": "+fullPetriNetPath);
+						break;
+					case -5:
+					case -6:
+						UnityEngine.Debug.LogError ("Laalys Error: in Monitoring Manager component unable to load the \"Filtered Petri Net Path\": "+filteredPetriNetPath);
+						break;
+					case -8:
+					case -9:
+						UnityEngine.Debug.LogError ("Laalys Error: in Monitoring Manager component unable to load the \"Specifications Path\": "+featuresPath);
+						break;
+					default:
+						UnityEngine.Debug.LogError (LaalysProcess.StandardOutput.ReadToEnd());
+						break;
+				}
+			}
+		}
+
+		void Update (){
+			// wait client connection
+			if (serverSocket != null && clientSocket == null && serverSocket.Pending ()) {
+				// client connection pending => accept this new connection
+				clientSocket = serverSocket.AcceptTcpClient ();
+				networkStream = clientSocket.GetStream ();
+				// Sends data immediately upon calling NetworkStream.Write.
+				clientSocket.NoDelay = true;
+			}
+		}
+
+        void OnDestroy()
+		{
+			if (_monitoringManager == this) {
+				// close Socket
+				if (clientSocket != null)
+					clientSocket.Close ();
+				if (serverSocket != null)
+					serverSocket.Stop ();
+				// Stop process
+				if (LaalysProcess != null && !LaalysProcess.HasExited) {
+					// Stop to capture output stream
+					LaalysProcess.Exited -= LaalysEH;
+					LaalysProcess.Kill ();
+				}
+				// Save traces
+				XmlHandler.saveTraces (fileName);
+				_monitoringManager = null;
+			}
         }
     }
 }

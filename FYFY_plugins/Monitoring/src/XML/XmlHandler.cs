@@ -14,7 +14,7 @@ namespace FYFY_plugins.Monitoring {
 		private static List<XElement> xSpecifList = new List<XElement>();
 
 		/// Add a new trace
-		internal static void addTrace(string performedBy, string trace)
+		internal static void addTrace(string trace, string performedBy)
 	    {
 	        xTraceList.Add(
 				new XElement("transition", 

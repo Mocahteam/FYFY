@@ -5,7 +5,7 @@
   <PropertyGroup>
     <SrcPath>src</SrcPath>
     <OutputPath>bin</OutputPath>
-    <RootNamespace>FYFY_plugins.Monitoring_Inspector</RootNamespace>
+    <RootNamespace>FYFY_plugins.Monitoring</RootNamespace>
     <AssemblyName>Monitoring_Inspector</AssemblyName>
     <UnityEnginePath>C:\Program Files\Unity\Editor\Data\Managed\UnityEngine.dll</UnityEnginePath>
     <UnityEditorPath>C:\Program Files\Unity\Editor\Data\Managed\UnityEditor.dll</UnityEditorPath>
