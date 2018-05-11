@@ -13,7 +13,6 @@ namespace FYFY_plugins.Monitoring{
 	[ExecuteInEditMode]
     public class ComponentMonitoring : MonoBehaviour
     {
-        
 		/// <summary> Pnml File associated to the monitor </summary>
 		[HideInInspector]
 		public UnityEngine.Object PnmlFile;
@@ -58,7 +57,7 @@ namespace FYFY_plugins.Monitoring{
 		/// <summary> Look for a transition matching with label influenced by links </summary>
 		/// <param name="label">The label of the transition to find.</param>
 		/// <return> If a transition with appropriate label exists, returns this transition and links. Returns null otherwise. </return>
-        public TransitionLink getTransitionLinkByTransitionLabel(String label)
+        private TransitionLink getTransitionLinkByTransitionLabel(String label)
         {
             foreach(TransitionLink tc in transitionLinks)
             {
@@ -67,42 +66,41 @@ namespace FYFY_plugins.Monitoring{
             }
             return null;
         }
-
-		/// <summary>
-		/// This function enables you to match Petri Net initial marking with families content on start. Use this function only into systems' constructor.
-		/// </summary>
-		/// <param name="stateName">State name you want to initialize, this name has to match with a place defined into associated Petri Net <see cref="PnmlFile"/>.</param>
-		/// <param name="initialValue">The initial positive or null value.</param>
-		public void initState (string stateName, uint initialValue){
-			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame (1, true);										// get caller stackFrame with informations
-			string exceptionStackTrace = "(at " + stackFrame.GetFileName () + ":" + stackFrame.GetFileLineNumber ().ToString () + ")";	// to point where this function was called
-
-			if (petriNet != null) {
-				Node place = petriNet.getPlaceByName (name);
-				if (place != null)
-					place.initialMarking = (int)initialValue;
-				else {
-					throw new InitFailed("Place \"" + name + "\" is not known into associated Petri Net.", exceptionStackTrace);
-				}
-			} else {
-				throw new InitFailed("No Petri Net defined.", exceptionStackTrace);
-			}
-		}
+		
 		/// <summary>
 		/// 	Trace game action.
 		/// </summary>
 		/// <param name="actionName">Action name you want to trace, this name has to match with a transition defined into associated Petri Net <see cref="PnmlFile"/>.</param>
 		/// <param name="performedBy">Specify who perform this action, the player or the system. <see cref="MonitoringManager.Source"/></param>
-		/// <param name="processLinks">Set to false if the logic expression associated to the action include "+" operators and the action performed by the player is not allowed by the system. In this case fourth parameters will not be processed. True (default) means fourth parameter will be analysed.</param>
-		/// <param name="linksConcerned">links label concerned by this action. Very important if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to build the trace: l0 and l3 OR l1 and l3 => <code>this.trace(..., "l0", "l3");</code> OR <code>this.trace(..., "l1", "l3");</code></param>
+		/// <param name="processLinks">Set to false if the logic expression associated to the action include "+" operators AND the action performed by the player is not allowed by the system. In this case fourth parameters will not be processed. True (default) means fourth parameter will be analysed.</param>
+		/// <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to build the trace: l0 and l3 OR l1 and l3 => <code>this.trace(..., "l0", "l3");</code> OR <code>this.trace(..., "l1", "l3");</code></param>
 		/// <return> labels found for this game action if in game analysis is enabled (see: MonitoringManager). return empty Array else </return>
 		public string[] trace(string actionName, string performedBy, bool processLinks = true, params string[] linksConcerned)
 		{
-			string[] labels = new string[] {};
-
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame (1, true);										// get caller stackFrame with informations
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName () + ":" + stackFrame.GetFileLineNumber ().ToString () + ")";	// to point where this function was called
 
+			string internalName = getInternalName(actionName, exceptionStackTrace, processLinks, linksConcerned);
+			return MonitoringManager.processTrace (internalName, performedBy);
+		}
+		
+		/// <summary>
+		/// 	Get next actions to perform in order to reach targeted game action.
+		/// </summary>
+		/// <param name="targetedActionName">Action name you want to reach, this name has to match with a transition defined into associated Petri Net <see cref="PnmlFile"/>.</param>
+		/// <param name="maxActions">Maximum number of actions returned.</param>
+		/// <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to look for the trace: l0 and l3 OR l1 and l3 => <code>this.getNextActionToReach(..., "l0", "l3");</code> OR <code>this.getNextActionToReach(..., "l1", "l3");</code></param>
+		/// <return>List of Pairs including a ComponentMonitoring and its associated game action useful to reach the targeted action, the number of actions returned is less or equal to maxActions parameters.</return>
+		public List<KeyValuePair<ComponentMonitoring, string>> getNextActionsToReach(string targetedActionName, int maxActions, params string[] linksConcerned)
+		{
+			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame (1, true);										// get caller stackFrame with informations
+			string exceptionStackTrace = "(at " + stackFrame.GetFileName () + ":" + stackFrame.GetFileLineNumber ().ToString () + ")";	// to point where this function was called
+
+			string internalName = getInternalName(targetedActionName, exceptionStackTrace, true, linksConcerned);
+			return MonitoringManager.getNextActionsToReach (internalName, maxActions);
+		}
+		
+		private string getInternalName(string actionName, string exceptionStackTrace, bool processLinks = true, params string[] linksConcerned){
 			TransitionLink transitionLink  = getTransitionLinkByTransitionLabel(actionName);
 			if (transitionLink != null) {
 				ExpressionParser exp_parser = new ExpressionParser ();
@@ -162,7 +160,7 @@ namespace FYFY_plugins.Monitoring{
 						}
 
 						if (linksFound) {
-							labels = MonitoringManager.processTrace (prefix + actionName + "_" + this.id, performedBy);
+							return prefix + actionName + "_" + this.id;
 						} else {
 							string debug = "";
 							foreach (string link in linksConcerned)
@@ -185,17 +183,43 @@ namespace FYFY_plugins.Monitoring{
 			} else {
 				throw new TraceAborted ("Action \"" + actionName + "\" is not monitored by \"" + this.gameObject.name + "\" Game Object.", exceptionStackTrace);
 			}
-			return labels;
+			
 		}
 
-		void Awake(){
-			if (id == -1 || !IDGenerator.isUnique (this)) {
-				// get new unique id
-				id = IDGenerator.genID();
+		void Start(){
+			// Check if we have to compute a new Id.
+			// This is the case if this id is already used by an other ComponentMonitoring
+			bool needNewId = MonitoringManager.uniqueMonitoringId2ComponentMonitoring.ContainsKey(id);
+			if (needNewId)
+				needNewId = MonitoringManager.uniqueMonitoringId2ComponentMonitoring[id] != this;
+			// OR if id is not initialized
+			needNewId = needNewId || id == -1;
+			
+			if (needNewId) {
+				// Get all used ids
+				List <int> ids = new List<int>(MonitoringManager.uniqueMonitoringId2ComponentMonitoring.Keys);
+				ids.Sort();
+				// Find the first hole available
+				int newId = 0;
+				foreach (int i in ids)
+				{
+					if (newId != i)
+						break;
+					newId++;
+				}
+				id = newId;
+				// update id of petrinet
 				if (petriNet != null)
-					// update id of petrinet
 					petriNet.attachID(id);
 			}
+			// In all cases we reset entry with this
+			MonitoringManager.uniqueMonitoringId2ComponentMonitoring[id] = this;
+		}
+		
+		void OnDestroy(){
+			// When launching play, all GameObject are destroyed in editor and new Awake, Start... are launched in play mode. Same when we click on Stop button, OnDestroy is called in play mode and Awake, Start... are launched in editor mode (due to [ExecuteInEditMode] metatag) => Then we have to check if dictionnary is already defined in case of MonitoringManager is destroyed before this ComponentMonitoring
+			if (MonitoringManager.uniqueMonitoringId2ComponentMonitoring != null)
+				MonitoringManager.uniqueMonitoringId2ComponentMonitoring.Remove(id);
 		}
     }
 }
