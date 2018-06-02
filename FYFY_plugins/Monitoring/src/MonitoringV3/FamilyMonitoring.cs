@@ -7,7 +7,9 @@ namespace FYFY_plugins.Monitoring{
 	/// <summary>
 	/// 	Add monitoring functionalities to a Family
 	/// </summary>
-
+	[Serializable]
+	[ExecuteInEditMode] // Awake, Start... will be call in edit mode
+	[AddComponentMenu("")]
 	public class FamilyMonitoring : ComponentMonitoring
     {
 		// TODO: add this boolean to automatically include ComponentMonitoring in all GameObjects of this family

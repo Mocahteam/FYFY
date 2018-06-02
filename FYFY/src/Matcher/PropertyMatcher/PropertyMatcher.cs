@@ -11,13 +11,13 @@
 		/// </summary>
 		public enum PROPERTY {
 			/// <summary>
-			/// 	The GameObject has the variables <c>activeInHierarchy</c> and <c>activeSelf</c> true.
+			/// 	The GameObject has the variables <c>activeSelf</c> true.
 			/// </summary>
-			ENABLED,
+			ACTIVE_SELF,
 			/// <summary>
-			/// 	The GameObject has at least one of the variables <c>activeInHierarchy</c> or <c>activeSelf</c> false.
+			/// 	The GameObject has the variables <c>activeInHierarchy</c> true.
 			/// </summary>
-			DISABLED,
+			ACTIVE_IN_HIERARCHY,
 			/// <summary>
 			/// 	The GameObject has one direct parent.
 			/// </summary>
@@ -54,10 +54,10 @@
 		/// </summary>
 		protected bool hasProperty(UnityEngine.GameObject gameObject, PROPERTY property) {
 			switch(property) {
-				case PROPERTY.ENABLED:
-					return (gameObject.activeInHierarchy && gameObject.activeSelf) == true;
-				case PROPERTY.DISABLED:
-					return (gameObject.activeInHierarchy && gameObject.activeSelf) == false;
+				case PROPERTY.ACTIVE_SELF:
+					return gameObject.activeSelf == true;
+				case PROPERTY.ACTIVE_IN_HIERARCHY:
+					return gameObject.activeInHierarchy;
 				case PROPERTY.HAS_PARENT:
 					return gameObject.transform.parent != null;
 				case PROPERTY.HAS_CHILD:

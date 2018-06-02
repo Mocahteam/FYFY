@@ -18,8 +18,9 @@ namespace FYFY_plugins.Monitoring {
 	public class EditionView : EditorWindow
 	{
 	    private Rect windowRect = new Rect(20, 20, 20, 20);
-		private static EditorWindow window;
-	    private static string[] optType = new string[] { "at least", "less than" };
+		internal static EditorWindow window;
+	    private static string[] optType = new string[] { "Get", "Produce", "Require" };
+	    private static string[] optFlag = new string[] { "at least", "less than" };
 
 		private int ObjectSelectedFlag = 0;
 	    private int oldFlag;
@@ -114,36 +115,42 @@ namespace FYFY_plugins.Monitoring {
 	        go_labels = new List<string>();
 			// Get all Game Objects with monitoring component
 			monitors = Resources.FindObjectsOfTypeAll(typeof(ComponentMonitoring)) as ComponentMonitoring[];
-			// Remove GO used to monitor families (child of Main_Loop GO)
-			FamilyMonitoring[] families_monitored = Resources.FindObjectsOfTypeAll(typeof(FamilyMonitoring)) as FamilyMonitoring[];
-	        List<ComponentMonitoring> tmpList = monitors.ToList();
-			foreach (FamilyMonitoring fmonitored in families_monitored)
-	            tmpList.Remove(fmonitored);
-			// Sort list by game object name
-			tmpList.Sort (delegate(ComponentMonitoring x, ComponentMonitoring y) {
-				if (x == null && y == null)
-					return 0;
-				else if (x == null)
-					return -1;
-				else if (y == null)
-					return 1;
-				else
-					return x.gameObject.name.CompareTo (y.gameObject.name);
-			});
-			monitors = tmpList.ToArray();
+			// check if MonitoringManager is defined, if not remove all ComponentMonitoring components
+			if (MonitoringManager.Instance == null){
+				for (int i = 0 ; i < monitors.Length ; i++)
+					Undo.DestroyObjectImmediate (monitors [i]);
+			} else {
+				// Remove GO used to monitor families (child of Main_Loop GO)
+				FamilyMonitoring[] families_monitored = Resources.FindObjectsOfTypeAll(typeof(FamilyMonitoring)) as FamilyMonitoring[];
+				List<ComponentMonitoring> tmpList = monitors.ToList();
+				foreach (FamilyMonitoring fmonitored in families_monitored)
+					tmpList.Remove(fmonitored);
+				// Sort list by game object name
+				tmpList.Sort (delegate(ComponentMonitoring x, ComponentMonitoring y) {
+					if (x == null && y == null)
+						return 0;
+					else if (x == null)
+						return -1;
+					else if (y == null)
+						return 1;
+					else
+						return x.gameObject.name.CompareTo (y.gameObject.name);
+				});
+				monitors = tmpList.ToArray();
 
-	        // Update link counter
-			int selection = 0;
-	        foreach (ComponentMonitoring composant in monitors)
-	        {
-	            int cpt = 0;
-	            foreach(TransitionLink ctr in composant.transitionLinks)
-	                cpt += ctr.links.Count;
-				go_labels.Add(composant.gameObject.name+" (ref: "+composant.id+") "+(composant.PnmlFile==null?"(PN: None":"(PN: "+composant.PnmlFile.name)+"; Total link: "+cpt+")");
-				if (newOne != null && newOne == composant)
-					ObjectSelectedFlag = selection;
-				selection++;
-	        }
+				// Update link counter
+				int selection = 0;
+				foreach (ComponentMonitoring composant in monitors)
+				{
+					int cpt = 0;
+					foreach(TransitionLink ctr in composant.transitionLinks)
+						cpt += ctr.links.Count;
+					go_labels.Add(composant.gameObject.name+" (ref: "+composant.id+") "+(composant.PnmlFile==null?"(PN: None":"(PN: "+composant.PnmlFile.name)+"; Total link: "+cpt+")");
+					if (newOne != null && newOne == composant)
+						ObjectSelectedFlag = selection;
+					selection++;
+				}
+			}
 	    }
 
 	    void OnGUI()
@@ -161,24 +168,34 @@ namespace FYFY_plugins.Monitoring {
 	            {
 					// Forbid to drag and drop child of MainLoop
 					if (!tmp.transform.IsChildOf (mainLoop.transform)) {
-						bool isActive = tmp.activeSelf;
-						if (!isActive) tmp.SetActive(true); // enable G0 in order to process Awake into ComponentMonitoring and compute ID
-						ComponentMonitoring monitor = Undo.AddComponent<ComponentMonitoring> (tmp);
-						if (!isActive) tmp.SetActive(false); // reset default state
-						//monitor.hideFlags = HideFlags.HideInInspector;
-						loadMonitoredGo (monitor);
+						// be sure that MonitoringManager is used because ComponentMonitoring requires it
+						if (MonitoringManager.Instance != null){
+							ComponentMonitoring monitor = Undo.AddComponent<ComponentMonitoring> (tmp);
+							// in case of monitor's GameObject is not active in hierarchy Start of ComponentMonitoring will not be called => then we force to compute unique id
+							if (!tmp.activeInHierarchy)
+								monitor.computeUniqueId();
+							//monitor.hideFlags = HideFlags.HideInInspector;
+							loadMonitoredGo (monitor);
+						} else {
+							EditorUtility.DisplayDialog ("Action aborted", "You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", "Close");
+						}
 					} else {
 						EditorUtility.DisplayDialog ("Action aborted", "You can't monitor the Main_Loop GameObject or one of its childs.", "Close");
 					}
 	            }
 
-	            if (go_labels.Count != 0)
+	            if (go_labels.Count > 0)
 	            {
 					EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 
 					EditorGUILayout.BeginHorizontal();
 					ObjectSelectedFlag = EditorGUILayout.Popup("Select Game Object:", ObjectSelectedFlag, go_labels.ToArray());
+					if (ObjectSelectedFlag >= go_labels.Count) // can occur with Ctrl+Z
+						ObjectSelectedFlag = go_labels.Count - 1;
 					if (GUILayout.Button ("X", GUILayout.Width (20))) {
+						// in case of monitor's GameObject is not active in hierarchy OnDestroy of ComponentMonitoring will not be called => then we force to free unique id
+						if (!monitors [ObjectSelectedFlag].gameObject.activeInHierarchy)
+							monitors [ObjectSelectedFlag].freeUniqueId();
 						Undo.DestroyObjectImmediate (monitors [ObjectSelectedFlag]);
 						ObjectSelectedFlag = 0;
 					}
@@ -224,11 +241,16 @@ namespace FYFY_plugins.Monitoring {
 					EditorGUILayout.BeginHorizontal();
 					EditorGUIUtility.labelWidth = 100;
 	                ObjectSelectedFlag = EditorGUILayout.Popup("Select a family:", ObjectSelectedFlag, flabels.ToArray());
+					if (ObjectSelectedFlag >= flabels.Count) // can occur with Ctrl+Z
+						ObjectSelectedFlag = flabels.Count - 1;
 					// Find a child of Main_Loop GameObject associated with object selected
 					Transform child = mainLoop.transform.Find(families[ObjectSelectedFlag].equivMonitor);
 					if (child != null) {
 						// If found, add button to remove monitoring
 						if (GUILayout.Button ("X", GUILayout.Width (20))) {
+							// in case of child is not active in hierarchy OnDestroy of FamilyMonitoring will not be called => then we force to free unique id
+							if (!child.gameObject.activeInHierarchy)
+								child.gameObject.GetComponent<FamilyMonitoring>().freeUniqueId();
 							Undo.DestroyObjectImmediate (child.gameObject);
 							ObjectSelectedFlag = 0;
 						}
@@ -364,6 +386,8 @@ namespace FYFY_plugins.Monitoring {
 					}
 
 					flagTransition = EditorGUILayout.Popup ("Action: ", flagTransition, labelsBuilt.ToArray ());
+					if (flagTransition >= labelsBuilt.Count) // can occur with Ctrl+Z
+						flagTransition = labelsBuilt.Count - 1;
 
 					TransitionLink tLink = monitor.transitionLinks [flagTransition];
 					
@@ -422,7 +446,7 @@ namespace FYFY_plugins.Monitoring {
 												EditorGUILayout.BeginHorizontal ();
 												// Add Produce/Require combo box
 												EditorGUIUtility.labelWidth = 50;
-												int newType = EditorGUILayout.Popup ("And", link.type, new string[] { "Get", "Produce", "Require" }, GUILayout.MaxWidth (110));
+												int newType = EditorGUILayout.Popup ("And", link.type, optType, GUILayout.MaxWidth (110));
 												if (newType != link.type) {
 													Undo.RecordObject (monitor, "Update Type of Link");
 													link.type = newType;
@@ -431,7 +455,7 @@ namespace FYFY_plugins.Monitoring {
 												EditorGUIUtility.labelWidth = 0; // reset default value
 												// if Require selected, add "at least"/"at most" combo box
 												if (link.type == 2) {
-													int newFlag = EditorGUILayout.Popup (link.flagsType, optType, GUILayout.MaxWidth (80));
+													int newFlag = EditorGUILayout.Popup (link.flagsType, optFlag, GUILayout.MaxWidth (80));
 													if (newFlag != link.flagsType) {
 														Undo.RecordObject (monitor, "Update At least/At most"); 
 														link.flagsType = newFlag;

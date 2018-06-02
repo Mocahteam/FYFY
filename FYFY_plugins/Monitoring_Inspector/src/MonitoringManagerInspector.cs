@@ -30,6 +30,12 @@ namespace FYFY_plugins.Monitoring {
 			_featuresPath = serializedObject.FindProperty ("featuresPath");
 			_laalysPath = serializedObject.FindProperty ("laalysPath");
 		}
+		
+		private void OnDestroy(){
+			if (EditionView.window != null){
+				EditionView.window.Repaint();
+			}
+		}
 
 		/// <summary></summary>
 		public override void OnInspectorGUI(){

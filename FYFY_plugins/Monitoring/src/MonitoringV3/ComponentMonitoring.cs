@@ -10,7 +10,8 @@ namespace FYFY_plugins.Monitoring{
 	/// 	Add monitoring functionalities to a Game Object
 	/// </summary>
 	[Serializable]
-	[ExecuteInEditMode]
+	[ExecuteInEditMode] // Awake, Start... will be call in edit mode
+	[AddComponentMenu("")]
     public class ComponentMonitoring : MonoBehaviour
     {
 		/// <summary> Pnml File associated to the monitor </summary>
@@ -185,41 +186,55 @@ namespace FYFY_plugins.Monitoring{
 			}
 			
 		}
+		
+		internal void computeUniqueId(){
+			// Check if one MonitoringManager is available
+			if (MonitoringManager.Instance != null){
+				MonitoringManager mm = MonitoringManager.Instance;
+				// Check if we have to compute a new Id.
+				// This is the case if this id is already used by an other ComponentMonitoring
+				bool needNewId = mm.uniqueMonitoringId2ComponentMonitoring.ContainsKey(id);
+				if (needNewId)
+					needNewId = mm.uniqueMonitoringId2ComponentMonitoring[id] != this;
+				// OR if id is not initialized
+				needNewId = needNewId || id == -1;
+				
+				if (needNewId) {
+					// Get all used ids
+					List <int> ids = new List<int>(mm.uniqueMonitoringId2ComponentMonitoring.Keys);
+					ids.Sort();
+					// Find the first hole available
+					int newId = 0;
+					foreach (int i in ids)
+					{
+						if (newId != i)
+							break;
+						newId++;
+					}
+					id = newId;
+					// update id of petrinet
+					if (petriNet != null)
+						petriNet.attachID(id);
+				}
+				// In all cases we reset entry with this
+				mm.uniqueMonitoringId2ComponentMonitoring[id] = this;
+			} else {
+				throw new NullReferenceException ("You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).");
+			}
+		}
+		
+		internal void freeUniqueId(){
+			// When launching play, all GameObject are destroyed in editor and new Awake, Start... are launched in play mode. Same when we click on Stop button, OnDestroy is called in play mode and Awake, Start... are launched in editor mode (due to [ExecuteInEditMode] metatag) => Then we have to check if dictionary is already defined in case of MonitoringManager is destroyed before this ComponentMonitoring
+			if (MonitoringManager.Instance != null)
+				MonitoringManager.Instance.uniqueMonitoringId2ComponentMonitoring.Remove(id);
+		}
 
 		void Start(){
-			// Check if we have to compute a new Id.
-			// This is the case if this id is already used by an other ComponentMonitoring
-			bool needNewId = MonitoringManager.uniqueMonitoringId2ComponentMonitoring.ContainsKey(id);
-			if (needNewId)
-				needNewId = MonitoringManager.uniqueMonitoringId2ComponentMonitoring[id] != this;
-			// OR if id is not initialized
-			needNewId = needNewId || id == -1;
-			
-			if (needNewId) {
-				// Get all used ids
-				List <int> ids = new List<int>(MonitoringManager.uniqueMonitoringId2ComponentMonitoring.Keys);
-				ids.Sort();
-				// Find the first hole available
-				int newId = 0;
-				foreach (int i in ids)
-				{
-					if (newId != i)
-						break;
-					newId++;
-				}
-				id = newId;
-				// update id of petrinet
-				if (petriNet != null)
-					petriNet.attachID(id);
-			}
-			// In all cases we reset entry with this
-			MonitoringManager.uniqueMonitoringId2ComponentMonitoring[id] = this;
+			computeUniqueId();
 		}
 		
 		void OnDestroy(){
-			// When launching play, all GameObject are destroyed in editor and new Awake, Start... are launched in play mode. Same when we click on Stop button, OnDestroy is called in play mode and Awake, Start... are launched in editor mode (due to [ExecuteInEditMode] metatag) => Then we have to check if dictionnary is already defined in case of MonitoringManager is destroyed before this ComponentMonitoring
-			if (MonitoringManager.uniqueMonitoringId2ComponentMonitoring != null)
-				MonitoringManager.uniqueMonitoringId2ComponentMonitoring.Remove(id);
+			freeUniqueId();
 		}
     }
 }

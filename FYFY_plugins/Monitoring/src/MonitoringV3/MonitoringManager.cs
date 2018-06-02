@@ -16,10 +16,26 @@ namespace FYFY_plugins.Monitoring{
 	///		This component trigger the building of PetriNets and Specification on Start and write traces when the game is over.
 	/// </summary>
 	[ExecuteInEditMode] // Awake, Start... will be call in edit mode
+	[DisallowMultipleComponent]
 	public class MonitoringManager : MonoBehaviour {
-		internal static MonitoringManager _monitoringManager = null; // singleton => only one Monitoring Manager (see Awake)
+		private static MonitoringManager _instance = null;
+		/// <summary> Get singleton instance of MonitoringManager </summary>
+		// singleton => only one Monitoring Manager (see Awake)
+		public static MonitoringManager Instance{
+			set{
+				_instance = value;
+			}
+			get{
+				if (_instance == null)
+					_instance = UnityEngine.Object.FindObjectOfType<MonitoringManager>();
+				return _instance;
+			}
+		}
 		internal static string NEXT_ACTION_TOKEN = "NextActionToReach"; // token used with Laalys intercommunication
-		internal static Dictionary<int, ComponentMonitoring> uniqueMonitoringId2ComponentMonitoring = null;
+		
+		/// <summary> Association between ids and ComponentMonitoring </summary>
+		[HideInInspector]
+		public Dictionary<int, ComponentMonitoring> uniqueMonitoringId2ComponentMonitoring = new Dictionary<int, ComponentMonitoring>();
 
 		/// <summary>Define the different source that can trigger a game action.</summary>
 		public static class Source {
@@ -47,7 +63,7 @@ namespace FYFY_plugins.Monitoring{
 		public string featuresPath;
 		/// <summary>Path to the jar file of Laalys</summary>
 		public string laalysPath;
-
+		
 		/// <summary>Ask to Laalys to provide the next actions to perform in order to reach one of the expert end actions</summary>
 		/// <param name="maxActions">Maximum number of actions returned.</param>
 		/// <return>List of Pairs including a ComponentMonitoring and its associated game action useful to reach one of the expert end actions, the number of actions returned is less or equal to maxActions parameters.</return>
@@ -59,8 +75,8 @@ namespace FYFY_plugins.Monitoring{
 		/// <summary>Ask to Laalys to provide all triggerable actions</summary>
 		/// <return>List of Pairs including a ComponentMonitoring and its associated game action that may be triggered.</return>
 		public static List<KeyValuePair<ComponentMonitoring, string>> getTriggerableActions(){
-			if (_monitoringManager != null) {
-				string[] actions = _monitoringManager.analyseToken ("TriggerableActions");
+			if (Instance != null) {
+				string[] actions = Instance.analyseToken ("TriggerableActions");
 				return extractTuplesFromActionsName(actions);
 			} else
 				return new List<KeyValuePair<ComponentMonitoring, string>>();
@@ -69,8 +85,8 @@ namespace FYFY_plugins.Monitoring{
 		internal static string[] processTrace(string actionName, string performedBy){
 			string[] labels = new string[] {};
 			XmlHandler.addTrace (actionName, performedBy);
-			if (_monitoringManager != null) {
-				labels = _monitoringManager.analyseToken (actionName, performedBy);
+			if (Instance != null) {
+				labels = Instance.analyseToken (actionName, performedBy);
 			}
 			return labels;
 		}
@@ -80,8 +96,8 @@ namespace FYFY_plugins.Monitoring{
 			if (maxActions < 0)
 				maxActions = 0;
 			
-			if (_monitoringManager != null) {
-				string[] actions = _monitoringManager.analyseToken ("NextActionToReach", targetAction, maxActions.ToString());
+			if (Instance != null) {
+				string[] actions = Instance.analyseToken ("NextActionToReach", targetAction, maxActions.ToString());
 				return extractTuplesFromActionsName(actions);
 			} else
 				return new List<KeyValuePair<ComponentMonitoring, string>>();
@@ -96,12 +112,15 @@ namespace FYFY_plugins.Monitoring{
 				// last token is id
 				int id;
 				if (tokens.Length > 2 && Int32.TryParse(tokens[tokens.Length-1], out id)){
-					ComponentMonitoring cm;
-					if (uniqueMonitoringId2ComponentMonitoring.TryGetValue(id, out cm)){
-						// second to last is game action name => Add pair
-						results.Add(new KeyValuePair<ComponentMonitoring, string>(cm, tokens[tokens.Length-2]));
+					if (Instance != null){
+						ComponentMonitoring cm;
+						if (Instance.uniqueMonitoringId2ComponentMonitoring.TryGetValue(id, out cm)){
+							// second to last is game action name => Add pair
+							results.Add(new KeyValuePair<ComponentMonitoring, string>(cm, tokens[tokens.Length-2]));
+						} else
+							UnityEngine.Debug.LogError ("No MonitoringComponent with id: "+id);
 					} else
-						UnityEngine.Debug.LogError ("No MonitoringComponent with id: "+id);
+						UnityEngine.Debug.LogError ("No MonitoringManager defined. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).");
 				}
 				else
 					UnityEngine.Debug.LogError ("Action name malformed: "+action);
@@ -141,15 +160,11 @@ namespace FYFY_plugins.Monitoring{
 
 		void Awake (){
 			// Several instances of MonitoringManager are not allowed
-			if (_monitoringManager != null) {
-				UnityEngine.Debug.Log ("Only one MonitoringManager component could be instantiate in this scene");
+			if (Instance != null && Instance != this) {
+				UnityEngine.Debug.LogError ("Only one MonitoringManager component could be instantiate in a scene.");
 				DestroyImmediate (this);
 				return;
 			}
-			_monitoringManager = this;
-			
-			// reset association table between id and ComponentMonitoring
-			uniqueMonitoringId2ComponentMonitoring = new Dictionary<int, ComponentMonitoring>();
 
 			if (Application.isPlaying && inGameAnalysis) {
 				try {
@@ -188,7 +203,6 @@ namespace FYFY_plugins.Monitoring{
 		}
 
 		private void OnLaalysExit(object sender, System.EventArgs e){
-			UnityEngine.Debug.Log (LaalysProcess.ExitCode);
 			if (LaalysProcess.ExitCode < 0) {
 				switch (LaalysProcess.ExitCode) {
 					case -2:
@@ -223,7 +237,7 @@ namespace FYFY_plugins.Monitoring{
 
         void OnDestroy()
 		{
-			if (_monitoringManager == this) {
+			if (Instance == this) {
 				// close Socket
 				if (clientSocket != null)
 					clientSocket.Close ();
@@ -236,8 +250,10 @@ namespace FYFY_plugins.Monitoring{
 					LaalysProcess.Kill ();
 				}
 				// Save traces
-				XmlHandler.saveTraces (fileName);
-				_monitoringManager = null;
+				if (Application.isPlaying)
+					XmlHandler.saveTraces (fileName);
+				
+				Instance = null;
 			}
         }
     }
