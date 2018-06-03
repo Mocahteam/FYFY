@@ -118,7 +118,7 @@ namespace FYFY_plugins.Monitoring {
 						if (curTransition_copy.overridedLabel != null && !curTransition_copy.overridedLabel.Equals(""))
 							publicLabel = curTransition_copy.overridedLabel+" ";
 						if (monitor is FamilyMonitoring)
-							publicLabel = publicLabel+((FamilyMonitoring)monitor).familyName;
+							publicLabel = publicLabel+((FamilyMonitoring)monitor).equivalentName;
 						else
 							publicLabel = publicLabel+monitor.gameObject.name;
 						curTransition_copy.label = monitor.gameObject.name+"_"+curTransition_copy.label;

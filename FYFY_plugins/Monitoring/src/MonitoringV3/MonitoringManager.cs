@@ -4,7 +4,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Diagnostics;
+using System.Reflection;
 using UnityEngine;
+using FYFY;
 
 using System.IO;
 using System;
@@ -15,7 +17,7 @@ namespace FYFY_plugins.Monitoring{
 	/// <summary>
 	///		This component trigger the building of PetriNets and Specification on Start and write traces when the game is over.
 	/// </summary>
-	[ExecuteInEditMode] // Awake, Start... will be call in edit mode
+	[ExecuteInEditMode] // Awake, OnEnable, Start, Destroy... will be call in edit mode
 	[DisallowMultipleComponent]
 	public class MonitoringManager : MonoBehaviour {
 		private static MonitoringManager _instance = null;
@@ -50,6 +52,20 @@ namespace FYFY_plugins.Monitoring{
 		private NetworkStream networkStream = null;
 		private Process LaalysProcess = null;
 		private EventHandler LaalysEH = null;
+		
+		[HideInInspector]
+		[SerializeField]
+		internal List<ComponentMonitoring> c_monitors = new List<ComponentMonitoring>();
+		[HideInInspector]
+		[SerializeField]
+		private List<FamilyMonitoring> f_monitors = new List<FamilyMonitoring>();
+		internal List<FamilyAssociation> availableFamilies;
+		internal class FamilyAssociation {
+			internal string systemName; // The name of the system the family is defined
+			internal string familyName; // The name of the family inside associated system
+			internal Family family; // The family object
+			internal string equivWith; // formated name of the first equivalent family defined in another system
+		}
 
 		/// <summary>The file name to save PetriNet, Specifications and logs.</summary>
         public string fileName;
@@ -157,6 +173,62 @@ namespace FYFY_plugins.Monitoring{
 			}
 			return results;
 		}
+		
+		private void OnLaalysExit(object sender, System.EventArgs e){
+			if (LaalysProcess.ExitCode < 0) {
+				switch (LaalysProcess.ExitCode) {
+					case -2:
+					case -3:
+						UnityEngine.Debug.LogError ("Laalys Error: in Monitoring Manager component unable to load the \"Full Petri Net Path\": "+fullPetriNetPath);
+						break;
+					case -5:
+					case -6:
+						UnityEngine.Debug.LogError ("Laalys Error: in Monitoring Manager component unable to load the \"Filtered Petri Net Path\": "+filteredPetriNetPath);
+						break;
+					case -8:
+					case -9:
+						UnityEngine.Debug.LogError ("Laalys Error: in Monitoring Manager component unable to load the \"Specifications Path\": "+featuresPath);
+						break;
+					default:
+						UnityEngine.Debug.LogError (LaalysProcess.StandardError.ReadToEnd());
+						break;
+				}
+			}
+		}
+		
+		internal void registerMonitor (ComponentMonitoring cm){
+			if (cm is FamilyMonitoring)
+				f_monitors.Add((FamilyMonitoring)cm);
+			else{
+				c_monitors.Add(cm);
+				c_monitors.Sort (delegate(ComponentMonitoring x, ComponentMonitoring y) {
+					if (x == null && y == null)
+						return 0;
+					else if (x == null)
+						return -1;
+					else if (y == null)
+						return 1;
+					else
+						return x.gameObject.name.CompareTo (y.gameObject.name);
+				});
+			}
+		}
+		
+		internal void unregisterMonitor (ComponentMonitoring cm){
+			if (cm is FamilyMonitoring)
+				f_monitors.Remove((FamilyMonitoring)cm);
+			else
+				c_monitors.Remove(cm);
+		}
+		
+		internal FamilyMonitoring getFamilyMonitoring (Family family){
+			foreach (FamilyMonitoring fm in f_monitors){
+				if (family.Equals(fm.descriptor)){
+					return fm;
+				}
+			}
+			return null;
+		}
 
 		void Awake (){
 			// Several instances of MonitoringManager are not allowed
@@ -201,26 +273,64 @@ namespace FYFY_plugins.Monitoring{
 				}
 			}
 		}
-
-		private void OnLaalysExit(object sender, System.EventArgs e){
-			if (LaalysProcess.ExitCode < 0) {
-				switch (LaalysProcess.ExitCode) {
-					case -2:
-					case -3:
-						UnityEngine.Debug.LogError ("Laalys Error: in Monitoring Manager component unable to load the \"Full Petri Net Path\": "+fullPetriNetPath);
-						break;
-					case -5:
-					case -6:
-						UnityEngine.Debug.LogError ("Laalys Error: in Monitoring Manager component unable to load the \"Filtered Petri Net Path\": "+filteredPetriNetPath);
-						break;
-					case -8:
-					case -9:
-						UnityEngine.Debug.LogError ("Laalys Error: in Monitoring Manager component unable to load the \"Specifications Path\": "+featuresPath);
-						break;
-					default:
-						UnityEngine.Debug.LogError (LaalysProcess.StandardError.ReadToEnd());
-						break;
+		
+		void OnEnable () {
+			// OnEnable is called after script compilation (due to [ExecuteInEditMode]). We use this mechanism to update list of available families
+			availableFamilies = new List<FamilyAssociation>();
+			// Load all FSystem included into assembly
+			System.Type[] systemTypes = (from assembly in System.AppDomain.CurrentDomain.GetAssemblies()
+				from type in assembly.GetExportedTypes()
+				where (type.IsClass == true && type.IsAbstract == false && type.IsSubclassOf(typeof(FSystem)) == true)
+				select type).ToArray();
+			// Parse all FSystems
+			for (int i = 0; i < systemTypes.Length; ++i) {
+				System.Type systemType = systemTypes [i];
+				try{
+					// Create instance of FSystem in order to know its Families types
+					FSystem system = (FSystem) System.Activator.CreateInstance(systemType);
+					// Load all members of this System
+					MemberInfo[] members = systemType.GetMembers (BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+					foreach (MemberInfo member in members) {
+						if (member.MemberType == MemberTypes.Field) {
+							FieldInfo field = (FieldInfo)member;
+							if (field.FieldType == typeof(FYFY.Family)) {
+								Family f = (Family)field.GetValue (system);
+								// Check if this family is equivalent to another family already loaded
+								string equivFamily = null;
+								foreach (FamilyAssociation f_alreadyStored in availableFamilies)
+									if (f.Equals(f_alreadyStored.family))
+										equivFamily = f_alreadyStored.equivWith;
+								// store data and link with equivalent family
+								FamilyAssociation entry = new FamilyAssociation ();
+								entry.systemName = systemType.FullName;
+								entry.familyName = field.Name;
+								entry.family = f;
+								if (equivFamily != null)
+									entry.equivWith = equivFamily; 
+								else
+									entry.equivWith = "equivWith_" + entry.systemName + "_" + entry.familyName;
+								availableFamilies.Add (entry);
+							}
+						}
+					}
+				} catch (Exception){
+					UnityEngine.Debug.LogError (systemType.FullName+": Instance creation failed (all families of this system are ignored). MonitoringManager requires to instantiate your systems in order to inspect their families. Common solution: Check in your constructor if Application.isPlaying is true.");
 				}
+			}
+			
+			// Check if associations between FamilyMonitoring components and new available families are still stable
+			for (int i = f_monitors.Count-1 ; i >= 0 ; i--){
+				bool found = false;
+				foreach (FamilyAssociation fa in availableFamilies){
+					if (fa.family.Equals(f_monitors[i].descriptor)){
+						found = true; // we found one
+						f_monitors[i].equivalentName = fa.equivWith;
+						f_monitors[i].gameObject.name = fa.equivWith;
+						break;
+					}
+				}
+				if (!found)
+					DestroyImmediate(f_monitors[i].gameObject);
 			}
 		}
 
@@ -252,6 +362,13 @@ namespace FYFY_plugins.Monitoring{
 				// Save traces
 				if (Application.isPlaying)
 					XmlHandler.saveTraces (fileName);
+				
+				// Destroy all ComponentMonitors
+				for (int i = c_monitors.Count-1 ; i >= 0 ; i--)
+					DestroyImmediate(c_monitors[i]);
+				// Destroy all FamilyMonitorings
+				for (int i = f_monitors.Count-1 ; i >= 0 ; i--)
+					DestroyImmediate(f_monitors[i].gameObject);
 				
 				Instance = null;
 			}

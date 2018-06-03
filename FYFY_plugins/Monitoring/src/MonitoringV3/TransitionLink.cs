@@ -24,14 +24,16 @@ namespace FYFY_plugins.Monitoring{
 		internal TransitionLink(){
 			links = new List<Link>();
 		}
-
-		internal Link addLink(Node transition, string label, int type, int placeId, GameObject obj, int weight)
-        {
-            this.transition = transition;
-			Link ctr = new Link(label, type, placeId, obj, weight);
-            links.Add(ctr);
-            return ctr;
-        }
+		
+		internal TransitionLink(TransitionLink template){
+			this.links = new List<Link>();
+			foreach (Link l in template.links)
+				this.links.Add(new Link(l));
+			this.transition = new Node(template.transition);
+			this.isSystemAction = template.isSystemAction;
+			this.isEndAction = template.isEndAction;
+			this.logic = template.logic;
+		}
 
         internal Link getLabeledLink(string label){
 			foreach(Link link in links){

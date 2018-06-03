@@ -161,20 +161,6 @@ namespace FYFY {
 			return this.IncludedInto(other) && other.IncludedInto(this);
 		}
 		
-		/// <summary>
-		///		Get the first Game Object included into the family
-		/// </summary>
-		/// <returns>
-		/// 	The first GameObject or null if the family is empty.
-		/// </returns>
-		public GameObject First(){
-			IEnumerator<GameObject> goEnum = GetEnumerator();
-			if (goEnum.MoveNext())
-				return goEnum.Current;
-			else
-				return null;
-		}
-		
 		// Check if "this" is included into "other"
 		private bool IncludedInto(Family other){
 			for (int i = 0; i < _matchers.Length; ++i){
@@ -187,6 +173,60 @@ namespace FYFY {
 					return false;
 			}
 			return true;
+		}
+		
+		/// <summary>
+		/// 	Check if this is equal with descriptor
+		/// </summary>
+		public bool Equals(string[] descriptor){
+			if (_matchers.Length != descriptor.Length)
+				return false;
+			
+			for (int i = 0; i < _matchers.Length; ++i){
+				bool found = false;
+				for (int j = 0 ; !found && j < descriptor.Length ; j++){
+					if (_matchers[i]._descriptor == descriptor[j])
+						found = true;
+				}
+				if (!found)
+					return false;
+			}
+			
+			for (int i = 0; i < descriptor.Length; ++i){
+				bool found = false;
+				for (int j = 0 ; !found && j < _matchers.Length ; j++){
+					if (descriptor[i] == _matchers[j]._descriptor)
+						found = true;
+				}
+				if (!found)
+					return false;
+			}
+			
+			return true;
+		}
+		
+		/// <summary>
+		/// 	Return a descriptor of this family
+		/// </summary>
+		public string[] getDescriptor(){
+			List<string> descriptor = new List<string>();
+			for (int i = 0; i < _matchers.Length; ++i)
+				descriptor.Add(_matchers[i]._descriptor);
+			return descriptor.ToArray();
+		}
+		
+		/// <summary>
+		///		Get the first Game Object included into the family
+		/// </summary>
+		/// <returns>
+		/// 	The first GameObject or null if the family is empty.
+		/// </returns>
+		public GameObject First(){
+			IEnumerator<GameObject> goEnum = GetEnumerator();
+			if (goEnum.MoveNext())
+				return goEnum.Current;
+			else
+				return null;
 		}
 
 		internal bool matches(GameObjectWrapper gameObjectWrapper) {

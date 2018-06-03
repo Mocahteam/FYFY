@@ -54,6 +54,17 @@ namespace FYFY_plugins.Monitoring{
 				}
 			}
 		}
+		
+		internal void clone(ComponentMonitoring template){
+			this.PnmlFile = template.PnmlFile;
+			this.comments = template.comments;
+			this.petriNet = new PetriNet(template.petriNet);
+			this.petriNet.attachID(this.id); // propagate local id
+			this.transitionLinks = new List<TransitionLink>();
+			foreach (TransitionLink tl in template.transitionLinks){
+				this.transitionLinks.Add(new TransitionLink (tl));
+			}
+		}
 
 		/// <summary> Look for a transition matching with label influenced by links </summary>
 		/// <param name="label">The label of the transition to find.</param>
@@ -218,6 +229,8 @@ namespace FYFY_plugins.Monitoring{
 				}
 				// In all cases we reset entry with this
 				mm.uniqueMonitoringId2ComponentMonitoring[id] = this;
+				// register this monitor
+				MonitoringManager.Instance.registerMonitor(this);
 			} else {
 				throw new NullReferenceException ("You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).");
 			}
@@ -225,11 +238,13 @@ namespace FYFY_plugins.Monitoring{
 		
 		internal void freeUniqueId(){
 			// When launching play, all GameObject are destroyed in editor and new Awake, Start... are launched in play mode. Same when we click on Stop button, OnDestroy is called in play mode and Awake, Start... are launched in editor mode (due to [ExecuteInEditMode] metatag) => Then we have to check if dictionary is already defined in case of MonitoringManager is destroyed before this ComponentMonitoring
-			if (MonitoringManager.Instance != null)
+			if (MonitoringManager.Instance != null){
 				MonitoringManager.Instance.uniqueMonitoringId2ComponentMonitoring.Remove(id);
+				MonitoringManager.Instance.unregisterMonitor(this);
+			}
 		}
 
-		void Start(){
+		void Awake(){
 			computeUniqueId();
 		}
 		

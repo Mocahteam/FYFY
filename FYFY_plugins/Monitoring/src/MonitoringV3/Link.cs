@@ -35,6 +35,16 @@ namespace FYFY_plugins.Monitoring{
             this.weight = weight;
         }
 		
+		internal Link (Link template){
+			this.label = template.label;
+			this.type = template.type;
+			this.flagsType = template.flagsType;
+			this.weight = template.weight;
+			this.placeId = template.placeId;
+			this.scroll = template.scroll;
+			this.linkedObject = template.linkedObject;
+		}
+		
 		/// <summary>Initializes a new instance of the <see cref="FYFY_plugins.Monitoring.Link"/> class.</summary>
         public Link()
         {

@@ -23,6 +23,7 @@ namespace FYFY_plugins.Monitoring {
 	    private static string[] optFlag = new string[] { "at least", "less than" };
 
 		private int ObjectSelectedFlag = 0;
+		private int TemplateSelected = 0;
 	    private int oldFlag;
 
 	    //Handling menu buttons
@@ -33,12 +34,6 @@ namespace FYFY_plugins.Monitoring {
 	    private bool goMenuItemActive = true;
 	    private bool familyMenuItemActive = false;
 
-		// Pair Key <=> FSystem name
-		// Value Key <=> Family included into FSystem name
-		private List<Family2Monitor> families;
-
-		private List<string> go_labels;
-		private ComponentMonitoring[] monitors;
 	    private int flagTransition;
 	    private static int cptSt = 0;
 	    private Vector2 scrollPosition;
@@ -46,240 +41,218 @@ namespace FYFY_plugins.Monitoring {
 		private bool showStates = false;
 		private bool showActions = false;
 
-		private class Family2Monitor {
-			internal string systemName;
-			internal string familyName;
-			internal Family family;
-			internal string equivMonitor;
-		}
-
 	    [MenuItem("FYFY/Edit Monitoring")]
 	    private static void ShowWindow()
 	    {
-	        //Show existing window instance. If one doesn't exist, make one.
-			window = EditorWindow.GetWindow(typeof(EditionView));
-			// Add callback to process Undo/Redo events
-			Undo.undoRedoPerformed += window.Repaint; 
-	    }
-
-	    // Use this for initialization
-		void OnEnable () {
-	        loadFamilies();
-	        loadMonitoredGo();
-	    }
-
-	    void loadFamilies()
-	    {
-			families = new List<Family2Monitor>();
-			// Load all FSystem included into assembly
-			System.Type[] systemTypes = (from assembly in System.AppDomain.CurrentDomain.GetAssemblies()
-				from type in assembly.GetExportedTypes()
-				where (type.IsClass == true && type.IsAbstract == false && type.IsSubclassOf(typeof(FSystem)) == true)
-				select type).ToArray();
-			// Parse all FSystems
-			for (int i = 0; i < systemTypes.Length; ++i) {
-				System.Type systemType = systemTypes [i];
-				// Create instance of FSystem in order to know its Families types
-				FSystem system = (FSystem) System.Activator.CreateInstance(systemType);
-				// Load all members this System
-				MemberInfo[] members = systemType.GetMembers (BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-				foreach (MemberInfo member in members) {
-					if (member.MemberType == MemberTypes.Field) {
-						FieldInfo field = (FieldInfo)member;
-						if (field.FieldType == typeof(FYFY.Family)) {
-							Family f = (Family)field.GetValue (system);
-							// Check if this family is equivalent to another family already loaded
-							string equivFamily = null;
-							foreach (Family2Monitor f_alreadyStored in families)
-								if (f.Equals(f_alreadyStored.family))
-									equivFamily = f_alreadyStored.equivMonitor;
-							// store data and link with equivalent family
-							Family2Monitor entry = new Family2Monitor ();
-							entry.systemName = systemType.FullName;
-							entry.familyName = field.Name;
-							entry.family = f;
-							if (equivFamily != null)
-								entry.equivMonitor = equivFamily; 
-							else
-								entry.equivMonitor = "equivWith_" + entry.systemName + "_" + field.Name;
-							families.Add (entry);
-						}
-					}
-				}
-			}
-	    }
-
-		// reload monitored Game Object and select the new one if it exists
-		private void loadMonitoredGo(ComponentMonitoring newOne = null)
-	    {
-	        go_labels = new List<string>();
-			// Get all Game Objects with monitoring component
-			monitors = Resources.FindObjectsOfTypeAll(typeof(ComponentMonitoring)) as ComponentMonitoring[];
-			// check if MonitoringManager is defined, if not remove all ComponentMonitoring components
-			if (MonitoringManager.Instance == null){
-				for (int i = 0 ; i < monitors.Length ; i++)
-					Undo.DestroyObjectImmediate (monitors [i]);
+			// be sure that MonitoringManager is instantiated
+			if (MonitoringManager.Instance != null){
+				//Show existing window instance. If one doesn't exist, make one.
+				window = EditorWindow.GetWindow(typeof(EditionView));
+				// Add callback to process Undo/Redo events
+				Undo.undoRedoPerformed += window.Repaint; 
 			} else {
-				// Remove GO used to monitor families (child of Main_Loop GO)
-				FamilyMonitoring[] families_monitored = Resources.FindObjectsOfTypeAll(typeof(FamilyMonitoring)) as FamilyMonitoring[];
-				List<ComponentMonitoring> tmpList = monitors.ToList();
-				foreach (FamilyMonitoring fmonitored in families_monitored)
-					tmpList.Remove(fmonitored);
-				// Sort list by game object name
-				tmpList.Sort (delegate(ComponentMonitoring x, ComponentMonitoring y) {
-					if (x == null && y == null)
-						return 0;
-					else if (x == null)
-						return -1;
-					else if (y == null)
-						return 1;
-					else
-						return x.gameObject.name.CompareTo (y.gameObject.name);
-				});
-				monitors = tmpList.ToArray();
-
-				// Update link counter
-				int selection = 0;
-				foreach (ComponentMonitoring composant in monitors)
-				{
-					int cpt = 0;
-					foreach(TransitionLink ctr in composant.transitionLinks)
-						cpt += ctr.links.Count;
-					go_labels.Add(composant.gameObject.name+" (ref: "+composant.id+") "+(composant.PnmlFile==null?"(PN: None":"(PN: "+composant.PnmlFile.name)+"; Total link: "+cpt+")");
-					if (newOne != null && newOne == composant)
-						ObjectSelectedFlag = selection;
-					selection++;
-				}
+				EditorUtility.DisplayDialog ("Action aborted", "You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", "Close");
 			}
 	    }
 
 	    void OnGUI()
 	    {
+			// Check if MonitoringManager is still available
+			if (MonitoringManager.Instance == null){
+				window.Close();
+				return;
+			}
 	        //Menu
 	        makeMenu();
-			loadMonitoredGo();
+			MonitoringManager mm = MonitoringManager.Instance;
 			GameObject mainLoop = GameObject.Find("Main_Loop");
-	        if (goMenuItemActive)
-	        {
+			if (goMenuItemActive)
+			{
 				GameObject tmp = null;
 				EditorGUIUtility.labelWidth = 125;
 				tmp = EditorGUILayout.ObjectField("Add Game Object:", tmp, typeof(UnityEngine.Object), true) as GameObject;
-	            if (tmp != null)
-	            {
+				if (tmp != null)
+				{
 					// Forbid to drag and drop child of MainLoop
 					if (!tmp.transform.IsChildOf (mainLoop.transform)) {
-						// be sure that MonitoringManager is used because ComponentMonitoring requires it
-						if (MonitoringManager.Instance != null){
-							ComponentMonitoring monitor = Undo.AddComponent<ComponentMonitoring> (tmp);
-							// in case of monitor's GameObject is not active in hierarchy Start of ComponentMonitoring will not be called => then we force to compute unique id
-							if (!tmp.activeInHierarchy)
-								monitor.computeUniqueId();
-							//monitor.hideFlags = HideFlags.HideInInspector;
-							loadMonitoredGo (monitor);
-						} else {
-							EditorUtility.DisplayDialog ("Action aborted", "You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", "Close");
-						}
+						ComponentMonitoring newMonitor = Undo.AddComponent<ComponentMonitoring> (tmp);
+						// in case of monitor's GameObject is not active in hierarchy Start of ComponentMonitoring will not be called => then we force to compute unique id
+						if (!tmp.activeInHierarchy)
+							newMonitor.computeUniqueId();
+						//newMonitor.hideFlags = HideFlags.HideInInspector;
 					} else {
 						EditorUtility.DisplayDialog ("Action aborted", "You can't monitor the Main_Loop GameObject or one of its childs.", "Close");
 					}
-	            }
+				}
 
-	            if (go_labels.Count > 0)
-	            {
+				List<string> go_labels = new List<string>();
+				foreach (ComponentMonitoring cm in mm.c_monitors)
+				{
+					int cpt = 0;
+					foreach(TransitionLink ctr in cm.transitionLinks)
+						cpt += ctr.links.Count;
+					go_labels.Add(cm.gameObject.name+" (ref: "+cm.id+") "+(cm.PnmlFile==null?"(PN: None":"(PN: "+cm.PnmlFile.name)+"; Total link: "+cpt+")");
+				}
+				if (go_labels.Count > 0)
+				{
 					EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 
 					EditorGUILayout.BeginHorizontal();
-					ObjectSelectedFlag = EditorGUILayout.Popup("Select Game Object:", ObjectSelectedFlag, go_labels.ToArray());
+					ObjectSelectedFlag = EditorGUILayout.Popup("Edit Game Object:", ObjectSelectedFlag, go_labels.ToArray());
 					if (ObjectSelectedFlag >= go_labels.Count) // can occur with Ctrl+Z
 						ObjectSelectedFlag = go_labels.Count - 1;
 					if (GUILayout.Button ("X", GUILayout.Width (20))) {
 						// in case of monitor's GameObject is not active in hierarchy OnDestroy of ComponentMonitoring will not be called => then we force to free unique id
-						if (!monitors [ObjectSelectedFlag].gameObject.activeInHierarchy)
-							monitors [ObjectSelectedFlag].freeUniqueId();
-						Undo.DestroyObjectImmediate (monitors [ObjectSelectedFlag]);
-						ObjectSelectedFlag = 0;
+						if (!mm.c_monitors [ObjectSelectedFlag].gameObject.activeInHierarchy)
+							mm.c_monitors [ObjectSelectedFlag].freeUniqueId();
+						Undo.DestroyObjectImmediate (mm.c_monitors [ObjectSelectedFlag]);
+						go_labels.RemoveAt(ObjectSelectedFlag);
+						if (go_labels.Count <= 0)
+							return;
+						if (ObjectSelectedFlag >= go_labels.Count)
+							ObjectSelectedFlag = go_labels.Count - 1;
 					}
-	                EditorGUILayout.EndHorizontal();
-	                
-	                if (ObjectSelectedFlag != oldFlag)
-	                    flagTransition = 0;
-	                oldFlag = ObjectSelectedFlag;
+					EditorGUILayout.EndHorizontal();
+					
+					if (ObjectSelectedFlag != oldFlag)
+						flagTransition = 0;
+					oldFlag = ObjectSelectedFlag;
 
-	                EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-
-	                //DrawUI
-					if (monitors[ObjectSelectedFlag] != null)
-	                	DrawUI(monitors[ObjectSelectedFlag]);
-	            }
-
-	        }
-	        else if (familyMenuItemActive)
-	        {
-	            List<string> flabels = new List<string>();
-
-
-				foreach (Family2Monitor fi in families)
-	            {
-					Transform child = mainLoop.transform.Find(fi.equivMonitor);
-					// Display all families
-	                if (child == null)
-						flabels.Add(fi.systemName+"."+fi.familyName + " (Not monitored)");
-	                else if (child.GetComponent<FamilyMonitoring>() != null)
-	                {
-	                    FamilyMonitoring sf = child.GetComponent<FamilyMonitoring>();
-	                    int cpt = 0;
-	                    foreach (TransitionLink ctr in sf.transitionLinks)
-	                    {
-	                        cpt += ctr.links.Count;
-	                    }
-						flabels.Add(fi.systemName+"."+fi.familyName + " " + (sf.PnmlFile == null ? "(PN: None" : "(PN: " + sf.PnmlFile.name) + "; Total link: " + cpt + ")");
-	                }
-	            }
-	            
-	            if (families.Count != 0)
-	            {
-					EditorGUILayout.BeginHorizontal();
-					EditorGUIUtility.labelWidth = 100;
-	                ObjectSelectedFlag = EditorGUILayout.Popup("Select a family:", ObjectSelectedFlag, flabels.ToArray());
-					if (ObjectSelectedFlag >= flabels.Count) // can occur with Ctrl+Z
-						ObjectSelectedFlag = flabels.Count - 1;
-					// Find a child of Main_Loop GameObject associated with object selected
-					Transform child = mainLoop.transform.Find(families[ObjectSelectedFlag].equivMonitor);
-					if (child != null) {
-						// If found, add button to remove monitoring
-						if (GUILayout.Button ("X", GUILayout.Width (20))) {
-							// in case of child is not active in hierarchy OnDestroy of FamilyMonitoring will not be called => then we force to free unique id
-							if (!child.gameObject.activeInHierarchy)
-								child.gameObject.GetComponent<FamilyMonitoring>().freeUniqueId();
-							Undo.DestroyObjectImmediate (child.gameObject);
-							ObjectSelectedFlag = 0;
+					EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+					
+					// Init from a template
+					List<string> templates_id = new List<string>();
+					List<ComponentMonitoring> templates_cm = new List<ComponentMonitoring>();
+					foreach (ComponentMonitoring cm in mm.c_monitors)
+					{
+						if (cm.id != mm.c_monitors[ObjectSelectedFlag].id && cm.PnmlFile != null){ // we exclude from the list monitor with the same id and monitors where pnmlfile is not defined (i.e. non initialized)
+							int cpt = 0;
+							foreach(TransitionLink ctr in cm.transitionLinks)
+								cpt += ctr.links.Count;
+							templates_id.Add(cm.gameObject.name+" (ref: "+cm.id+") (PN: "+cm.PnmlFile.name+"; Total link: "+cpt+")");
+							templates_cm.Add(cm);
 						}
 					}
-	                EditorGUILayout.EndHorizontal();
+					if (templates_id.Count > 0){
+						if (TemplateSelected >= templates_id.Count)
+							TemplateSelected = templates_id.Count - 1;
+						EditorGUILayout.BeginHorizontal ();
+						EditorGUILayout.LabelField ("(Option)", GUILayout.Width (60));
+						TemplateSelected = EditorGUILayout.Popup("Import from model:", TemplateSelected, templates_id.ToArray());
+						if (GUILayout.Button ("Import", GUILayout.Width (80))) {
+							// clone from template
+							mm.c_monitors[ObjectSelectedFlag].clone(templates_cm[TemplateSelected]);
+						}
+						EditorGUILayout.EndHorizontal ();
+						EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+					}
+			
+					//DrawUI
+					if (mm.c_monitors[ObjectSelectedFlag] != null)
+						DrawUI(mm.c_monitors[ObjectSelectedFlag]);
+				}
 
-	                if (child == null)
-	                {
+			}
+			else if (familyMenuItemActive)
+			{
+				List<string> flabels = new List<string>();
+
+				// Build families label for each available families
+				// Parse all available families
+				foreach (MonitoringManager.FamilyAssociation fa in mm.availableFamilies)
+				{
+					// Try to find associated monitor to current available family
+					FamilyMonitoring fm = mm.getFamilyMonitoring(fa.family);
+					if (fm == null) // no monitor found
+						flabels.Add(fa.systemName+"."+fa.familyName + " (Not monitored)");
+					else {
+						// Monitor found: we compute the number of links
+						int cpt = 0;
+						foreach (TransitionLink ctr in fm.transitionLinks)
+						{
+							cpt += ctr.links.Count;
+						}
+						// build rich label
+						flabels.Add(fa.systemName+"."+fa.familyName + " " + (fm.PnmlFile == null ? "(PN: None" : "(PN: " + fm.PnmlFile.name) + "; Total link: " + cpt + ")");
+					}
+				}
+				
+				// If at least one family is available
+				if (mm.availableFamilies.Count > 0)
+				{
+					EditorGUILayout.BeginHorizontal();
+					EditorGUIUtility.labelWidth = 100;
+					ObjectSelectedFlag = EditorGUILayout.Popup("Select a family:", ObjectSelectedFlag, flabels.ToArray());
+					// Find monitor associated with object selected
+					FamilyMonitoring fm = mm.getFamilyMonitoring(mm.availableFamilies[ObjectSelectedFlag].family);
+					if (fm != null) {
+						// If found, add button to remove monitoring
+						if (GUILayout.Button ("X", GUILayout.Width (20))) {
+							// in case of monitor is not active in hierarchy OnDestroy of FamilyMonitoring will not be called => then we force to free unique id
+							if (!fm.gameObject.activeInHierarchy)
+								fm.freeUniqueId();
+							Undo.DestroyObjectImmediate (fm.gameObject);
+						}
+					}
+					EditorGUILayout.EndHorizontal();
+
+					if (fm == null)
+					{
 						// if Not found, add button to add a monitor to this family
-	                    EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-	                    if (GUILayout.Button("Add monitor to this family"))
-	                    {
-							GameObject go = new GameObject(families[ObjectSelectedFlag].equivMonitor);
-							FamilyMonitoring fm = go.AddComponent<FamilyMonitoring>();
-							fm.familyName = families[ObjectSelectedFlag].familyName;
-	                        go.transform.parent = mainLoop.transform;
-	                        //go.GetComponent<FamilyMonitoring>().hideFlags = HideFlags.HideInInspector;
+						EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+						if (GUILayout.Button("Add monitor to this family"))
+						{
+							GameObject go = new GameObject(mm.availableFamilies[ObjectSelectedFlag].equivWith);
+							FamilyMonitoring newMonitor = go.AddComponent<FamilyMonitoring>();
+							newMonitor.equivalentName = mm.availableFamilies[ObjectSelectedFlag].equivWith;
+							newMonitor.descriptor = mm.availableFamilies[ObjectSelectedFlag].family.getDescriptor();
+							go.transform.parent = mainLoop.transform;
+							//go.GetComponent<FamilyMonitoring>().hideFlags = HideFlags.HideInInspector;
 							Undo.RegisterCreatedObjectUndo(go, "Add monitor to family");
-	                    }
-	                }
-	                else
-	                {
-	                    EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-	                    DrawUI(child.GetComponent<FamilyMonitoring>());
-	                }
-	            }
-	            else
-	                EditorGUILayout.LabelField("No family found");
-	        }
+						}
+					}
+					else
+					{
+						// Init from a template
+						List<string> templates_id = new List<string>();
+						List<FamilyMonitoring> templates_fm = new List<FamilyMonitoring>();
+						foreach (MonitoringManager.FamilyAssociation fa in mm.availableFamilies)
+						{
+							// Try to find associated monitor to current available family
+							FamilyMonitoring fm_template = mm.getFamilyMonitoring(fa.family);
+							if (fm_template != null && fm_template.equivalentName != fm.equivalentName && fm_template.PnmlFile != null){
+								// Monitor found: we compute the number of links
+								int cpt = 0;
+								foreach (TransitionLink ctr in fm_template.transitionLinks)
+									cpt += ctr.links.Count;
+								// build rich label
+								templates_id.Add(fa.systemName+"."+fa.familyName + " (PN: " + fm_template.PnmlFile.name + "; Total link: " + cpt + ")");
+								templates_fm.Add(fm_template);
+							}
+						}
+						if (templates_id.Count > 0){
+							EditorGUIUtility.labelWidth = 125;
+							EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+							if (TemplateSelected >= templates_id.Count)
+								TemplateSelected = templates_id.Count - 1;
+							EditorGUILayout.BeginHorizontal ();
+							EditorGUILayout.LabelField ("(Option)", GUILayout.Width (60));
+							TemplateSelected = EditorGUILayout.Popup("Import from model:", TemplateSelected, templates_id.ToArray());
+							if (GUILayout.Button ("Import", GUILayout.Width (80))) {
+								// clone from template
+								fm.clone((ComponentMonitoring)templates_fm[TemplateSelected]);
+							}
+							EditorGUIUtility.labelWidth = 100;
+							EditorGUILayout.EndHorizontal ();
+						}
+						
+						EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+						DrawUI(fm);
+					}
+				}
+				else
+					EditorGUILayout.LabelField("No family found");
+			}
 	        
 	        windowRect = GUI.Window(0, windowRect, DoMyWindow, "Editing monitors");
 		}
@@ -615,7 +588,6 @@ namespace FYFY_plugins.Monitoring {
 	            familyMenuItemActive = false;
 	            ObjectSelectedFlag = 0;
 	            flagTransition = 0;
-	            //loadDatas(families[flagFamily], components);
 
 	        }
 
@@ -625,7 +597,6 @@ namespace FYFY_plugins.Monitoring {
 	            familyMenuItemActive = true;
 	            ObjectSelectedFlag = 0;
 	            flagTransition = 0;
-	            //loadDatas(families[flagFamily], layers);
 	        }
 
 	        GUILayout.EndHorizontal();

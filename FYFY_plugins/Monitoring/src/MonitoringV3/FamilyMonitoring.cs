@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using FYFY;
 
 namespace FYFY_plugins.Monitoring{
 	/// <summary>
@@ -15,8 +16,12 @@ namespace FYFY_plugins.Monitoring{
 		// TODO: add this boolean to automatically include ComponentMonitoring in all GameObjects of this family
         //public bool suiviGlobal = true;
 		
-		/// <summary> Name of the family. </summary>
+		/// <summary> Name of an equivalent family name in an other system. </summary>
 		[HideInInspector] 
-		public string familyName;
+		public string equivalentName;
+		
+		/// <summary> descriptor of the Family associated to this monitor. </summary>
+		[HideInInspector]
+		public string[] descriptor;
 	}
 }
