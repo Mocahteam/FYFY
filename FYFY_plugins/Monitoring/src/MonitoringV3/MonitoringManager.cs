@@ -80,47 +80,137 @@ namespace FYFY_plugins.Monitoring{
 		/// <summary>Path to the jar file of Laalys</summary>
 		public string laalysPath;
 		
+		
+		
+		/// <summary>
+		/// 	Trace game action.
+		/// </summary>
+		/// <param name="cm">The ComponentMonitoring to use to build trace.</param>
+		/// <param name="actionName">Action name you want to trace, this name has to match with a transition defined into associated Petri Net of the "cm" parameter <see cref="ComponentMonitoring.PnmlFile"/>.</param>
+		/// <param name="performedBy">Specify who perform this action, the player or the system. <see cref="MonitoringManager.Source"/></param>
+		/// <param name="processLinks">Set to false if the logic expression associated to the action include "+" operators AND the action performed by the player is not allowed by the system. In this case fourth parameters will not be processed. True (default) means fourth parameter will be analysed.</param>
+		/// <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to build the trace: l0 and l3 OR l1 and l3 => <code>this.trace(..., "l0", "l3");</code> OR <code>this.trace(..., "l1", "l3");</code></param>
+		/// <return> labels found for this game action if in game analysis is enabled (see: MonitoringManager). return empty Array else </return>
+		public static string[] trace(ComponentMonitoring cm, string actionName, string performedBy, bool processLinks = true, params string[] linksConcerned)
+		{
+			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame (1, true);										// get caller stackFrame with informations
+			string exceptionStackTrace = "(at " + stackFrame.GetFileName () + ":" + stackFrame.GetFileLineNumber ().ToString () + ")";	// to point where this function was called
+			
+			if (MonitoringManager.Instance == null)
+				throw new TraceAborted ("No MonitoringManager found. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", null);
+
+			string internalName = cm.getInternalName(actionName, exceptionStackTrace, processLinks, linksConcerned);
+			return MonitoringManager.processTrace (internalName, performedBy);
+		}
+		
+		/// <summary>
+		/// 	Trace game action.
+		/// </summary>
+		/// <param name="family">The monitored Family to use to build trace.</param>
+		/// <param name="actionName">Action name you want to trace, this name has to match with a transition defined into associated Petri Net of the "family" parameter <see cref="ComponentMonitoring.PnmlFile"/>.</param>
+		/// <param name="performedBy">Specify who perform this action, the player or the system. <see cref="MonitoringManager.Source"/></param>
+		/// <param name="processLinks">Set to false if the logic expression associated to the action include "+" operators AND the action performed by the player is not allowed by the system. In this case fourth parameters will not be processed. True (default) means fourth parameter will be analysed.</param>
+		/// <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to build the trace: l0 and l3 OR l1 and l3 => <code>this.trace(..., "l0", "l3");</code> OR <code>this.trace(..., "l1", "l3");</code></param>
+		/// <return> labels found for this game action if in game analysis is enabled (see: MonitoringManager). return empty Array else </return>
+		public static string[] trace(Family family, string actionName, string performedBy, bool processLinks = true, params string[] linksConcerned)
+		{
+			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame (1, true);										// get caller stackFrame with informations
+			string exceptionStackTrace = "(at " + stackFrame.GetFileName () + ":" + stackFrame.GetFileLineNumber ().ToString () + ")";	// to point where this function was called
+			
+			if (MonitoringManager.Instance == null)
+				throw new TraceAborted ("No MonitoringManager found. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", null);
+			
+			FamilyMonitoring fm = MonitoringManager.Instance.getFamilyMonitoring(family);
+			if (fm == null)
+				throw new TraceAborted ("No monitor found for this family.", null);
+
+			string internalName = fm.getInternalName(actionName, exceptionStackTrace, processLinks, linksConcerned);
+			return MonitoringManager.processTrace (internalName, performedBy);
+		}
+		
+		/// <summary>
+		/// 	Get next actions to perform in order to reach targeted game action.
+		/// </summary>
+		/// <param name="cm">The ComponentMonitoring on which you want reach action.</param>
+		/// <param name="targetedActionName">Action name you want to reach, this name has to match with a transition defined into associated Petri Net  of the "cm" parameter <see cref="ComponentMonitoring.PnmlFile"/>.</param>
+		/// <param name="maxActions">Maximum number of actions returned.</param>
+		/// <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to look for the trace: l0 and l3 OR l1 and l3 => <code>this.getNextActionToReach(..., "l0", "l3");</code> OR <code>this.getNextActionToReach(..., "l1", "l3");</code></param>
+		/// <return>List of Pairs including a ComponentMonitoring and its associated game action useful to reach the targeted action, the number of actions returned is less or equal to maxActions parameters.</return>
+		public static List<KeyValuePair<ComponentMonitoring, string>> getNextActionsToReach(ComponentMonitoring cm, string targetedActionName, int maxActions, params string[] linksConcerned)
+		{
+			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame (1, true);										// get caller stackFrame with informations
+			string exceptionStackTrace = "(at " + stackFrame.GetFileName () + ":" + stackFrame.GetFileLineNumber ().ToString () + ")";	// to point where this function was called
+			
+			if (MonitoringManager.Instance == null)
+				throw new TraceAborted ("No MonitoringManager found. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", null);
+
+			string internalName = cm.getInternalName(targetedActionName, exceptionStackTrace, true, linksConcerned);
+			return MonitoringManager.getNextActionsToReach (internalName, maxActions);
+		}
+		
+		/// <summary>
+		/// 	Get next actions to perform in order to reach targeted game action.
+		/// </summary>
+		/// <param name="family">The monitored Family on which you want reach action.</param>
+		/// <param name="targetedActionName">Action name you want to reach, this name has to match with a transition defined into associated Petri Net  of the "cm" parameter <see cref="ComponentMonitoring.PnmlFile"/>.</param>
+		/// <param name="maxActions">Maximum number of actions returned.</param>
+		/// <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to look for the trace: l0 and l3 OR l1 and l3 => <code>this.getNextActionToReach(..., "l0", "l3");</code> OR <code>this.getNextActionToReach(..., "l1", "l3");</code></param>
+		/// <return>List of Pairs including a ComponentMonitoring and its associated game action useful to reach the targeted action, the number of actions returned is less or equal to maxActions parameters.</return>
+		public static List<KeyValuePair<ComponentMonitoring, string>> getNextActionsToReach(Family family, string targetedActionName, int maxActions, params string[] linksConcerned)
+		{
+			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame (1, true);										// get caller stackFrame with informations
+			string exceptionStackTrace = "(at " + stackFrame.GetFileName () + ":" + stackFrame.GetFileLineNumber ().ToString () + ")";	// to point where this function was called
+			
+			if (MonitoringManager.Instance == null)
+				throw new TraceAborted ("No MonitoringManager found. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", null);
+			
+			FamilyMonitoring fm = MonitoringManager.Instance.getFamilyMonitoring(family);
+			if (fm == null)
+				throw new TraceAborted ("No monitor found for this family", null);
+
+			string internalName = fm.getInternalName(targetedActionName, exceptionStackTrace, true, linksConcerned);
+			return MonitoringManager.getNextActionsToReach (internalName, maxActions);
+		}
+		
 		/// <summary>Ask to Laalys to provide the next actions to perform in order to reach one of the expert end actions</summary>
 		/// <param name="maxActions">Maximum number of actions returned.</param>
 		/// <return>List of Pairs including a ComponentMonitoring and its associated game action useful to reach one of the expert end actions, the number of actions returned is less or equal to maxActions parameters.</return>
 		public static List<KeyValuePair<ComponentMonitoring, string>> getNextActionsToReachEnd(int maxActions){
+			
+			if (MonitoringManager.Instance == null)
+				throw new TraceAborted ("No MonitoringManager found. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", null);
+			
 			// Ask next actions
-			return getNextActionsToReach ("end", maxActions);
+			return MonitoringManager.getNextActionsToReach ("end", maxActions);
 		}
 		
 		/// <summary>Ask to Laalys to provide all triggerable actions</summary>
 		/// <return>List of Pairs including a ComponentMonitoring and its associated game action that may be triggered.</return>
 		public static List<KeyValuePair<ComponentMonitoring, string>> getTriggerableActions(){
-			if (Instance != null) {
-				string[] actions = Instance.analyseToken ("TriggerableActions");
-				return extractTuplesFromActionsName(actions);
-			} else
-				return new List<KeyValuePair<ComponentMonitoring, string>>();
+			
+			if (MonitoringManager.Instance == null)
+				throw new TraceAborted ("No MonitoringManager found. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", null);
+			
+			string[] actions = MonitoringManager.Instance.analyseToken ("TriggerableActions");
+			return extractTuplesFromActionsName(actions);
 		}
 
-		internal static string[] processTrace(string actionName, string performedBy){
-			string[] labels = new string[] {};
+		private static string[] processTrace(string actionName, string performedBy){
 			XmlHandler.addTrace (actionName, performedBy);
-			if (Instance != null) {
-				labels = Instance.analyseToken (actionName, performedBy);
-			}
-			return labels;
+			return MonitoringManager.Instance.analyseToken (actionName, performedBy);
 		}
 
-		internal static List<KeyValuePair<ComponentMonitoring, string>> getNextActionsToReach(string targetAction, int maxActions){
+		private static List<KeyValuePair<ComponentMonitoring, string>> getNextActionsToReach(string targetAction, int maxActions){
 			// be sure that maxActions is greater or equal to 0
 			if (maxActions < 0)
 				maxActions = 0;
 			
-			if (Instance != null) {
-				string[] actions = Instance.analyseToken ("NextActionToReach", targetAction, maxActions.ToString());
-				return extractTuplesFromActionsName(actions);
-			} else
-				return new List<KeyValuePair<ComponentMonitoring, string>>();
+			string[] actions = MonitoringManager.Instance.analyseToken ("NextActionToReach", targetAction, maxActions.ToString());
+			return extractTuplesFromActionsName(actions);
 		}
 		
 		// Extract from Laalys actions' name the associated ComponentMonitoring and game action
-		internal static List<KeyValuePair<ComponentMonitoring, string>> extractTuplesFromActionsName (string [] actions){
+		private static List<KeyValuePair<ComponentMonitoring, string>> extractTuplesFromActionsName (string [] actions){
 			List<KeyValuePair<ComponentMonitoring, string>> results = new List<KeyValuePair<ComponentMonitoring, string>>();
 			// extract Monitoring id from actions' name
 			foreach (string action in actions){
@@ -128,15 +218,12 @@ namespace FYFY_plugins.Monitoring{
 				// last token is id
 				int id;
 				if (tokens.Length > 2 && Int32.TryParse(tokens[tokens.Length-1], out id)){
-					if (Instance != null){
-						ComponentMonitoring cm;
-						if (Instance.uniqueMonitoringId2ComponentMonitoring.TryGetValue(id, out cm)){
-							// second to last is game action name => Add pair
-							results.Add(new KeyValuePair<ComponentMonitoring, string>(cm, tokens[tokens.Length-2]));
-						} else
-							UnityEngine.Debug.LogError ("No MonitoringComponent with id: "+id);
+					ComponentMonitoring cm;
+					if (Instance.uniqueMonitoringId2ComponentMonitoring.TryGetValue(id, out cm)){
+						// second to last is game action name => Add pair
+						results.Add(new KeyValuePair<ComponentMonitoring, string>(cm, tokens[tokens.Length-2]));
 					} else
-						UnityEngine.Debug.LogError ("No MonitoringManager defined. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).");
+						UnityEngine.Debug.LogError ("No MonitoringComponent with id: "+id);
 				}
 				else
 					UnityEngine.Debug.LogError ("Action name malformed: "+action);
@@ -368,7 +455,8 @@ namespace FYFY_plugins.Monitoring{
 					DestroyImmediate(c_monitors[i]);
 				// Destroy all FamilyMonitorings
 				for (int i = f_monitors.Count-1 ; i >= 0 ; i--)
-					DestroyImmediate(f_monitors[i].gameObject);
+					if (f_monitors[i])
+						DestroyImmediate(f_monitors[i].gameObject);
 				
 				Instance = null;
 			}

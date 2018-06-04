@@ -181,7 +181,7 @@ namespace FYFY_plugins.Monitoring {
 				if (mm.availableFamilies.Count > 0)
 				{
 					EditorGUILayout.BeginHorizontal();
-					EditorGUIUtility.labelWidth = 100;
+					EditorGUIUtility.labelWidth = 125;
 					ObjectSelectedFlag = EditorGUILayout.Popup("Select a family:", ObjectSelectedFlag, flabels.ToArray());
 					// Find monitor associated with object selected
 					FamilyMonitoring fm = mm.getFamilyMonitoring(mm.availableFamilies[ObjectSelectedFlag].family);
@@ -231,7 +231,6 @@ namespace FYFY_plugins.Monitoring {
 							}
 						}
 						if (templates_id.Count > 0){
-							EditorGUIUtility.labelWidth = 125;
 							EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 							if (TemplateSelected >= templates_id.Count)
 								TemplateSelected = templates_id.Count - 1;
@@ -242,7 +241,6 @@ namespace FYFY_plugins.Monitoring {
 								// clone from template
 								fm.clone((ComponentMonitoring)templates_fm[TemplateSelected]);
 							}
-							EditorGUIUtility.labelWidth = 100;
 							EditorGUILayout.EndHorizontal ();
 						}
 						
