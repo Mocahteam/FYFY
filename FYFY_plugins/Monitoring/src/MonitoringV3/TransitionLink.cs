@@ -25,11 +25,11 @@ namespace FYFY_plugins.Monitoring{
 			links = new List<Link>();
 		}
 		
-		internal TransitionLink(TransitionLink template){
+		// copy all data from template except transition because its a reference of PetriNet
+		internal void import(TransitionLink template){
 			this.links = new List<Link>();
 			foreach (Link l in template.links)
 				this.links.Add(new Link(l));
-			this.transition = new Node(template.transition);
 			this.isSystemAction = template.isSystemAction;
 			this.isEndAction = template.isEndAction;
 			this.logic = template.logic;

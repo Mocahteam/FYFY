@@ -40,6 +40,7 @@ namespace FYFY_plugins.Monitoring {
 
 		private bool showStates = false;
 		private bool showActions = false;
+		private bool showOptions = false;
 
 	    [MenuItem("FYFY/Edit Monitoring")]
 	    private static void ShowWindow()
@@ -70,7 +71,7 @@ namespace FYFY_plugins.Monitoring {
 			{
 				GameObject tmp = null;
 				EditorGUIUtility.labelWidth = 125;
-				tmp = EditorGUILayout.ObjectField("Add Game Object:", tmp, typeof(UnityEngine.Object), true) as GameObject;
+				tmp = EditorGUILayout.ObjectField(new GUIContent("Add Game Object:", "Drag&Drop a game object you want to monitor. A same game object can be added several time."), tmp, typeof(UnityEngine.Object), true) as GameObject;
 				if (tmp != null)
 				{
 					// Forbid to drag and drop child of MainLoop
@@ -79,38 +80,41 @@ namespace FYFY_plugins.Monitoring {
 						// in case of monitor's GameObject is not active in hierarchy Start of ComponentMonitoring will not be called => then we force to compute unique id
 						if (!tmp.activeInHierarchy)
 							newMonitor.computeUniqueId();
+						ObjectSelectedFlag = mm.c_monitors.FindIndex(x => x.id == newMonitor.id);
 						//newMonitor.hideFlags = HideFlags.HideInInspector;
 					} else {
 						EditorUtility.DisplayDialog ("Action aborted", "You can't monitor the Main_Loop GameObject or one of its childs.", "Close");
 					}
 				}
 
-				List<string> go_labels = new List<string>();
+				List<GUIContent> go_labels = new List<GUIContent>();
 				foreach (ComponentMonitoring cm in mm.c_monitors)
 				{
 					int cpt = 0;
 					foreach(TransitionLink ctr in cm.transitionLinks)
 						cpt += ctr.links.Count;
-					go_labels.Add(cm.gameObject.name+" (ref: "+cm.id+") "+(cm.PnmlFile==null?"(PN: None":"(PN: "+cm.PnmlFile.name)+"; Total link: "+cpt+")");
+					go_labels.Add(new GUIContent(cm.gameObject.name+" (ref: "+cm.id+") "+(cm.PnmlFile==null?"(PN: None":"(PN: "+cm.PnmlFile.name)+"; Total link: "+cpt+")"));
 				}
 				if (go_labels.Count > 0)
 				{
 					EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 
 					EditorGUILayout.BeginHorizontal();
-					ObjectSelectedFlag = EditorGUILayout.Popup("Edit Game Object:", ObjectSelectedFlag, go_labels.ToArray());
+					ObjectSelectedFlag = EditorGUILayout.Popup(new GUIContent("Edit Monitor:", "Select the monitor you want to configure."), ObjectSelectedFlag, go_labels.ToArray());
 					if (ObjectSelectedFlag >= go_labels.Count) // can occur with Ctrl+Z
 						ObjectSelectedFlag = go_labels.Count - 1;
-					if (GUILayout.Button ("X", GUILayout.Width (20))) {
+					ComponentMonitoring cm = mm.c_monitors [ObjectSelectedFlag];
+					if (GUILayout.Button (new GUIContent("X", "Remove selected monitor."), GUILayout.Width (20))) {
 						// in case of monitor's GameObject is not active in hierarchy OnDestroy of ComponentMonitoring will not be called => then we force to free unique id
-						if (!mm.c_monitors [ObjectSelectedFlag].gameObject.activeInHierarchy)
-							mm.c_monitors [ObjectSelectedFlag].freeUniqueId();
-						Undo.DestroyObjectImmediate (mm.c_monitors [ObjectSelectedFlag]);
+						if (!cm.gameObject.activeInHierarchy)
+							cm.freeUniqueId();
+						Undo.DestroyObjectImmediate (cm);
 						go_labels.RemoveAt(ObjectSelectedFlag);
 						if (go_labels.Count <= 0)
 							return;
 						if (ObjectSelectedFlag >= go_labels.Count)
 							ObjectSelectedFlag = go_labels.Count - 1;
+						cm = mm.c_monitors [ObjectSelectedFlag]; // reset ComponentMonitoring in case of ObjectSelectedFlag update
 					}
 					EditorGUILayout.EndHorizontal();
 					
@@ -120,36 +124,48 @@ namespace FYFY_plugins.Monitoring {
 
 					EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 					
-					// Init from a template
-					List<string> templates_id = new List<string>();
+					// compute template list
+					List<GUIContent> templates_id = new List<GUIContent>();
 					List<ComponentMonitoring> templates_cm = new List<ComponentMonitoring>();
-					foreach (ComponentMonitoring cm in mm.c_monitors)
+					foreach (ComponentMonitoring _cm in mm.c_monitors)
 					{
-						if (cm.id != mm.c_monitors[ObjectSelectedFlag].id && cm.PnmlFile != null){ // we exclude from the list monitor with the same id and monitors where pnmlfile is not defined (i.e. non initialized)
+						if (_cm.id != cm.id && _cm.PnmlFile != null){ // we exclude from the list monitor with the same id and monitors where pnmlfile is not defined (i.e. non initialized)
 							int cpt = 0;
-							foreach(TransitionLink ctr in cm.transitionLinks)
+							foreach(TransitionLink ctr in _cm.transitionLinks)
 								cpt += ctr.links.Count;
-							templates_id.Add(cm.gameObject.name+" (ref: "+cm.id+") (PN: "+cm.PnmlFile.name+"; Total link: "+cpt+")");
-							templates_cm.Add(cm);
+							templates_id.Add(new GUIContent(_cm.gameObject.name+" (ref: "+_cm.id+") (PN: "+_cm.PnmlFile.name+"; Total link: "+cpt+")"));
+							templates_cm.Add(_cm);
 						}
 					}
-					if (templates_id.Count > 0){
-						if (TemplateSelected >= templates_id.Count)
-							TemplateSelected = templates_id.Count - 1;
-						EditorGUILayout.BeginHorizontal ();
-						EditorGUILayout.LabelField ("(Option)", GUILayout.Width (60));
-						TemplateSelected = EditorGUILayout.Popup("Import from model:", TemplateSelected, templates_id.ToArray());
-						if (GUILayout.Button ("Import", GUILayout.Width (80))) {
-							// clone from template
-							mm.c_monitors[ObjectSelectedFlag].clone(templates_cm[TemplateSelected]);
+					
+					showOptions = EditorGUILayout.Foldout (showOptions, "Options");
+					if (showOptions) {
+						EditorGUI.indentLevel += 2;
+						EditorGUIUtility.labelWidth = 160;
+						if (templates_id.Count > 0){
+							if (TemplateSelected >= templates_id.Count)
+								TemplateSelected = templates_id.Count - 1;
+							EditorGUILayout.BeginHorizontal ();
+							TemplateSelected = EditorGUILayout.Popup(new GUIContent("Import from model:", "Select the monitor you want to use as template, all properties will be copied to the editing monitor."), TemplateSelected, templates_id.ToArray());
+							if (GUILayout.Button ("Import", GUILayout.Width (80))) {
+								// clone from template
+								cm.clone(templates_cm[TemplateSelected]);
+							}
+							EditorGUILayout.EndHorizontal ();
 						}
-						EditorGUILayout.EndHorizontal ();
-						EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+						string newLabel = EditorGUILayout.TextField (new GUIContent("Parent Petri net:", "You can define the name of the parent Petri net in which this monitor will be merged (default: the scene name)."), cm.exportPn);
+						if (newLabel != cm.exportPn) {
+							Undo.RecordObject (cm, "Update Export Petri net");
+							cm.exportPn = newLabel;
+						}
+						EditorGUIUtility.labelWidth = 125;
+						EditorGUI.indentLevel -= 2;
 					}
+					EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 			
 					//DrawUI
-					if (mm.c_monitors[ObjectSelectedFlag] != null)
-						DrawUI(mm.c_monitors[ObjectSelectedFlag]);
+					if (cm != null)
+						DrawUI(cm);
 				}
 
 			}
@@ -173,7 +189,7 @@ namespace FYFY_plugins.Monitoring {
 							cpt += ctr.links.Count;
 						}
 						// build rich label
-						flabels.Add(fa.systemName+"."+fa.familyName + " " + (fm.PnmlFile == null ? "(PN: None" : "(PN: " + fm.PnmlFile.name) + "; Total link: " + cpt + ")");
+						flabels.Add(fa.systemName+"."+fa.familyName +" (ref: "+fm.id+") "+ (fm.PnmlFile == null ? "(PN: None" : "(PN: " + fm.PnmlFile.name) + "; Total link: " + cpt + ")");
 					}
 				}
 				
@@ -187,7 +203,7 @@ namespace FYFY_plugins.Monitoring {
 					FamilyMonitoring fm = mm.getFamilyMonitoring(mm.availableFamilies[ObjectSelectedFlag].family);
 					if (fm != null) {
 						// If found, add button to remove monitoring
-						if (GUILayout.Button ("X", GUILayout.Width (20))) {
+						if (GUILayout.Button (new GUIContent("X", "Remove monitor from this family."), GUILayout.Width (20))) {
 							// in case of monitor is not active in hierarchy OnDestroy of FamilyMonitoring will not be called => then we force to free unique id
 							if (!fm.gameObject.activeInHierarchy)
 								fm.freeUniqueId();
@@ -213,8 +229,11 @@ namespace FYFY_plugins.Monitoring {
 					}
 					else
 					{
-						// Init from a template
-						List<string> templates_id = new List<string>();
+
+						EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+						
+						// Compute template list
+						List<GUIContent> templates_id = new List<GUIContent>();
 						List<FamilyMonitoring> templates_fm = new List<FamilyMonitoring>();
 						foreach (MonitoringManager.FamilyAssociation fa in mm.availableFamilies)
 						{
@@ -226,24 +245,34 @@ namespace FYFY_plugins.Monitoring {
 								foreach (TransitionLink ctr in fm_template.transitionLinks)
 									cpt += ctr.links.Count;
 								// build rich label
-								templates_id.Add(fa.systemName+"."+fa.familyName + " (PN: " + fm_template.PnmlFile.name + "; Total link: " + cpt + ")");
+								templates_id.Add(new GUIContent(fa.systemName+"."+fa.familyName +" (ref: "+fm.id+") (PN: " + fm_template.PnmlFile.name + "; Total link: " + cpt + ")"));
 								templates_fm.Add(fm_template);
 							}
 						}
-						if (templates_id.Count > 0){
-							EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-							if (TemplateSelected >= templates_id.Count)
-								TemplateSelected = templates_id.Count - 1;
-							EditorGUILayout.BeginHorizontal ();
-							EditorGUILayout.LabelField ("(Option)", GUILayout.Width (60));
-							TemplateSelected = EditorGUILayout.Popup("Import from model:", TemplateSelected, templates_id.ToArray());
-							if (GUILayout.Button ("Import", GUILayout.Width (80))) {
-								// clone from template
-								fm.clone((ComponentMonitoring)templates_fm[TemplateSelected]);
-							}
-							EditorGUILayout.EndHorizontal ();
-						}
 						
+						showOptions = EditorGUILayout.Foldout (showOptions, "Options");
+						if (showOptions) {
+							EditorGUI.indentLevel += 2;
+							EditorGUIUtility.labelWidth = 160;
+							if (templates_id.Count > 0){
+								if (TemplateSelected >= templates_id.Count)
+									TemplateSelected = templates_id.Count - 1;
+								EditorGUILayout.BeginHorizontal ();
+								TemplateSelected = EditorGUILayout.Popup(new GUIContent("Import from model:", "Select the monitor you want to use as template, all properties will be copied to the editing monitor."), TemplateSelected, templates_id.ToArray());
+								if (GUILayout.Button ("Import", GUILayout.Width (80))) {
+									// clone from template
+									fm.clone((ComponentMonitoring)templates_fm[TemplateSelected]);
+								}
+								EditorGUILayout.EndHorizontal ();
+							}
+							string newLabel = EditorGUILayout.TextField (new GUIContent("Parent Petri net:", "You can define the name of the parent Petri net in which this monitor will be merged (default: the scene name)."), fm.exportPn);
+							if (newLabel != fm.exportPn) {
+								Undo.RecordObject (fm, "Update Export Petri net");
+								fm.exportPn = newLabel;
+							}
+							EditorGUIUtility.labelWidth = 125;
+							EditorGUI.indentLevel -= 2;
+						}
 						EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 						DrawUI(fm);
 					}
@@ -258,7 +287,7 @@ namespace FYFY_plugins.Monitoring {
 		private void DrawUI(ComponentMonitoring monitor)
 		{
 			// Pnml input field
-			UnityEngine.Object tmp = EditorGUILayout.ObjectField("PNML file:", monitor.PnmlFile, typeof(UnityEngine.Object), true);
+			UnityEngine.Object tmp = EditorGUILayout.ObjectField(new GUIContent("PNML file:", "Drag&Drop a file with .pnml extension."), monitor.PnmlFile, typeof(UnityEngine.Object), true);
 			if (tmp == null) {
 				if (tmp != monitor.PnmlFile) {
 					Undo.RecordObject (monitor, "Remove PNML file");
@@ -327,7 +356,7 @@ namespace FYFY_plugins.Monitoring {
 						}
 						// Add override field
 						//EditorGUIUtility.labelWidth = 150;
-						string newLabel = EditorGUILayout.TextField ("Override name:", place.overridedLabel/*, GUILayout.MaxWidth (300)*/);
+						string newLabel = EditorGUILayout.TextField (new GUIContent("Override name:", "You can define a more explicit name (useful to edit links)."), place.overridedLabel/*, GUILayout.MaxWidth (300)*/);
 						//EditorGUIUtility.labelWidth = 0; // reset default value
 						if (newLabel != place.overridedLabel) {
 							Undo.RecordObject (monitor, "Update Override Label");
@@ -350,31 +379,31 @@ namespace FYFY_plugins.Monitoring {
 				else
 				{
 					// Build explicit labels
-					List<string> labelsBuilt = new List<string> ();
+					List<GUIContent> labelsBuilt = new List<GUIContent> ();
 
 					foreach (TransitionLink tc in monitor.transitionLinks){
-						labelsBuilt.Add (tc.transition.label + " (links: " + tc.links.Count + ")");
+						labelsBuilt.Add (new GUIContent(tc.transition.label + " (links: " + tc.links.Count + ")"));
 					}
 
-					flagTransition = EditorGUILayout.Popup ("Action: ", flagTransition, labelsBuilt.ToArray ());
+					flagTransition = EditorGUILayout.Popup (new GUIContent("Action:", "Select action to configure."), flagTransition, labelsBuilt.ToArray ());
 					if (flagTransition >= labelsBuilt.Count) // can occur with Ctrl+Z
 						flagTransition = labelsBuilt.Count - 1;
 
 					TransitionLink tLink = monitor.transitionLinks [flagTransition];
 					
 					// Add override field
-					string newTrLabel = EditorGUILayout.TextField ("Override name:", tLink.transition.overridedLabel);
+					string newTrLabel = EditorGUILayout.TextField (new GUIContent("Override name:", "You can define a more explicit name (only used in Laalys UI)."), tLink.transition.overridedLabel);
 					if (newTrLabel != tLink.transition.overridedLabel) {
 						Undo.RecordObject (monitor, "Update Override Label");
 						tLink.transition.overridedLabel = newTrLabel;
 					}
 					
-					bool newToggle = EditorGUILayout.ToggleLeft ("Not a player action (triggered by game simulation)", tLink.isSystemAction);
+					bool newToggle = EditorGUILayout.ToggleLeft (new GUIContent("Not a player action (triggered by game simulation)", "If checked this action will be considered as a system action and will be not labelled by Laalys."), tLink.isSystemAction);
 					if (newToggle != tLink.isSystemAction) {
 						Undo.RecordObject (monitor, "Is Player Action");
 						tLink.isSystemAction = newToggle;
 					}
-					newToggle = EditorGUILayout.ToggleLeft ("Player objective", tLink.isEndAction);
+					newToggle = EditorGUILayout.ToggleLeft (new GUIContent("Player objective", "If check this action is a player objective. At least one action for each parent Petri net has to be set as payer objective."), tLink.isEndAction);
 					if (newToggle != tLink.isEndAction) {
 						Undo.RecordObject (monitor, "Is Player Objective");
 						tLink.isEndAction = newToggle;
@@ -513,7 +542,7 @@ namespace FYFY_plugins.Monitoring {
 									}
 								}
 								EditorGUILayout.EndVertical ();
-								if (GUILayout.Button ("X", GUILayout.Width (20))) {
+								if (GUILayout.Button (new GUIContent("X", "Remove this link."), GUILayout.Width (20))) {
 									Undo.RecordObject (monitor, "Delete link");
 									tLink.links.Remove (link);
 								}

@@ -55,11 +55,11 @@ namespace FYFY_plugins.Monitoring{
 		
 		[HideInInspector]
 		[SerializeField]
-		internal List<ComponentMonitoring> c_monitors = new List<ComponentMonitoring>();
+		internal List<ComponentMonitoring> c_monitors = new List<ComponentMonitoring>(); // used in EditionView
 		[HideInInspector]
 		[SerializeField]
 		private List<FamilyMonitoring> f_monitors = new List<FamilyMonitoring>();
-		internal List<FamilyAssociation> availableFamilies;
+		internal List<FamilyAssociation> availableFamilies; // used in EditionView
 		internal class FamilyAssociation {
 			internal string systemName; // The name of the system the family is defined
 			internal string familyName; // The name of the family inside associated system
@@ -80,7 +80,23 @@ namespace FYFY_plugins.Monitoring{
 		/// <summary>Path to the jar file of Laalys</summary>
 		public string laalysPath;
 		
-		
+		/// <summary>
+		/// 	Get monitor with asked id.
+		/// </summary>
+		/// <param name="id">The id of the monitor to get.</param>
+		/// <return> The ComponentMonitoring object associated to the id <see cref="ComponentMonitoring"/>. </return>
+		public static ComponentMonitoring getMonitorById (int id){
+			if (MonitoringManager.Instance == null)
+				throw new TraceAborted ("No MonitoringManager found. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", null);
+			
+			foreach (ComponentMonitoring cm in MonitoringManager.Instance.c_monitors)
+				if (cm.id == id)
+					return cm;
+			foreach (FamilyMonitoring fm in MonitoringManager.Instance.f_monitors)
+				if (fm.id == id)
+					return (ComponentMonitoring) fm;
+			throw new ArgumentException ("No ComponentMonitoring or FamilyMonitoring available for id "+id);
+		}
 		
 		/// <summary>
 		/// 	Trace game action.
@@ -362,6 +378,10 @@ namespace FYFY_plugins.Monitoring{
 		}
 		
 		void OnEnable () {
+			// avoid to inspect System in playing mode
+			if (Application.isPlaying)
+				return;
+			
 			// OnEnable is called after script compilation (due to [ExecuteInEditMode]). We use this mechanism to update list of available families
 			availableFamilies = new List<FamilyAssociation>();
 			// Load all FSystem included into assembly

@@ -29,6 +29,10 @@ namespace FYFY_plugins.Monitoring{
 		[HideInInspector]
 		[SerializeField]
 		private PetriNet petriNet;
+		
+		/// <summary> Name of the parent Petri net to include this monitor</summary>
+		[HideInInspector]
+		public string exportPn;
 
 		/// <summary> List of transitions influenced by links. </summary>
 		[HideInInspector] 
@@ -58,12 +62,12 @@ namespace FYFY_plugins.Monitoring{
 		internal void clone(ComponentMonitoring template){
 			this.PnmlFile = template.PnmlFile;
 			this.comments = template.comments;
-			this.petriNet = new PetriNet(template.petriNet);
-			this.petriNet.attachID(this.id); // propagate local id
-			this.transitionLinks = new List<TransitionLink>();
-			foreach (TransitionLink tl in template.transitionLinks){
-				this.transitionLinks.Add(new TransitionLink (tl));
+			this.PetriNet = new PetriNet(template.petriNet); // this set init transitionLinks (see setter defined before)
+			this.PetriNet.attachID(this.id); // propagate local id
+			for (int i = 0 ; i < template.transitionLinks.Count ; i++){
+				this.transitionLinks[i].import(template.transitionLinks[i]);
 			}
+			this.exportPn = template.exportPn;
 		}
 
 		/// <summary> Look for a transition matching with label influenced by links </summary>
