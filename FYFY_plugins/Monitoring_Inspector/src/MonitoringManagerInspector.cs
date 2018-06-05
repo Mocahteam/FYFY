@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
-using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -15,18 +15,16 @@ namespace FYFY_plugins.Monitoring {
 	[CustomEditor(typeof(FYFY_plugins.Monitoring.MonitoringManager))]
 	public class MonitoringManagerInspector : Editor {
 
-		private SerializedProperty _fileName;
 		private SerializedProperty _inGameAnalysis;	
-		private SerializedProperty _fullPetriNetPath;	
-		private SerializedProperty _filteredPetriNetPath;	
+		private SerializedProperty _fullPetriNetsPath;	
+		private SerializedProperty _filteredPetriNetsPath;	
 		private SerializedProperty _featuresPath;		
 		private SerializedProperty _laalysPath;
 
 		private void OnEnable(){
-			_fileName = serializedObject.FindProperty ("fileName");
 			_inGameAnalysis = serializedObject.FindProperty ("inGameAnalysis");
-			_fullPetriNetPath = serializedObject.FindProperty ("fullPetriNetPath");
-			_filteredPetriNetPath = serializedObject.FindProperty ("filteredPetriNetPath");
+			_fullPetriNetsPath = serializedObject.FindProperty ("fullPetriNetsPath");
+			_filteredPetriNetsPath = serializedObject.FindProperty ("filteredPetriNetsPath");
 			_featuresPath = serializedObject.FindProperty ("featuresPath");
 			_laalysPath = serializedObject.FindProperty ("laalysPath");
 		}
@@ -41,37 +39,29 @@ namespace FYFY_plugins.Monitoring {
 		public override void OnInspectorGUI(){
 			serializedObject.Update();
 
-			string newFileName = EditorGUILayout.TextField (new GUIContent("Base files name:", "This base file name will be used to build full Petri net file with .pnml extension and specifications file with .xml extension. This files will be saved into \"completeNet\" and \"specifs\" folders of the Unity project."), _fileName.stringValue);
-			if (newFileName != _fileName.stringValue) {
-				Undo.RecordObject ((MonitoringManager)target, "Update Base files name");
-				_fileName.stringValue = newFileName;
-			}
-
-			if (newFileName == null || newFileName == "") GUI.enabled = false; // disable following fields if in game analysis is disabled
-			if (GUILayout.Button ("Build full Petri net and features"))
-				GeneratePNandSpecifs (newFileName);
-			if (newFileName == null || newFileName == "")	GUI.enabled = true; // reset default
-
-			bool newInGameAnalysis = EditorGUILayout.ToggleLeft (new GUIContent("Enable in game analysis", "If enabled, Laalys will be launched in game and each game action traced will be analysed depending on Full and Filtered Petri nets and spécifications."), _inGameAnalysis.boolValue);
+			if (GUILayout.Button ("Build full Petri nets and features"))
+				GeneratePNandFeatures ();
+			
+			bool newInGameAnalysis = EditorGUILayout.ToggleLeft (new GUIContent("Enable in game analysis", "If enabled, Laalys will be launched in game and each game action traced will be analysed depending on Full and Filtered Petri nets and features."), _inGameAnalysis.boolValue);
 			if (newInGameAnalysis != _inGameAnalysis.boolValue) {
 				Undo.RecordObject ((MonitoringManager)target, "Update In Game Analysis");
 				_inGameAnalysis.boolValue = newInGameAnalysis;
 			}
 
 			if (!newInGameAnalysis)	GUI.enabled = false; // disable following fields if in game analysis is disabled
-			string newFullPath = EditorGUILayout.TextField (new GUIContent("Full Petri net path:", "The full Petri net to use in case of in game analysis is enabled."), _fullPetriNetPath.stringValue);
-			if (newFullPath != _fullPetriNetPath.stringValue) {
-				Undo.RecordObject ((MonitoringManager)target, "Update Full Petri net path");
-				_fullPetriNetPath.stringValue = newFullPath;
+			string newFullPath = EditorGUILayout.TextField (new GUIContent("Full P. nets path:", "The full Petri nets location to use in case of in game analysis is enabled (default: \"./completeNets/\")."), _fullPetriNetsPath.stringValue);
+			if (newFullPath != _fullPetriNetsPath.stringValue) {
+				Undo.RecordObject ((MonitoringManager)target, "Update Full Petri nets path");
+				_fullPetriNetsPath.stringValue = newFullPath;
 			}
-			string newFilteredPath = EditorGUILayout.TextField (new GUIContent("Filtered Petri net path:", "The filtered Petri net to use in case of in game analysis is enabled."), _filteredPetriNetPath.stringValue);
-			if (newFilteredPath != _filteredPetriNetPath.stringValue) {
-				Undo.RecordObject ((MonitoringManager)target, "Update Filtered Petri net path");
-				_filteredPetriNetPath.stringValue = newFilteredPath;
+			string newFilteredPath = EditorGUILayout.TextField (new GUIContent("Filtered P. nets path:", "The filtered Petri nets location to use in case of in game analysis is enabled (default: \"./filteredNets/\")."), _filteredPetriNetsPath.stringValue);
+			if (newFilteredPath != _filteredPetriNetsPath.stringValue) {
+				Undo.RecordObject ((MonitoringManager)target, "Update Filtered Petri nets path");
+				_filteredPetriNetsPath.stringValue = newFilteredPath;
 			}
-			string newFeaturesPath = EditorGUILayout.TextField (new GUIContent("Specifications path:", "The specifications to use in case of in game analysis is enabled."), _featuresPath.stringValue);
+			string newFeaturesPath = EditorGUILayout.TextField (new GUIContent("Features path:", "The features location to use in case of in game analysis is enabled (default: \"./features/\")."), _featuresPath.stringValue);
 			if (newFeaturesPath != _featuresPath.stringValue) {
-				Undo.RecordObject ((MonitoringManager)target, "Update Specifications path");
+				Undo.RecordObject ((MonitoringManager)target, "Update Features path");
 				_featuresPath.stringValue = newFeaturesPath;
 			}
 			if (!newInGameAnalysis)	GUI.enabled = true; // reset default
@@ -94,20 +84,29 @@ namespace FYFY_plugins.Monitoring {
 			serializedObject.ApplyModifiedProperties();
 		}
 
-		private void GeneratePNandSpecifs (string baseFileName) {
-			// Build final PetriNet
-			PetriNet petriNet = new PetriNet ();
-
-			float offsetX = 0;
+		private void GeneratePNandFeatures () {
+			// List of full Petri nets
+			// Key => Petri net name defined inside monitor.fullPn
+			// Value => Pair <PetriNet, offsetX>
+			Dictionary<string, KeyValuePair<PetriNet, float>> petriNets = new Dictionary <string, KeyValuePair<PetriNet, float>>();
 
 			// Fill final PN
 			foreach (ComponentMonitoring monitor in Resources.FindObjectsOfTypeAll<ComponentMonitoring> ()) {
+				// Get full Petri net for this monitor
+				string fullName = SceneManager.GetActiveScene().name;
+				if (monitor.fullPn != null && monitor.fullPn != "")
+					fullName = monitor.fullPn;
+				if (!petriNets.ContainsKey(fullName))
+					petriNets[fullName] = new KeyValuePair<PetriNet, float>(new PetriNet(), 0);
+				PetriNet fullPn = petriNets[fullName].Key;
+				float offsetX = petriNets[fullName].Value;
+				
 				// Check if PN exists
 				if (monitor.PetriNet != null) {
 					// Make a copy of local PN in order to organise it spatially without changing original PN
 					PetriNet tmpPN = new PetriNet(monitor.PetriNet, monitor.gameObject.name);
 					tmpPN.addWidth (offsetX);
-					petriNet.addSubNet (tmpPN);
+					fullPn.addSubNet (tmpPN);
 
 					// Process links
 					foreach (TransitionLink transitionLink in monitor.transitionLinks)
@@ -122,8 +121,10 @@ namespace FYFY_plugins.Monitoring {
 						else
 							publicLabel = publicLabel+monitor.gameObject.name;
 						curTransition_copy.label = monitor.gameObject.name+"_"+curTransition_copy.label;
-						// Add this transition to Specifications
-						XmlHandler.addSpecif(curTransition_copy.label+"_"+monitor.id, publicLabel, transitionLink.isSystemAction, transitionLink.isEndAction);
+						
+						// Add this transition to Features
+						XmlHandler.addFeature(fullName, curTransition_copy.label+"_"+monitor.id, publicLabel, transitionLink.isSystemAction, transitionLink.isEndAction);
+						
 						Node oldTransition = curTransition_copy;
 						if (isNullOrWhiteSpace(transitionLink.logic))
 						{
@@ -139,7 +140,7 @@ namespace FYFY_plugins.Monitoring {
 										// Define arc type
 										ArcType arcType = curLink.type == 2 ? Arc.stringToArcType (Arc.optType.ElementAt (curLink.flagsType)) : ArcType.regular;
 										// Create arc between Transition and linked place (depends on Get/Produce/Require diffusion state)
-										petriNet.arcs.Add (curLink.type != 1 ? new Arc (linkedPlace_copy, curTransition_copy, arcType, curLink.weight) : new Arc (curTransition_copy, linkedPlace_copy, arcType, curLink.weight));
+										fullPn.arcs.Add (curLink.type != 1 ? new Arc (linkedPlace_copy, curTransition_copy, arcType, curLink.weight) : new Arc (curTransition_copy, linkedPlace_copy, arcType, curLink.weight));
 									}
 								}
 							}
@@ -173,7 +174,7 @@ namespace FYFY_plugins.Monitoring {
 												// Define arc type
 												ArcType arcType = curLink.type == 2 ? Arc.stringToArcType (Arc.optType.ElementAt (curLink.flagsType)) : ArcType.regular;
 												// Create arc between Transition and linked place (depends on Get/Produce/Require diffusion state)
-												petriNet.arcs.Add (curLink.type != 1 ? new Arc (linkedPlace_copy, curTransition_copy, arcType, curLink.weight) : new Arc (curTransition_copy, linkedPlace_copy, arcType, curLink.weight));
+												fullPn.arcs.Add (curLink.type != 1 ? new Arc (linkedPlace_copy, curTransition_copy, arcType, curLink.weight) : new Arc (curTransition_copy, linkedPlace_copy, arcType, curLink.weight));
 											}
 										}
 									}
@@ -187,19 +188,19 @@ namespace FYFY_plugins.Monitoring {
 										curTransition_copy.position.y += 50;
 										curTransition_copy = new Node("or" + (or++) + "_" + oldTransition.label, curTransition_copy.id, curTransition_copy.offset, curTransition_copy.initialMarking, curTransition_copy.position);
 										// Add this new transition to PN
-										petriNet.transitions.Add(curTransition_copy);
-										// and to specifications
-										XmlHandler.addSpecif(curTransition_copy.label+"_"+monitor.id, publicLabel, transitionLink.isSystemAction, transitionLink.isEndAction);
+										fullPn.transitions.Add(curTransition_copy);
+										// and to features
+										XmlHandler.addFeature(fullName, curTransition_copy.label+"_"+monitor.id, publicLabel, transitionLink.isSystemAction, transitionLink.isEndAction);
 										// Duplicate arcs from old transition
 										foreach (Arc a in tmpPN.getConcernedArcs(oldTransition))
 										{
 											if (a.target.label.Equals(oldTransition.label))
 											{
-												petriNet.arcs.Add(new Arc(a.source, curTransition_copy, a.type, a.weight));
+												fullPn.arcs.Add(new Arc(a.source, curTransition_copy, a.type, a.weight));
 											}
 											else if (a.source.label.Equals(oldTransition.label))
 											{
-												petriNet.arcs.Add(new Arc(curTransition_copy, a.target, a.type, a.weight));
+												fullPn.arcs.Add(new Arc(curTransition_copy, a.target, a.type, a.weight));
 											}
 										}
 									}
@@ -209,14 +210,17 @@ namespace FYFY_plugins.Monitoring {
 								UnityEngine.Debug.LogError("Petri Net Building aborted: Logic expression of \""+transitionLink.transition.label+"\" action from \""+monitor.gameObject.name+"\" is not valid => \""+transitionLink.logic+"\". Please check it from Monitor edit view.");
 						}
 					}
-					offsetX += monitor.PetriNet.getWidth ()+50; // Add spaces between PN
+					petriNets[fullName] = new KeyValuePair<PetriNet, float>(fullPn, offsetX + monitor.PetriNet.getWidth ()+50); // Add spaces between PN
 				}
 			}
 
-			PnmlParser.SaveAtPath (petriNet, baseFileName+".pnml");
-			XmlHandler.saveSpecifications(baseFileName);
+			// Save all Petri nets
+			foreach (KeyValuePair<string, KeyValuePair<PetriNet, float>> pn in petriNets)
+				PnmlParser.SaveAtPath (pn.Value.Key, pn.Key+".pnml");
+			// and features
+			XmlHandler.saveFeatures();
 
-			EditorUtility.DisplayDialog ("Files built", "Files have been saved into \"completeNet\" and \"specifs\" folders of this Unity project", "Close");
+			EditorUtility.DisplayDialog ("Files built", "Files have been saved into \"completeNets\" and \"features\" folders of this Unity project", "Close");
 
 		}
 

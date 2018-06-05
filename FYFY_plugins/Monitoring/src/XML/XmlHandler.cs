@@ -11,14 +11,15 @@ namespace FYFY_plugins.Monitoring {
 	internal class XmlHandler {
 
 		private static List<XElement> xTraceList = new List<XElement>();
-		private static List<XElement> xSpecifList = new List<XElement>();
+		private static Dictionary<string, List<XElement>> xFeatureList = new Dictionary<string, List<XElement>>();
 
 		/// Add a new trace
-		internal static void addTrace(string trace, string performedBy)
+		internal static void addTrace(string pnName, string trace, string performedBy)
 	    {
 	        xTraceList.Add(
 				new XElement("transition", 
 				new XAttribute("time", GetTimestamp(DateTime.Now)),
+		        new XAttribute("pnName", pnName),
 		        new XAttribute("action", trace),
 	            new XAttribute("origin", performedBy))
 	        );
@@ -48,9 +49,11 @@ namespace FYFY_plugins.Monitoring {
 	        return value.ToString("yyyyMMddHHmmssffff");
 	    }
 
-		internal static void addSpecif(string id, string label, bool isSystem, bool isEnd)
+		internal static void addFeature(string fullPn, string id, string label, bool isSystem, bool isEnd)
 		{
-			xSpecifList.Add(new XElement("transition",
+			if (!xFeatureList.ContainsKey(fullPn))
+					xFeatureList[fullPn] = new List<XElement>();
+			xFeatureList[fullPn].Add(new XElement("transition",
 				new XAttribute("id", id),
 				new XAttribute("label", label),
 				new XAttribute("system", isSystem.ToString()),
@@ -58,19 +61,21 @@ namespace FYFY_plugins.Monitoring {
 			);
 		}
 
-	    internal static void saveSpecifications(string name)
+	    internal static void saveFeatures()
 	    {
-			XDocument doc = new XDocument();
+			foreach (KeyValuePair<string,  List<XElement>> spec in xFeatureList){
+				XDocument doc = new XDocument();
 
-			doc = new XDocument(         
-				new XElement("transitions", 
-					xSpecifList.Select(x => x)
-				)
-			);
+				doc = new XDocument(         
+					new XElement("transitions", 
+						spec.Value.Select(x => x)
+					)
+				);
 
-			System.IO.Directory.CreateDirectory("specifs");
-			doc.Save("specifs\\"+name+"_specifs.xml");
-			xSpecifList.Clear();
+				System.IO.Directory.CreateDirectory("features");
+				doc.Save("features\\"+spec.Key+".xml");
+			}
+			xFeatureList.Clear();
 	    }
 	}
 }

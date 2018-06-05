@@ -153,10 +153,10 @@ namespace FYFY_plugins.Monitoring {
 							}
 							EditorGUILayout.EndHorizontal ();
 						}
-						string newLabel = EditorGUILayout.TextField (new GUIContent("Parent Petri net:", "You can define the name of the parent Petri net in which this monitor will be merged (default: the scene name)."), cm.exportPn);
-						if (newLabel != cm.exportPn) {
+						string newLabel = EditorGUILayout.TextField (new GUIContent("Full Petri net:", "You can define the name of the parent Petri net in which this monitor will be merged (default: the scene name)."), cm.fullPn);
+						if (newLabel != cm.fullPn) {
 							Undo.RecordObject (cm, "Update Export Petri net");
-							cm.exportPn = newLabel;
+							cm.fullPn = newLabel;
 						}
 						EditorGUIUtility.labelWidth = 125;
 						EditorGUI.indentLevel -= 2;
@@ -265,10 +265,10 @@ namespace FYFY_plugins.Monitoring {
 								}
 								EditorGUILayout.EndHorizontal ();
 							}
-							string newLabel = EditorGUILayout.TextField (new GUIContent("Parent Petri net:", "You can define the name of the parent Petri net in which this monitor will be merged (default: the scene name)."), fm.exportPn);
-							if (newLabel != fm.exportPn) {
+							string newLabel = EditorGUILayout.TextField (new GUIContent("Full Petri net:", "You can define the name of the full Petri net in which this monitor will be merged (default: the scene name)."), fm.fullPn);
+							if (newLabel != fm.fullPn) {
 								Undo.RecordObject (fm, "Update Export Petri net");
-								fm.exportPn = newLabel;
+								fm.fullPn = newLabel;
 							}
 							EditorGUIUtility.labelWidth = 125;
 							EditorGUI.indentLevel -= 2;

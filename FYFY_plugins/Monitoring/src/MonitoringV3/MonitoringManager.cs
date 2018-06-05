@@ -6,6 +6,7 @@ using System.Text;
 using System.Diagnostics;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using FYFY;
 
 using System.IO;
@@ -15,7 +16,7 @@ using System.Linq;
 
 namespace FYFY_plugins.Monitoring{
 	/// <summary>
-	///		This component trigger the building of PetriNets and Specification on Start and write traces when the game is over.
+	///		This component trigger the building of PetriNets and Features and write traces when the game is over.
 	/// </summary>
 	[ExecuteInEditMode] // Awake, OnEnable, Start, Destroy... will be call in edit mode
 	[DisallowMultipleComponent]
@@ -67,15 +68,13 @@ namespace FYFY_plugins.Monitoring{
 			internal string equivWith; // formated name of the first equivalent family defined in another system
 		}
 
-		/// <summary>The file name to save PetriNet, Specifications and logs.</summary>
-        public string fileName;
 		/// <summary>Is analysis run in game?</summary>
 		public bool inGameAnalysis;
-		/// <summary>Full Petri net to use if in game analysis is enabled</summary>
-		public string fullPetriNetPath;
-		/// <summary>Filtered Petri net to use if in game analysis is enabled</summary>
-		public string filteredPetriNetPath;
-		/// <summary>Specification to use if in game analysis is enabled</summary>
+		/// <summary>Full Petri nets location to use if in game analysis is enabled</summary>
+		public string fullPetriNetsPath;
+		/// <summary>Filtered Petri nets location to use if in game analysis is enabled</summary>
+		public string filteredPetriNetsPath;
+		/// <summary>Features location to use if in game analysis is enabled</summary>
 		public string featuresPath;
 		/// <summary>Path to the jar file of Laalys</summary>
 		public string laalysPath;
@@ -116,7 +115,7 @@ namespace FYFY_plugins.Monitoring{
 				throw new TraceAborted ("No MonitoringManager found. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", null);
 
 			string internalName = cm.getInternalName(actionName, exceptionStackTrace, processLinks, linksConcerned);
-			return MonitoringManager.processTrace (internalName, performedBy);
+			return MonitoringManager.processTrace (cm.fullPn, internalName, performedBy);
 		}
 		
 		/// <summary>
@@ -141,7 +140,7 @@ namespace FYFY_plugins.Monitoring{
 				throw new TraceAborted ("No monitor found for this family.", null);
 
 			string internalName = fm.getInternalName(actionName, exceptionStackTrace, processLinks, linksConcerned);
-			return MonitoringManager.processTrace (internalName, performedBy);
+			return MonitoringManager.processTrace (fm.fullPn, internalName, performedBy);
 		}
 		
 		/// <summary>
@@ -161,7 +160,7 @@ namespace FYFY_plugins.Monitoring{
 				throw new TraceAborted ("No MonitoringManager found. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", null);
 
 			string internalName = cm.getInternalName(targetedActionName, exceptionStackTrace, true, linksConcerned);
-			return MonitoringManager.getNextActionsToReach (internalName, maxActions);
+			return MonitoringManager.getNextActionsToReach (cm.fullPn, internalName, maxActions);
 		}
 		
 		/// <summary>
@@ -185,19 +184,7 @@ namespace FYFY_plugins.Monitoring{
 				throw new TraceAborted ("No monitor found for this family", null);
 
 			string internalName = fm.getInternalName(targetedActionName, exceptionStackTrace, true, linksConcerned);
-			return MonitoringManager.getNextActionsToReach (internalName, maxActions);
-		}
-		
-		/// <summary>Ask to Laalys to provide the next actions to perform in order to reach one of the expert end actions</summary>
-		/// <param name="maxActions">Maximum number of actions returned.</param>
-		/// <return>List of Pairs including a ComponentMonitoring and its associated game action useful to reach one of the expert end actions, the number of actions returned is less or equal to maxActions parameters.</return>
-		public static List<KeyValuePair<ComponentMonitoring, string>> getNextActionsToReachEnd(int maxActions){
-			
-			if (MonitoringManager.Instance == null)
-				throw new TraceAborted ("No MonitoringManager found. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", null);
-			
-			// Ask next actions
-			return MonitoringManager.getNextActionsToReach ("end", maxActions);
+			return MonitoringManager.getNextActionsToReach (fm.fullPn, internalName, maxActions);
 		}
 		
 		/// <summary>Ask to Laalys to provide all triggerable actions</summary>
@@ -211,17 +198,17 @@ namespace FYFY_plugins.Monitoring{
 			return extractTuplesFromActionsName(actions);
 		}
 
-		private static string[] processTrace(string actionName, string performedBy){
-			XmlHandler.addTrace (actionName, performedBy);
-			return MonitoringManager.Instance.analyseToken (actionName, performedBy);
+		private static string[] processTrace(string pnName, string actionName, string performedBy){
+			XmlHandler.addTrace (pnName, actionName, performedBy);
+			return MonitoringManager.Instance.analyseToken (pnName, actionName, performedBy);
 		}
 
-		private static List<KeyValuePair<ComponentMonitoring, string>> getNextActionsToReach(string targetAction, int maxActions){
+		private static List<KeyValuePair<ComponentMonitoring, string>> getNextActionsToReach(string pnName, string targetAction, int maxActions){
 			// be sure that maxActions is greater or equal to 0
 			if (maxActions < 0)
 				maxActions = 0;
 			
-			string[] actions = MonitoringManager.Instance.analyseToken ("NextActionToReach", targetAction, maxActions.ToString());
+			string[] actions = MonitoringManager.Instance.analyseToken ("NextActionToReach", pnName, targetAction, maxActions.ToString());
 			return extractTuplesFromActionsName(actions);
 		}
 		
@@ -281,16 +268,13 @@ namespace FYFY_plugins.Monitoring{
 			if (LaalysProcess.ExitCode < 0) {
 				switch (LaalysProcess.ExitCode) {
 					case -2:
-					case -3:
-						UnityEngine.Debug.LogError ("Laalys Error: in Monitoring Manager component unable to load the \"Full Petri Net Path\": "+fullPetriNetPath);
+						UnityEngine.Debug.LogError ("Laalys Error: in Monitoring Manager component \""+fullPetriNetsPath+"\" no such directory");
 						break;
-					case -5:
+					case -4:
+						UnityEngine.Debug.LogError ("Laalys Error: in Monitoring Manager component \""+filteredPetriNetsPath+"\" no such directory");
+						break;
 					case -6:
-						UnityEngine.Debug.LogError ("Laalys Error: in Monitoring Manager component unable to load the \"Filtered Petri Net Path\": "+filteredPetriNetPath);
-						break;
-					case -8:
-					case -9:
-						UnityEngine.Debug.LogError ("Laalys Error: in Monitoring Manager component unable to load the \"Specifications Path\": "+featuresPath);
+						UnityEngine.Debug.LogError ("Laalys Error: in Monitoring Manager component \""+featuresPath+"\" no such directory");
 						break;
 					default:
 						UnityEngine.Debug.LogError (LaalysProcess.StandardError.ReadToEnd());
@@ -350,16 +334,16 @@ namespace FYFY_plugins.Monitoring{
 					// Launch Laalys
 					if (!File.Exists(laalysPath))
 						UnityEngine.Debug.LogError ("You enabled in game analysis into Monitoring Manager component but you don't defined Laalys path.");
-					else if (fullPetriNetPath == null || fullPetriNetPath == "")
-						UnityEngine.Debug.LogError ("You enabled in game analysis into Monitoring Manager component but you don't defined a full Petri net.");
-					else if (filteredPetriNetPath == null || filteredPetriNetPath == "")
-						UnityEngine.Debug.LogError ("You enabled in game analysis into Monitoring Manager component but you don't defined a filtered Petri net.");
-					else if (featuresPath == null || featuresPath == "")
-						UnityEngine.Debug.LogError ("You enabled in game analysis into Monitoring Manager component but you don't defined a specifications.");
 					else {
+						if (fullPetriNetsPath == null || fullPetriNetsPath == "")
+							fullPetriNetsPath = "./completeNets/";
+						if (filteredPetriNetsPath == null || filteredPetriNetsPath == "")
+							filteredPetriNetsPath = "./filteredNets/";
+						if (featuresPath == null || featuresPath == "")
+							featuresPath = "./features/";
 						LaalysProcess = new Process ();
 						LaalysProcess.StartInfo.FileName = "java.exe";
-						LaalysProcess.StartInfo.Arguments = "-jar "+laalysPath+" -fullPn "+fullPetriNetPath+" -filteredPn "+filteredPetriNetPath+" -features "+featuresPath+" -serverIP localhost -serverPort 12000";
+						LaalysProcess.StartInfo.Arguments = "-jar "+laalysPath+" -fullPn "+fullPetriNetsPath+" -filteredPn "+filteredPetriNetsPath+" -features "+featuresPath+" -serverIP localhost -serverPort 12000";
 						// Options to capture exit code
 						LaalysProcess.StartInfo.CreateNoWindow = false;
 						LaalysProcess.EnableRaisingEvents = true;
@@ -468,7 +452,7 @@ namespace FYFY_plugins.Monitoring{
 				}
 				// Save traces
 				if (Application.isPlaying)
-					XmlHandler.saveTraces (fileName);
+					XmlHandler.saveTraces (SceneManager.GetActiveScene().name);
 				
 				// Destroy all ComponentMonitors
 				for (int i = c_monitors.Count-1 ; i >= 0 ; i--)
