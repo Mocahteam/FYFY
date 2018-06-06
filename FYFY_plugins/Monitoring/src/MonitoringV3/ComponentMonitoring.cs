@@ -9,7 +9,6 @@ namespace FYFY_plugins.Monitoring{
 	/// <summary>
 	/// 	Add monitoring functionalities to a Game Object
 	/// </summary>
-	[Serializable]
 	[ExecuteInEditMode] // Awake, Start... will be call in edit mode
 	[AddComponentMenu("")]
     public class ComponentMonitoring : MonoBehaviour
@@ -86,11 +85,10 @@ namespace FYFY_plugins.Monitoring{
 		internal string getInternalName(string actionName, string exceptionStackTrace, bool processLinks = true, params string[] linksConcerned){
 			TransitionLink transitionLink  = getTransitionLinkByTransitionLabel(actionName);
 			if (transitionLink != null) {
-				ExpressionParser exp_parser = new ExpressionParser ();
 				string logic = transitionLink.logic;
 				// Check logic expression
-				if (exp_parser.isValid (transitionLink)) {
-					string[] exp = exp_parser.getDistribution (logic);
+				if (ExpressionParser.isValid (transitionLink)) {
+					string[] exp = ExpressionParser.getDistribution (logic);
 					List<string> groupLinksByAnd = new List<string> ();
 					List<List<string>> groupAndByOr = new List<List<string>> ();
 					foreach (string s in exp) {
@@ -175,15 +173,21 @@ namespace FYFY_plugins.Monitoring{
 				MonitoringManager mm = MonitoringManager.Instance;
 				// Check if we have to compute a new Id.
 				// This is the case if this id is already used by an other ComponentMonitoring
-				bool needNewId = mm.uniqueMonitoringId2ComponentMonitoring.ContainsKey(id);
+				ComponentMonitoring cm = MonitoringManager.getMonitorById(id);
+				bool needNewId = cm != null;
+				// If we found a monitor with the same id we check if it is not this
 				if (needNewId)
-					needNewId = mm.uniqueMonitoringId2ComponentMonitoring[id] != this;
+					needNewId = cm != this;
 				// OR if id is not initialized
 				needNewId = needNewId || id == -1;
 				
 				if (needNewId) {
 					// Get all used ids
-					List <int> ids = new List<int>(mm.uniqueMonitoringId2ComponentMonitoring.Keys);
+					List <int> ids = new List<int>();
+					foreach (ComponentMonitoring _cm in mm.c_monitors)
+						ids.Add(_cm.id);
+					foreach (FamilyMonitoring _fm in mm.f_monitors)
+						ids.Add(_fm.id);
 					ids.Sort();
 					// Find the first hole available
 					int newId = 0;
@@ -198,10 +202,8 @@ namespace FYFY_plugins.Monitoring{
 					if (petriNet != null)
 						petriNet.attachID(id);
 				}
-				// In all cases we reset entry with this
-				mm.uniqueMonitoringId2ComponentMonitoring[id] = this;
 				// register this monitor
-				MonitoringManager.Instance.registerMonitor(this);
+				mm.registerMonitor(this);
 			} else {
 				throw new NullReferenceException ("You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).");
 			}
@@ -210,7 +212,6 @@ namespace FYFY_plugins.Monitoring{
 		internal void freeUniqueId(){
 			// When launching play, all GameObject are destroyed in editor and new Awake, Start... are launched in play mode. Same when we click on Stop button, OnDestroy is called in play mode and Awake, Start... are launched in editor mode (due to [ExecuteInEditMode] metatag) => Then we have to check if dictionary is already defined in case of MonitoringManager is destroyed before this ComponentMonitoring
 			if (MonitoringManager.Instance != null){
-				MonitoringManager.Instance.uniqueMonitoringId2ComponentMonitoring.Remove(id);
 				MonitoringManager.Instance.unregisterMonitor(this);
 			}
 		}

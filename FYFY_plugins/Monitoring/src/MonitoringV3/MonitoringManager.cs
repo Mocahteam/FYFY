@@ -35,10 +35,6 @@ namespace FYFY_plugins.Monitoring{
 			}
 		}
 		internal static string NEXT_ACTION_TOKEN = "NextActionToReach"; // token used with Laalys intercommunication
-		
-		/// <summary> Association between ids and ComponentMonitoring </summary>
-		[HideInInspector]
-		public Dictionary<int, ComponentMonitoring> uniqueMonitoringId2ComponentMonitoring = new Dictionary<int, ComponentMonitoring>();
 
 		/// <summary>Define the different source that can trigger a game action.</summary>
 		public static class Source {
@@ -59,7 +55,7 @@ namespace FYFY_plugins.Monitoring{
 		internal List<ComponentMonitoring> c_monitors = new List<ComponentMonitoring>(); // used in EditionView
 		[HideInInspector]
 		[SerializeField]
-		private List<FamilyMonitoring> f_monitors = new List<FamilyMonitoring>();
+		internal List<FamilyMonitoring> f_monitors = new List<FamilyMonitoring>();
 		internal List<FamilyAssociation> availableFamilies; // used in EditionView
 		internal class FamilyAssociation {
 			internal string systemName; // The name of the system the family is defined
@@ -83,7 +79,7 @@ namespace FYFY_plugins.Monitoring{
 		/// 	Get monitor with asked id.
 		/// </summary>
 		/// <param name="id">The id of the monitor to get.</param>
-		/// <return> The ComponentMonitoring object associated to the id <see cref="ComponentMonitoring"/>. </return>
+		/// <return> The ComponentMonitoring object associated to the id if it exists. Return null otherwise. <see cref="ComponentMonitoring"/> </return>
 		public static ComponentMonitoring getMonitorById (int id){
 			if (MonitoringManager.Instance == null)
 				throw new TraceAborted ("No MonitoringManager found. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", null);
@@ -94,7 +90,7 @@ namespace FYFY_plugins.Monitoring{
 			foreach (FamilyMonitoring fm in MonitoringManager.Instance.f_monitors)
 				if (fm.id == id)
 					return (ComponentMonitoring) fm;
-			throw new ArgumentException ("No ComponentMonitoring or FamilyMonitoring available for id "+id);
+			return null;
 		}
 		
 		/// <summary>
@@ -199,6 +195,8 @@ namespace FYFY_plugins.Monitoring{
 		}
 
 		private static string[] processTrace(string pnName, string actionName, string performedBy){
+			if (pnName == null || pnName == "")
+				pnName = SceneManager.GetActiveScene().name;
 			XmlHandler.addTrace (pnName, actionName, performedBy);
 			return MonitoringManager.Instance.analyseToken (pnName, actionName, performedBy);
 		}
@@ -221,8 +219,8 @@ namespace FYFY_plugins.Monitoring{
 				// last token is id
 				int id;
 				if (tokens.Length > 2 && Int32.TryParse(tokens[tokens.Length-1], out id)){
-					ComponentMonitoring cm;
-					if (Instance.uniqueMonitoringId2ComponentMonitoring.TryGetValue(id, out cm)){
+					ComponentMonitoring cm = MonitoringManager.getMonitorById(id);
+					if (cm != null){
 						// second to last is game action name => Add pair
 						results.Add(new KeyValuePair<ComponentMonitoring, string>(cm, tokens[tokens.Length-2]));
 					} else
@@ -284,20 +282,24 @@ namespace FYFY_plugins.Monitoring{
 		}
 		
 		internal void registerMonitor (ComponentMonitoring cm){
-			if (cm is FamilyMonitoring)
-				f_monitors.Add((FamilyMonitoring)cm);
+			if (cm is FamilyMonitoring){
+				if (!f_monitors.Contains((FamilyMonitoring)cm))
+					f_monitors.Add((FamilyMonitoring)cm);
+			}
 			else{
-				c_monitors.Add(cm);
-				c_monitors.Sort (delegate(ComponentMonitoring x, ComponentMonitoring y) {
-					if (x == null && y == null)
-						return 0;
-					else if (x == null)
-						return -1;
-					else if (y == null)
-						return 1;
-					else
-						return x.gameObject.name.CompareTo (y.gameObject.name);
-				});
+				if (!c_monitors.Contains(cm)){
+					c_monitors.Add(cm);
+					c_monitors.Sort (delegate(ComponentMonitoring x, ComponentMonitoring y) {
+						if (x == null && y == null)
+							return 0;
+						else if (x == null)
+							return -1;
+						else if (y == null)
+							return 1;
+						else
+							return x.gameObject.name.CompareTo (y.gameObject.name);
+					});
+				}
 			}
 		}
 		
@@ -439,7 +441,7 @@ namespace FYFY_plugins.Monitoring{
         void OnDestroy()
 		{
 			if (Instance == this) {
-				// close Socket
+				// close Socket 
 				if (clientSocket != null)
 					clientSocket.Close ();
 				if (serverSocket != null)
@@ -455,12 +457,14 @@ namespace FYFY_plugins.Monitoring{
 					XmlHandler.saveTraces (SceneManager.GetActiveScene().name);
 				
 				// Destroy all ComponentMonitors
-				for (int i = c_monitors.Count-1 ; i >= 0 ; i--)
+				for (int i = c_monitors.Count-1 ; i >= 0 ; i--){
 					DestroyImmediate(c_monitors[i]);
+				}
 				// Destroy all FamilyMonitorings
-				for (int i = f_monitors.Count-1 ; i >= 0 ; i--)
+				for (int i = f_monitors.Count-1 ; i >= 0 ; i--){
 					if (f_monitors[i])
 						DestroyImmediate(f_monitors[i].gameObject);
+				}
 				
 				Instance = null;
 			}

@@ -125,7 +125,7 @@ namespace FYFY_plugins.Monitoring {
 						// Add this transition to Features
 						XmlHandler.addFeature(fullName, curTransition_copy.label+"_"+monitor.id, publicLabel, transitionLink.isSystemAction, transitionLink.isEndAction);
 						
-						Node oldTransition = curTransition_copy;
+						Node oldTransition = curTransition_copy; 
 						if (isNullOrWhiteSpace(transitionLink.logic))
 						{
 							// Default : And of all link
@@ -147,13 +147,12 @@ namespace FYFY_plugins.Monitoring {
 						}
 						else
 						{
-							ExpressionParser expr_parser = new ExpressionParser();
-							if (expr_parser.isValid(transitionLink))
+							if (ExpressionParser.isValid(transitionLink))
 							{
 								// Logic expression is valid
 
 								// Distribute expression
-								string[] exp = expr_parser.getDistribution(transitionLink.logic);
+								string[] exp = ExpressionParser.getDistribution(transitionLink.logic);
 
 								int or = 0;
 

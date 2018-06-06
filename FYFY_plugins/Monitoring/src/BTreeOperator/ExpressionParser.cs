@@ -7,7 +7,7 @@ namespace FYFY_plugins.Monitoring {
 	/// <summary>Parser of logic expressions.</summary>
 	public class ExpressionParser{
 
-		internal string[] getDistribution(string exp){
+		internal static string[] getDistribution(string exp){
 			string[] tokens = parseExpression (exp);
 		
 			BTreeNode<string> tree = treeBuilder (tokens);
@@ -17,9 +17,14 @@ namespace FYFY_plugins.Monitoring {
 			string[] distrib = tree.getInfixValues ();
 	        return distrib;
 		}
+		
+		/// <summary>Check if a linkLabel doesn't contain one of these reserved tokens "()[]*+ ".</summary>
+		public static bool checkPrerequisite (string linkLabel){
+			return !linkLabel.Contains ("(") && !linkLabel.Contains (")") && !linkLabel.Contains ("[") && !linkLabel.Contains ("]") && !linkLabel.Contains ("*") && !linkLabel.Contains ("+") && !linkLabel.Contains (" ");
+		}
 
 		/// <summary>Check if a transitionLink contains a valid logix expression.</summary>
-		public bool isValid(TransitionLink tLink){
+		public static bool isValid(TransitionLink tLink){
 			string exp = tLink.logic;
 
 	        if (exp == null || exp.Length == 0)
@@ -27,6 +32,8 @@ namespace FYFY_plugins.Monitoring {
 
 			// Change all known link with true
 			foreach (Link l in tLink.links) {
+				if (!checkPrerequisite(l.label))
+					return false;
 				exp = Regex.Replace (exp, "^" + l.label + "$", "true");
 				exp = Regex.Replace (exp, "^" + l.label + "([*+ ])", "true$1");
 				exp = Regex.Replace (exp, "([(*+ ])(" + l.label + ")([)*+ ])", "$1true$3");
@@ -80,7 +87,7 @@ namespace FYFY_plugins.Monitoring {
 			return po == pf && !badOp;*/
 		}
 
-		string[] parseExpression(string exp){
+		static string[] parseExpression(string exp){
 			List<string> lStr = new List<string> ();
 			List<char> word = new List<char> ();
 			for (int i = 0; i < exp.Length; i++) {
@@ -105,13 +112,13 @@ namespace FYFY_plugins.Monitoring {
 		
 		}
 
-		void distribute(BTreeNode<string> tree){
+		static void distribute(BTreeNode<string> tree){
 
 			distribute (tree,tree);
 		}
 
 
-		void distribute(BTreeNode<string> root,BTreeNode<string> tree){
+		static void distribute(BTreeNode<string> root,BTreeNode<string> tree){
 
 			// Stop condition
 			if (tree == null || tree.isLeaf ()) {
@@ -152,7 +159,7 @@ namespace FYFY_plugins.Monitoring {
 			}
 		}
 
-		string[] removeParentesis(string[] tokens){
+		static string[] removeParentesis(string[] tokens){
 			
 			List<string> tmpList = new List<string> ();
 			foreach(string s in tokens){
@@ -163,7 +170,7 @@ namespace FYFY_plugins.Monitoring {
 			return tmpList.ToArray ();
 		}
 
-		BTreeNode<string> treeBuilder(string[] tokens){
+		static BTreeNode<string> treeBuilder(string[] tokens){
 			// Stop condition
 			if (tokens.Length == 0) {
 				return null;
@@ -183,11 +190,11 @@ namespace FYFY_plugins.Monitoring {
 		}
 			
 			
-		int getIndexOfMinPriority(List<string> expressions){ 
+		static int getIndexOfMinPriority(List<string> expressions){ 
 			return getIndexOfMinPriority (expressions.ToArray());
 		}
 
-		int getIndexOfMinPriority(string[] expressions){
+		static int getIndexOfMinPriority(string[] expressions){
 			int tmpVal = int.MaxValue;
 			int tmpIndex = -1;
 

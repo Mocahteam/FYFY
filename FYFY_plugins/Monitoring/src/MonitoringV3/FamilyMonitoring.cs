@@ -8,7 +8,6 @@ namespace FYFY_plugins.Monitoring{
 	/// <summary>
 	/// 	Add monitoring functionalities to a Family
 	/// </summary>
-	[Serializable]
 	[ExecuteInEditMode] // Awake, Start... will be call in edit mode
 	[AddComponentMenu("")]
 	public class FamilyMonitoring : ComponentMonitoring
