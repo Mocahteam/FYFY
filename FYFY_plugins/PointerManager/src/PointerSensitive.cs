@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using FYFY;
+using System.Collections.Generic;
 
 namespace FYFY_plugins.PointerManager {
 	/// <summary>
@@ -17,10 +19,22 @@ namespace FYFY_plugins.PointerManager {
 		private int _cpt = 0;
 		
 		private void OnDisable(){
+			_cpt = 1; // force counter to 1 and ask to remove pointerOver if one exists
 			removePointerOver();
 		}
 		
+		// WARNING bug identified and not resolved: If we move mouse pointer over a game object with a PointerSensitive and this.enabled is set to false and finally to true, no PointerOver will be added to the game object even if mouse pointer is still over the game object.
+		//
+		// Why?
+		// In Unity all component could be "disabled/enabled" by two ways :
+		//  - this.gameObject.SetActive(true/false) => it enables/disables the game object and not this component but it will call anyway OnEnable/OnDisable of this component
+		//  - this.enabled = true/false => it enables/disables this component and not the game object and it will call of course OnEnable/OnDisable of this component
+		// When we use this.gameObject.SetActive, all On...Enter/Exit functions will be call. This is very cool for us because PointerOver will be properly set.
+		// But if we use this.enabled, no one On..Enter/Exit functions will be call. In this case even if the mouse pointer is over the game object when enabling is set, no PointerOver will be added...
+		// The problem is not for disabling step, indeed in both cases we want to remove existing PointerOver. The problem occurs on enabling step, if enabling is due to this.gameObject.SetActive nothing is required but if enabling is due to this.enabled we would emulate On...Enter functions (with Raycast for instance). But because we don't know which case fired OnEnable function, we don't know if we have to call Raycast.
+		
 		private void OnDestroy(){
+			_cpt = 1; // force counter to 1 to force PointerOver removing if one exists
 			removePointerOver();
 		}
 		
@@ -78,7 +92,8 @@ namespace FYFY_plugins.PointerManager {
 					GameObjectManager.removeComponent<PointerOver>(this.gameObject, true);
 				}
 			}
-			_cpt--;
+			if (_cpt > 0)
+				_cpt--;
 		}
 		
 		private void addPointerOver(){
