@@ -23,7 +23,7 @@ namespace FYFY_plugins.TriggerManager {
 				// If not, we have to use FYFY to add Triggered3D in order to keep families synchronized.
 				// If so, we don't add this action because it will be queued after unbind and will not be able to proceed (unknown game object).
 				Transform[] parents = this.gameObject.GetComponentsInParent<Transform>(true); // this.gameobject.transform is include
-				if (!GameObjectManager.containUnbindActionFor(parents)){
+				if (!GameObjectManager.containActionFor(typeof(UnbindGameObject), parents)){
 					GameObject target = other.gameObject;
 					if (_targets.ContainsKey(target))
 						return;
@@ -121,7 +121,7 @@ namespace FYFY_plugins.TriggerManager {
 				// If not, we have to use FYFY to remove Triggered3D in order to keep families synchronized.
 				// If so, we can't use FYFY because "remove" action will be queued after unbind and will not be able to proceed (unknown game object). Then we have to remove Triggered3D component thanks to classic Unity function.
 				Transform[] parents = this.gameObject.GetComponentsInParent<Transform>(true); // this.gameobject.transform is include
-				if (GameObjectManager.containUnbindActionFor(parents)){
+				if (GameObjectManager.containActionFor(typeof(UnbindGameObject), parents)){
 					// We find an unbind action, then we remove Triggered3D component with classic Unity function
 					Triggered3D component = GetComponent<Triggered3D>();
 					Object.Destroy(component);

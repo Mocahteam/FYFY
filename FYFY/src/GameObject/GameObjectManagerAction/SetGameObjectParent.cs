@@ -13,6 +13,10 @@ namespace FYFY {
 			_worldPositionStays = worldPositionStays;
 			_exceptionStackTrace = exceptionStackTrace;
 		}
+		
+		GameObject IGameObjectManagerAction.getTarget(){
+			return _gameObject;
+		}
 
 		void IGameObjectManagerAction.perform() {
 			if(_gameObject == null) {

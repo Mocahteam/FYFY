@@ -293,13 +293,13 @@ namespace FYFY {
 		}
 		
 		// used in pluggins (TriggerSensitive / CollisionSensitive / PointerOver)
-		internal static bool containUnbindActionFor(Transform[] goTransforms){
+		internal static bool containActionFor(System.Type actionType, Transform[] goTransforms){
 			foreach(IGameObjectManagerAction action in _delayedActions) {
-				if(action.GetType() == typeof(UnbindGameObject)) {
-					GameObject go = (action as UnbindGameObject)._gameObject;
+				if(action.GetType() == actionType) {
+					GameObject go = action.getTarget();
 					foreach(Transform t in goTransforms) {
 						if(t.gameObject == go) {
-							// We find an unbind action for one of the game object of the set
+							// We find an action of asked type for one of the game object of the set
 							return true;
 						}
 					}

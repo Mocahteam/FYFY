@@ -12,6 +12,10 @@ namespace FYFY {
 			_gameObjectId = _gameObject.GetInstanceID();
 			_exceptionStackTrace = exceptionStrackTrace;
 		}
+		
+		GameObject IGameObjectManagerAction.getTarget(){
+			return _gameObject;
+		}
 
 		void IGameObjectManagerAction.perform() {
 			if(GameObjectManager._gameObjectWrappers.ContainsKey(_gameObjectId) == false){

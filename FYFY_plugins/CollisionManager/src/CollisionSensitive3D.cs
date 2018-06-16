@@ -25,7 +25,7 @@ namespace FYFY_plugins.CollisionManager {
 				// If not, we have to use FYFY to add InCollision3D in order to keep families synchronized.
 				// If so, we don't add this action because it will be queued after unbind and will not be able to proceed (unknown game object).
 				Transform[] parents = this.gameObject.GetComponentsInParent<Transform>(true); // this.gameobject.transform is include
-				if (!GameObjectManager.containUnbindActionFor(parents)){
+				if (!GameObjectManager.containActionFor(typeof(UnbindGameObject), parents)){
 					GameObject target = coll.gameObject;
 					if (_targets.ContainsKey(target))
 						return;
@@ -132,7 +132,7 @@ namespace FYFY_plugins.CollisionManager {
 				// If so, we can't use FYFY because "remove" action will be queued after unbind and will not be able to proceed (unknown game object). Then we have to remove InCollision3D component thanks to classic Unity function.
 				// If not, we have to use FYFY to remove InCollision3D in order to keep families synchronized.
 				Transform[] parents = this.gameObject.GetComponentsInParent<Transform>(true); // this.gameobject.transform is include
-				if (GameObjectManager.containUnbindActionFor(parents)){
+				if (GameObjectManager.containActionFor(typeof(UnbindGameObject), parents)){
 					// We find an unbind action, then we remove InCollision3D component with classic Unity function
 					InCollision3D component = GetComponent<InCollision3D>();
 					Object.Destroy(component);

@@ -11,6 +11,10 @@ namespace FYFY {
 			_tag = tag;
 			_exceptionStackTrace = exceptionStackTrace;
 		}
+		
+		GameObject IGameObjectManagerAction.getTarget(){
+			return _gameObject;
+		}
 
 		void IGameObjectManagerAction.perform() {
 			if(_gameObject == null) {

@@ -21,6 +21,10 @@ namespace FYFY {
 
 			_exceptionStackTrace = exceptionStackTrace;
 		}
+		
+		GameObject IGameObjectManagerAction.getTarget(){
+			return _gameObject;
+		}
 
 		void IGameObjectManagerAction.perform(){ // before this call GO is like a ghost for FYFY (not known by families but present into the scene)
 			if(_gameObject == null) { // The GO has been destroyed !!!

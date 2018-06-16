@@ -12,6 +12,10 @@ namespace FYFY {
 			_componentValues = componentValues;
 			_exceptionStackTrace = exceptionStackTrace;
 		}
+		
+		GameObject IGameObjectManagerAction.getTarget(){
+			return _gameObject;
+		}
 
 		void IGameObjectManagerAction.perform() {
 			if(_gameObject == null) {
@@ -64,6 +68,10 @@ namespace FYFY {
 			_componentType = componentType;
 			_componentValues = componentValues;
 			_exceptionStackTrace = exceptionStackTrace;
+		}
+		
+		GameObject IGameObjectManagerAction.getTarget(){
+			return _gameObject;
 		}
 
 		void IGameObjectManagerAction.perform() {
