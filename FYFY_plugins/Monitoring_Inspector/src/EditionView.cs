@@ -157,10 +157,16 @@ namespace FYFY_plugins.Monitoring {
 							}
 							EditorGUILayout.EndHorizontal ();
 						}
-						string newLabel = EditorGUILayout.TextField (new GUIContent("Full Petri net:", "You can define the name of the parent Petri net in which this monitor will be merged (default: the scene name)."), cm.fullPn);
-						if (newLabel != cm.fullPn) {
+						// Be sure that Petri net selected is not over the MonitoringManager list
+						if (cm.fullPnSelected >= mm.PetriNetsName.Count)
+							cm.fullPnSelected = 0;
+						templates_id = new List<GUIContent>();
+						foreach (string name in mm.PetriNetsName)
+							templates_id.Add(new GUIContent(name));
+						int pnSelected = EditorGUILayout.Popup(new GUIContent("Affect to Full Petri net:", "Add this monitor to the selected full Petri net. This list is defined in MonitoringManager component."), cm.fullPnSelected, templates_id.ToArray());
+						if (pnSelected != cm.fullPnSelected) {
 							Undo.RecordObject (cm, "Update Export Petri net");
-							cm.fullPn = newLabel;
+							cm.fullPnSelected = pnSelected;
 						}
 						EditorGUIUtility.labelWidth = 125;
 						EditorGUI.indentLevel -= 2;
@@ -269,10 +275,16 @@ namespace FYFY_plugins.Monitoring {
 								}
 								EditorGUILayout.EndHorizontal ();
 							}
-							string newLabel = EditorGUILayout.TextField (new GUIContent("Full Petri net:", "You can define the name of the full Petri net in which this monitor will be merged (default: the scene name)."), fm.fullPn);
-							if (newLabel != fm.fullPn) {
+							// Be sure that Petri net selected is not over the MonitoringManager list
+							if (fm.fullPnSelected >= mm.PetriNetsName.Count)
+								fm.fullPnSelected = 0;
+							templates_id = new List<GUIContent>();
+							foreach (string name in mm.PetriNetsName)
+								templates_id.Add(new GUIContent(name));
+							int pnSelected = EditorGUILayout.Popup(new GUIContent("Affect to Full Petri net:", "Add this monitor to the selected full Petri net. This list is defined in MonitoringManager component."), fm.fullPnSelected, templates_id.ToArray());
+							if (pnSelected != fm.fullPnSelected) {
 								Undo.RecordObject (fm, "Update Export Petri net");
-								fm.fullPn = newLabel;
+								fm.fullPnSelected = pnSelected;
 							}
 							EditorGUIUtility.labelWidth = 125;
 							EditorGUI.indentLevel -= 2;
@@ -336,36 +348,27 @@ namespace FYFY_plugins.Monitoring {
 				if (!validFileType)
 					EditorUtility.DisplayDialog ("Action aborted", "Only files with .pnml extension are compatible", "Close");
 				else {
-					// Check if this Pnml file is not already attached to an other monitor of this Game Object
-					bool samePnmlFound = false;
-					foreach (ComponentMonitoring other in monitor.gameObject.GetComponents<ComponentMonitoring>())
-						if (other != monitor && other.PnmlFile != null && other.PnmlFile.name == tmp.name)
-							samePnmlFound = true;
-					if (samePnmlFound)
-						EditorUtility.DisplayDialog ("Action aborted", "A Pnml file with the same name is already attached to this Game Object.", "Close");
-					else {
-						if (tmp != monitor.PnmlFile) {
-							Undo.RecordObject (monitor, "Change PNML file");
-							// Loading
-							monitor.PnmlFile = tmp;
-							monitor.PetriNet = PetriNet.loadFromFile (AssetDatabase.GetAssetPath (monitor.PnmlFile), monitor.id);
-							flagTransition = 0;
-						}
-						// Add comments field
-						EditorGUILayout.LabelField ("Comments:");
-						string newComment = EditorGUILayout.TextArea (monitor.comments);
-						if (newComment != monitor.comments) {
-							Undo.RecordObject (monitor, "Update Comments");
-							monitor.comments = newComment;
-						}
-						// Draw states
-						EditorGUILayout.LabelField ("", GUI.skin.horizontalSlider);
-						DrawStates (monitor);
-						EditorGUILayout.LabelField ("", GUI.skin.horizontalSlider);
-						// Draw actions
-						DrawActions (monitor);
-						EditorGUILayout.LabelField ("", GUI.skin.horizontalSlider);
+					if (tmp != monitor.PnmlFile) {
+						Undo.RecordObject (monitor, "Change PNML file");
+						// Loading
+						monitor.PnmlFile = tmp;
+						monitor.PetriNet = PetriNet.loadFromFile (AssetDatabase.GetAssetPath (monitor.PnmlFile), monitor.id);
+						flagTransition = 0;
 					}
+					// Add comments field
+					EditorGUILayout.LabelField ("Comments:");
+					string newComment = EditorGUILayout.TextArea (monitor.comments);
+					if (newComment != monitor.comments) {
+						Undo.RecordObject (monitor, "Update Comments");
+						monitor.comments = newComment;
+					}
+					// Draw states
+					EditorGUILayout.LabelField ("", GUI.skin.horizontalSlider);
+					DrawStates (monitor);
+					EditorGUILayout.LabelField ("", GUI.skin.horizontalSlider);
+					// Draw actions
+					DrawActions (monitor);
+					EditorGUILayout.LabelField ("", GUI.skin.horizontalSlider);
 				}
 			}
 			EditorGUILayout.EndScrollView ();

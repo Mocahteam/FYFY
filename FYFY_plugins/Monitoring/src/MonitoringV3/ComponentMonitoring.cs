@@ -31,7 +31,7 @@ namespace FYFY_plugins.Monitoring{
 		
 		/// <summary> Name of the parent Petri net to include this monitor</summary>
 		[HideInInspector]
-		public string fullPn;
+		public int fullPnSelected = 0;
 
 		/// <summary> List of transitions influenced by links. </summary>
 		[HideInInspector] 
@@ -66,7 +66,7 @@ namespace FYFY_plugins.Monitoring{
 			for (int i = 0 ; i < template.transitionLinks.Count ; i++){
 				this.transitionLinks[i].import(template.transitionLinks[i]);
 			}
-			this.fullPn = template.fullPn;
+			this.fullPnSelected = template.fullPnSelected;
 		}
 
 		/// <summary> Look for a transition matching with label influenced by links </summary>

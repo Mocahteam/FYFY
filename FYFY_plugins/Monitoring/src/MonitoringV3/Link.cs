@@ -64,7 +64,8 @@ namespace FYFY_plugins.Monitoring{
 			return places.ToArray();
 		}
 
-		internal Node getPlaceFromLinkedObject (int i){
+		internal Node getPlace (){
+			int i = placeId;
 			if (linkedObject != null) {
 				foreach (ComponentMonitoring m in linkedObject.GetComponents<ComponentMonitoring> ()) {
 					if (m.PetriNet != null) {
@@ -76,6 +77,22 @@ namespace FYFY_plugins.Monitoring{
 				}
 			}
 			return null;
+		}
+		
+		internal bool isCompatibleWithPnName(int fullPnId){
+			int i = placeId;
+			if (linkedObject != null) {
+				foreach (ComponentMonitoring m in linkedObject.GetComponents<ComponentMonitoring> ()) {
+					if (m.PetriNet != null) {
+						if (m.PetriNet.places.Count <= i || m.fullPnSelected != fullPnId)
+							i -= m.PetriNet.places.Count;
+						else
+							return i >= 0;
+					}
+				}
+				return false;
+			} else
+				return true;
 		}
     }
 }

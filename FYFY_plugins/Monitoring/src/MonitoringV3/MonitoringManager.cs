@@ -43,7 +43,7 @@ namespace FYFY_plugins.Monitoring{
 			/// <summary></summary>
 			public static string PLAYER = "player";
 		};
-			
+		
 		private TcpListener serverSocket = null;
 		private TcpClient clientSocket = null;
 		private NetworkStream networkStream = null;
@@ -64,6 +64,8 @@ namespace FYFY_plugins.Monitoring{
 			internal string equivWith; // formated name of the first equivalent family defined in another system
 		}
 
+		/// <summary>List of Petri Nets name</summary>
+		public List<string> PetriNetsName = null;
 		/// <summary>Is analysis run in game?</summary>
 		public bool inGameAnalysis;
 		/// <summary>Full Petri nets location to use if in game analysis is enabled</summary>
@@ -111,7 +113,10 @@ namespace FYFY_plugins.Monitoring{
 				throw new TraceAborted ("No MonitoringManager found. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", null);
 
 			string internalName = cm.getInternalName(actionName, exceptionStackTrace, processLinks, linksConcerned);
-			return MonitoringManager.processTrace (cm.fullPn, internalName, performedBy);
+			if (cm.fullPnSelected >= MonitoringManager.Instance.PetriNetsName.Count)
+				cm.fullPnSelected = 1;
+			string pnName = MonitoringManager.Instance.PetriNetsName[cm.fullPnSelected];
+			return MonitoringManager.processTrace (pnName, internalName, performedBy);
 		}
 		
 		/// <summary>
@@ -136,7 +141,10 @@ namespace FYFY_plugins.Monitoring{
 				throw new TraceAborted ("No monitor found for this family.", null);
 
 			string internalName = fm.getInternalName(actionName, exceptionStackTrace, processLinks, linksConcerned);
-			return MonitoringManager.processTrace (fm.fullPn, internalName, performedBy);
+			if (fm.fullPnSelected >= MonitoringManager.Instance.PetriNetsName.Count)
+				fm.fullPnSelected = 1;
+			string pnName = MonitoringManager.Instance.PetriNetsName[fm.fullPnSelected];
+			return MonitoringManager.processTrace (pnName, internalName, performedBy);
 		}
 		
 		/// <summary>
@@ -156,7 +164,10 @@ namespace FYFY_plugins.Monitoring{
 				throw new TraceAborted ("No MonitoringManager found. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", null);
 
 			string internalName = cm.getInternalName(targetedActionName, exceptionStackTrace, true, linksConcerned);
-			return MonitoringManager.getNextActionsToReach (cm.fullPn, internalName, maxActions);
+			if (cm.fullPnSelected >= MonitoringManager.Instance.PetriNetsName.Count)
+				cm.fullPnSelected = 1;
+			string pnName = MonitoringManager.Instance.PetriNetsName[cm.fullPnSelected];
+			return MonitoringManager.getNextActionsToReach (pnName, internalName, maxActions);
 		}
 		
 		/// <summary>
@@ -180,7 +191,10 @@ namespace FYFY_plugins.Monitoring{
 				throw new TraceAborted ("No monitor found for this family", null);
 
 			string internalName = fm.getInternalName(targetedActionName, exceptionStackTrace, true, linksConcerned);
-			return MonitoringManager.getNextActionsToReach (fm.fullPn, internalName, maxActions);
+			if (fm.fullPnSelected >= MonitoringManager.Instance.PetriNetsName.Count)
+				fm.fullPnSelected = 1;
+			string pnName = MonitoringManager.Instance.PetriNetsName[fm.fullPnSelected];
+			return MonitoringManager.getNextActionsToReach (pnName, internalName, maxActions);
 		}
 		
 		/// <summary>Ask to Laalys to provide all triggerable actions</summary>
@@ -325,6 +339,11 @@ namespace FYFY_plugins.Monitoring{
 				UnityEngine.Debug.LogError ("Only one MonitoringManager component could be instantiate in a scene.");
 				DestroyImmediate (this);
 				return;
+			}
+			
+			if (PetriNetsName == null){
+				PetriNetsName = new List<string>();
+				PetriNetsName.Add(SceneManager.GetActiveScene().name);
 			}
 
 			if (Application.isPlaying && inGameAnalysis) {
