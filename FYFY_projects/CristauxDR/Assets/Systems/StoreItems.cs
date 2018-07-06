@@ -6,7 +6,7 @@ using FYFY_plugins.PointerManager;
 using FYFY_plugins.Monitoring;
 
 public class StoreItems : FSystem {
-	private Family inGameObjects = FamilyManager.getFamily(new AllOfComponents(typeof(Triggered3D), typeof(PointerOver), typeof(Takable), typeof(ComponentMonitoring)), new AllOfProperties(PropertyMatcher.PROPERTY.ENABLED));
+	private Family inGameObjects = FamilyManager.getFamily(new AllOfComponents(typeof(Triggered3D), typeof(PointerOver), typeof(Takable), typeof(ComponentMonitoring)), new AllOfProperties(PropertyMatcher.PROPERTY.ACTIVE_IN_HIERARCHY));
 
 	// Use to process your families.
 	protected override void onProcess(int familiesUpdateCount) {
@@ -22,7 +22,7 @@ public class StoreItems : FSystem {
 				GameObjectManager.setGameObjectState (item.linkedWith, true);
 				GameObjectManager.setGameObjectState (go, false);
 				// trace this action
-				cm.trace("perform", MonitoringManager.Source.PLAYER);
+				MonitoringManager.trace(cm, "perform", MonitoringManager.Source.PLAYER);
 			}
 		}
 	}

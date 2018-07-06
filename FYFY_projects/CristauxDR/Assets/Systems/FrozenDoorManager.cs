@@ -20,9 +20,9 @@ public class FrozenDoorManager : FSystem {
 					Door door = door_GO.GetComponent<Door> ();
 					ComponentMonitoring monitor = door_GO.GetComponent<ComponentMonitoring> ();
 					if (door.isOpen) {
-						monitor.trace ("turnOff", MonitoringManager.Source.PLAYER);
+						MonitoringManager.trace (monitor, "turnOff", MonitoringManager.Source.PLAYER);
 					} else {
-						monitor.trace ("turnOn", MonitoringManager.Source.PLAYER);
+						MonitoringManager.trace (monitor, "turnOn", MonitoringManager.Source.PLAYER);
 					}
 					// Check constraints on the door
 					if (door.constraint == null || door.constraint.activeInHierarchy) {

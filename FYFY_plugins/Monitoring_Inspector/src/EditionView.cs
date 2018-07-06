@@ -542,6 +542,8 @@ namespace FYFY_plugins.Monitoring {
 											if (newPlaceId != link.placeId) {
 												Undo.RecordObject (monitor, "Update Link Target");
 												link.placeId = newPlaceId;
+												if (!link.isCompatibleWithPnName(monitor.fullPnSelected))
+													EditorUtility.DisplayDialog ("Warning!!!", "This selected state is part of a full Petri net different from the one associated to this monitor. Affect these two monitors to the same Petri net otherwise final full Petri nets building will fail.", "Close");
 											}
 											EditorGUIUtility.labelWidth = 0; // reset default value
 											EditorGUI.indentLevel += 1;

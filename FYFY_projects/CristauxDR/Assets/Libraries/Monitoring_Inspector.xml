@@ -9,5 +9,13 @@
             	Custom UI for editing monitoring.
             </summary>
         </member>
+        <member name="T:FYFY_plugins.Monitoring.MonitoringManagerInspector">
+            <summary>
+            	Custom inspector automatically used by Unity Editor when a <see cref="T:FYFY_plugins.Monitoring.MonitoringManager"/> is found in inspector view.
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.MonitoringManagerInspector.OnInspectorGUI">
+            <summary></summary>
+        </member>
     </members>
 </doc>

@@ -36,10 +36,10 @@ public class LeverManager : FSystem {
 					SpriteRenderer sr = leverFocused_GO.GetComponent<SpriteRenderer> ();
 					if (lever.isOn) {
 						sr.sprite = lever.on;
-						fm.trace("turnOn", MonitoringManager.Source.PLAYER);
+						MonitoringManager.trace(fm, "turnOn", MonitoringManager.Source.PLAYER);
 					} else {
 						sr.sprite = lever.off;
-						fm.trace("turnOff", MonitoringManager.Source.PLAYER);
+						MonitoringManager.trace(fm, "turnOff", MonitoringManager.Source.PLAYER);
 					}
 				}
 			}

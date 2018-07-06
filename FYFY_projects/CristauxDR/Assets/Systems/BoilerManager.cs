@@ -19,9 +19,9 @@ public class BoilerManager : FSystem {
 					ComponentMonitoring cm = boiler_go.GetComponent<ComponentMonitoring> (); 
 					Boiler boiler = boiler_go.GetComponent<Boiler> ();
 					if (boiler.isOn)
-						cm.trace ("turnOff", MonitoringManager.Source.PLAYER);
+						MonitoringManager.trace (cm, "turnOff", MonitoringManager.Source.PLAYER);
 					else
-						cm.trace ("turnOn", MonitoringManager.Source.PLAYER);
+						MonitoringManager.trace (cm, "turnOn", MonitoringManager.Source.PLAYER);
 					// Check if boiler is on OR boiler is not constrained OR the constraint is ok
 					if (boiler.isOn || boiler.constraint == null || boiler.constraint.activeInHierarchy) {
 						Animator anim = boiler_go.GetComponent<Animator> ();

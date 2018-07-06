@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using FYFY_plugins.Monitoring;
 
 public class InventoryManager : FSystem {
-	private Family inInventoryObjectsFocused = FamilyManager.getFamily(new AllOfComponents(typeof(PointerOver), typeof(ComponentMonitoring)), new AllOfProperties(PropertyMatcher.PROPERTY.ENABLED), new AnyOfLayers(5)); // Layer 5 == UI
+	private Family inInventoryObjectsFocused = FamilyManager.getFamily(new AllOfComponents(typeof(PointerOver), typeof(ComponentMonitoring)), new AllOfProperties(PropertyMatcher.PROPERTY.ACTIVE_IN_HIERARCHY), new AnyOfLayers(5)); // Layer 5 == UI
 	private Family highlightable = FamilyManager.getFamily(new AllOfComponents(typeof(PointerOver), typeof(Image)), new AnyOfLayers(5)); // Layer 5 == UI
 	private Family itemSelected = FamilyManager.getFamily(new AllOfComponents(typeof(CurrentSelection), typeof(ComponentMonitoring)));
 	private Dictionary<int, GameObject> goId2GO = new Dictionary<int, GameObject> ();
@@ -67,10 +67,10 @@ public class InventoryManager : FSystem {
 					if (item.GetInstanceID() == focused_GO.GetInstanceID()) {
 						alreadySelected = true;
 						// already selected => player deselect the item
-						cmItem.trace ("turnOff", MonitoringManager.Source.PLAYER);
+						MonitoringManager.trace (cmItem, "turnOff", MonitoringManager.Source.PLAYER);
 					} else {
 						// player select another item  => System action to storeback current item
-						cmItem.trace ("turnOff", MonitoringManager.Source.SYSTEM);
+						MonitoringManager.trace (cmItem, "turnOff", MonitoringManager.Source.SYSTEM);
 					}
 				}
 				if (!alreadySelected) {
@@ -79,7 +79,7 @@ public class InventoryManager : FSystem {
 					// Get its monitor
 					ComponentMonitoring cm = focused_GO.GetComponent<ComponentMonitoring>();
 					// player select a new item
-					cm.trace("turnOn", MonitoringManager.Source.PLAYER);
+					MonitoringManager.trace(cm, "turnOn", MonitoringManager.Source.PLAYER);
 				}
 			}
 		}

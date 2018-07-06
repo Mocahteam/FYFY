@@ -31,7 +31,7 @@ public class ExitManager : FSystem {
 			// Check if hero is near to exit (only hero can produce this component thanks to Unity Physics layers)
 			Triggered3D triggered = exit_GO.GetComponent<Triggered3D> ();
 			if (triggered != null) {
-				monitor.trace("perform", MonitoringManager.Source.PLAYER);
+				MonitoringManager.trace(monitor, "perform", MonitoringManager.Source.PLAYER);
 				GameObjectManager.setGameObjectState (endScreen_GO, true);
 				foreach (FSystem sys in FSystemManager.fixedUpdateSystems())
 					sys.Pause = true;

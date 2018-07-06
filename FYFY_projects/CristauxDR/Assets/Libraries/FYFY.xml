@@ -125,7 +125,7 @@
         </member>
         <member name="T:FYFY.Family">
             <summary>
-            	<c>Family</c> is a container of <c>GameObjects</c> which respect contraints specified by <see cref="T:FYFY.Matcher"/>.
+            	<c>Family</c> is a container of <c>GameObjects</c> which respect constraints specified by <see cref="T:FYFY.Matcher"/>.
             </summary>
             <remarks>
             	<para>The family is updated before each <c>FixedUpdate</c>, <c>Update</c>, <c>LateUpdate</c> blocks of the <see cref="T:FYFY.MainLoop"/>.</para>
@@ -147,6 +147,15 @@
             </summary>
             <returns>
             	The enumerator.
+            </returns>
+        </member>
+        <member name="M:FYFY.Family.getAt(System.Int32)">
+            <summary>
+            	Gets the GameObject at the specified index <see cref="T:FYFY.Family"/>.
+            	Warning: this function can return null if a Game Object is Destroyed without beeing unbinded, you still have to unbind Game Object before destroying them.
+            </summary>
+            <returns>
+            	The GameObject at the specified index.
             </returns>
         </member>
         <member name="M:FYFY.Family.contains(System.Int32)">
@@ -176,6 +185,16 @@
         <member name="M:FYFY.Family.Equals(FYFY.Family)">
             <summary>
             	Check if two families are equals.
+            </summary>
+        </member>
+        <member name="M:FYFY.Family.Equals(System.String[])">
+            <summary>
+            	Check if this is equal with descriptor
+            </summary>
+        </member>
+        <member name="M:FYFY.Family.getDescriptor">
+            <summary>
+            	Return a descriptor of this family
             </summary>
         </member>
         <member name="M:FYFY.Family.First">
@@ -349,6 +368,14 @@
             </remarks>
             <param name="sceneName">
             	Name of the scene to load.
+            </param>
+        </member>
+        <member name="M:FYFY.GameObjectManager.dontDestroyOnLoadAndRebind(UnityEngine.GameObject)">
+            <summary>
+            	Makes the game object target not be destroyed automatically when loading a new scene and rebind it automatically with FYFY.
+            </summary>
+            <param name="target">
+            	The game object to configure.
             </param>
         </member>
         <member name="M:FYFY.GameObjectManager.bind(UnityEngine.GameObject)">
@@ -628,14 +655,14 @@
             	List of properties of GameObject which can be used by the PropertyMatcher.
             </summary>
         </member>
-        <member name="F:FYFY.PropertyMatcher.PROPERTY.ENABLED">
+        <member name="F:FYFY.PropertyMatcher.PROPERTY.ACTIVE_SELF">
             <summary>
-            	The GameObject has the variables <c>activeInHierarchy</c> and <c>activeSelf</c> true.
+            	The GameObject has the variables <c>activeSelf</c> true.
             </summary>
         </member>
-        <member name="F:FYFY.PropertyMatcher.PROPERTY.DISABLED">
+        <member name="F:FYFY.PropertyMatcher.PROPERTY.ACTIVE_IN_HIERARCHY">
             <summary>
-            	The GameObject has at least one of the variables <c>activeInHierarchy</c> or <c>activeSelf</c> false.
+            	The GameObject has the variables <c>activeInHierarchy</c> true.
             </summary>
         </member>
         <member name="F:FYFY.PropertyMatcher.PROPERTY.HAS_PARENT">

@@ -16,7 +16,7 @@ public class RoomManager : FSystem {
 
 	private void onEnterRoom (GameObject go){
 		ComponentMonitoring monitor = go.GetComponent<ComponentMonitoring> ();
-		monitor.trace ("turnOn", MonitoringManager.Source.PLAYER);
+		MonitoringManager.trace (monitor, "turnOn", MonitoringManager.Source.PLAYER);
 		id2GO.Add (go.GetInstanceID(), go);
 	}
 
@@ -26,7 +26,7 @@ public class RoomManager : FSystem {
 			ComponentMonitoring monitor = go.GetComponent<ComponentMonitoring> ();
 			// We check this game object still contains a ComponentMonitoring
 			if (monitor != null)
-				monitor.trace ("turnOff", MonitoringManager.Source.PLAYER);
+				MonitoringManager.trace (monitor, "turnOff", MonitoringManager.Source.PLAYER);
 			id2GO.Remove (goId);
 		}
 	}

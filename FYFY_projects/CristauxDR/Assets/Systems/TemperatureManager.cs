@@ -75,7 +75,7 @@ public class TemperatureManager : FSystem {
 			if (temp.current <= 0 && newTemp > 0) {
 				// melting
 				if (!inTransition) {
-					iceMonitor.trace ("meltingStart", MonitoringManager.Source.SYSTEM);
+					MonitoringManager.trace (iceMonitor, "meltingStart", MonitoringManager.Source.SYSTEM);
 					inTransition = true;
 				}
 				// Check if animation is over
@@ -94,7 +94,7 @@ public class TemperatureManager : FSystem {
 				}
 				if (endOfAnim) {
 					temp.current = newTemp;
-					iceMonitor.trace("meltingEnd", MonitoringManager.Source.SYSTEM);
+					MonitoringManager.trace(iceMonitor, "meltingEnd", MonitoringManager.Source.SYSTEM);
 					inTransition = false;
 				}
 				else
@@ -103,9 +103,9 @@ public class TemperatureManager : FSystem {
 				// solidification
 				if (!inTransition) {	
 					if (!boiler.isOn)
-						iceMonitor.trace("solidifyingStart", MonitoringManager.Source.SYSTEM, true, "l9");
+						MonitoringManager.trace(iceMonitor, "solidifyingStart", MonitoringManager.Source.SYSTEM, true, "l9");
 					else
-						iceMonitor.trace("solidifyingStart", MonitoringManager.Source.SYSTEM, true, "l10");
+						MonitoringManager.trace(iceMonitor, "solidifyingStart", MonitoringManager.Source.SYSTEM, true, "l10");
 					inTransition = true;
 				}
 					
@@ -125,9 +125,9 @@ public class TemperatureManager : FSystem {
 				}
 				if (endOfAnim) {
 					if (!boiler.isOn)
-						iceMonitor.trace("solidifyingEnd", MonitoringManager.Source.SYSTEM, true, "l7");
+						MonitoringManager.trace(iceMonitor, "solidifyingEnd", MonitoringManager.Source.SYSTEM, true, "l7");
 					else
-						iceMonitor.trace("solidifyingEnd", MonitoringManager.Source.SYSTEM, true, "l8");
+						MonitoringManager.trace(iceMonitor, "solidifyingEnd", MonitoringManager.Source.SYSTEM, true, "l8");
 					temp.current = newTemp;
 					inTransition = false;
 				}
