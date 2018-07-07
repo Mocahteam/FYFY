@@ -148,11 +148,11 @@
             <summary>
             	Trace game action.
             </summary>
-            <param name="cm">The ComponentMonitoring to use to build trace.</param>
-            <param name="actionName">Action name you want to trace, this name has to match with a transition defined into associated Petri Net of the "cm" parameter <see cref="F:FYFY_plugins.Monitoring.ComponentMonitoring.PnmlFile"/>.</param>
+            <param name="monitor">The ComponentMonitoring to use to build trace.</param>
+            <param name="actionName">Action name you want to trace, this name has to match with a transition defined into associated Petri Net of the "monitor" parameter <see cref="F:FYFY_plugins.Monitoring.ComponentMonitoring.PnmlFile"/>.</param>
             <param name="performedBy">Specify who perform this action, the player or the system. <see cref="T:FYFY_plugins.Monitoring.MonitoringManager.Source"/></param>
             <param name="processLinks">Set to false if the logic expression associated to the action include "+" operators AND the action performed by the player is not allowed by the system. In this case fourth parameters will not be processed. True (default) means fourth parameter will be analysed.</param>
-            <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to build the trace: l0 and l3 OR l1 and l3 =&gt; <code>this.trace(..., "l0", "l3");</code> OR <code>this.trace(..., "l1", "l3");</code></param>
+            <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to build the trace: l0 and l3 OR l1 and l3 =&gt; <code>MonitoringManager.trace(..., "l0", "l3");</code> OR <code>MonitoringManager.trace(..., "l1", "l3");</code></param>
             <return> labels found for this game action if in game analysis is enabled (see: MonitoringManager). return empty Array else </return>
         </member>
         <member name="M:FYFY_plugins.Monitoring.MonitoringManager.trace(FYFY.Family,System.String,System.String,System.Boolean,System.String[])">
@@ -163,17 +163,17 @@
             <param name="actionName">Action name you want to trace, this name has to match with a transition defined into associated Petri Net of the "family" parameter <see cref="F:FYFY_plugins.Monitoring.ComponentMonitoring.PnmlFile"/>.</param>
             <param name="performedBy">Specify who perform this action, the player or the system. <see cref="T:FYFY_plugins.Monitoring.MonitoringManager.Source"/></param>
             <param name="processLinks">Set to false if the logic expression associated to the action include "+" operators AND the action performed by the player is not allowed by the system. In this case fourth parameters will not be processed. True (default) means fourth parameter will be analysed.</param>
-            <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to build the trace: l0 and l3 OR l1 and l3 =&gt; <code>this.trace(..., "l0", "l3");</code> OR <code>this.trace(..., "l1", "l3");</code></param>
+            <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to build the trace: l0 and l3 OR l1 and l3 =&gt; <code>MonitoringManager.trace(..., "l0", "l3");</code> OR <code>MonitoringManager.trace(..., "l1", "l3");</code></param>
             <return> labels found for this game action if in game analysis is enabled (see: MonitoringManager). return empty Array else </return>
         </member>
         <member name="M:FYFY_plugins.Monitoring.MonitoringManager.getNextActionsToReach(FYFY_plugins.Monitoring.ComponentMonitoring,System.String,System.Int32,System.String[])">
             <summary>
             	Get next actions to perform in order to reach targeted game action.
             </summary>
-            <param name="cm">The ComponentMonitoring on which you want reach action.</param>
-            <param name="targetedActionName">Action name you want to reach, this name has to match with a transition defined into associated Petri Net  of the "cm" parameter <see cref="F:FYFY_plugins.Monitoring.ComponentMonitoring.PnmlFile"/>.</param>
+            <param name="monitor">The ComponentMonitoring on which you want reach action.</param>
+            <param name="targetedActionName">Action name you want to reach, this name has to match with a transition defined into associated Petri Net  of the "monitor" parameter <see cref="F:FYFY_plugins.Monitoring.ComponentMonitoring.PnmlFile"/>.</param>
             <param name="maxActions">Maximum number of actions returned.</param>
-            <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to look for the trace: l0 and l3 OR l1 and l3 =&gt; <code>this.getNextActionToReach(..., "l0", "l3");</code> OR <code>this.getNextActionToReach(..., "l1", "l3");</code></param>
+            <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to look for the trace: l0 and l3 OR l1 and l3 =&gt; <code>MonitoringManager.getNextActionToReach(..., "l0", "l3");</code> OR <code>MonitoringManager.getNextActionToReach(..., "l1", "l3");</code></param>
             <return>List of Pairs including a ComponentMonitoring and its associated game action useful to reach the targeted action, the number of actions returned is less or equal to maxActions parameters.</return>
         </member>
         <member name="M:FYFY_plugins.Monitoring.MonitoringManager.getNextActionsToReach(FYFY.Family,System.String,System.Int32,System.String[])">
@@ -181,9 +181,9 @@
             	Get next actions to perform in order to reach targeted game action.
             </summary>
             <param name="family">The monitored Family on which you want reach action.</param>
-            <param name="targetedActionName">Action name you want to reach, this name has to match with a transition defined into associated Petri Net  of the "cm" parameter <see cref="F:FYFY_plugins.Monitoring.ComponentMonitoring.PnmlFile"/>.</param>
+            <param name="targetedActionName">Action name you want to reach, this name has to match with a transition defined into associated Petri Net  of the "family" parameter <see cref="F:FYFY_plugins.Monitoring.ComponentMonitoring.PnmlFile"/>.</param>
             <param name="maxActions">Maximum number of actions returned.</param>
-            <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to look for the trace: l0 and l3 OR l1 and l3 =&gt; <code>this.getNextActionToReach(..., "l0", "l3");</code> OR <code>this.getNextActionToReach(..., "l1", "l3");</code></param>
+            <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to look for the trace: l0 and l3 OR l1 and l3 =&gt; <code>MonitoringManager.getNextActionToReach(..., "l0", "l3");</code> OR <code>MonitoringManager.getNextActionToReach(..., "l1", "l3");</code></param>
             <return>List of Pairs including a ComponentMonitoring and its associated game action useful to reach the targeted action, the number of actions returned is less or equal to maxActions parameters.</return>
         </member>
         <member name="M:FYFY_plugins.Monitoring.MonitoringManager.getTriggerableActions">
