@@ -27,34 +27,19 @@ namespace FYFY {
 			}
 			
 			if(_gameObject.activeSelf != _enabled) {
-				bool isChild = (_gameObject.transform.parent != null);
-				bool lastState = _gameObject.activeSelf;
-				bool newState  = _enabled;
-
-				if(isChild){ // quand pas de parent -> activeInHierarchy == activeSelf donc pas bon faire ca tt le tps
-					lastState = _gameObject.activeInHierarchy;
-					newState &= _gameObject.transform.parent.gameObject.activeInHierarchy;
-				}
-
-				if(lastState != newState){
-					GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
-					this.propagate(_gameObject, newState); // je propage aux enfants car ils peuvent potentiellement changer detat eux aussi !
-				}
-
-				_gameObject.SetActive(_enabled); // a ne faire que en dernier pour pouvoir comparer ancien etat / nouveau
+				GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
+				this.propagate(_gameObject, _enabled); // we propagate on children because they can enter/exit family due to this new state on parent
+				
+				_gameObject.SetActive(_enabled);
 			}
 		}
 
 		private void propagate(GameObject source, bool newState) {
 			foreach(Transform childTransform in source.transform) {
 				GameObject child = childTransform.gameObject;
-				bool childLastState = child.activeInHierarchy && child.activeSelf;
-				bool childNewState = newState && child.activeSelf;
-
-				if(childNewState != childLastState) {  // MAJ SI ETAT CHANGE
-					GameObjectManager._modifiedGameObjectIds.Add(child.GetInstanceID());
-					this.propagate(child, childNewState); // repeat for childs of child
-				}
+				
+				GameObjectManager._modifiedGameObjectIds.Add(child.GetInstanceID());
+				this.propagate(child, newState); // repeat for childs of child
 			}
 		}
 	}
