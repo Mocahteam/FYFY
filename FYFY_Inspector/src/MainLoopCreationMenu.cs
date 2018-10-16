@@ -15,7 +15,8 @@ namespace FYFY_Inspector {
 				mainLoop.isStatic = true;
 			}
 			
-			Undo.AddComponent<FYFY.MainLoop> (mainLoop);
+			mainLoop.AddComponent<FYFY.MainLoop>();
+			Undo.RegisterCreatedObjectUndo(mainLoop, "Create MainLoop");
 		}
 
 		[MenuItem("FYFY/Create Main Loop %m", true)]
