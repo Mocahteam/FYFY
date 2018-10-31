@@ -22,13 +22,17 @@ namespace FYFY_plugins.Monitoring {
 	    private static string[] optType = new string[] { "Get", "Produce", "Require" };
 	    private static string[] optFlag = new string[] { "at least", "less than" };
 
-		private int ObjectSelectedFlag = 0;
-		private int TemplateSelected = 0;
-	    private int oldFlag;
+		private int petriNetFilter = 0;
+        private int systemFilter = 0;
+        private int monitorSelectedFlag = 0;
+        private int familySelectedFlag = 0;
+        private int templateSelected = 0;
+	    private int oldMonitorRef;
+        private int oldFamilyRef;
 
-	    //Handling menu buttons
+        //Handling menu buttons
 
-	    private static GUIStyle ToggleButtonStyleNormal = null;
+        private static GUIStyle ToggleButtonStyleNormal = null;
 	    private static GUIStyle ToggleButtonStyleToggled = null;
 
 	    private bool goMenuItemActive = true;
@@ -37,8 +41,9 @@ namespace FYFY_plugins.Monitoring {
 	    private int flagTransition;
 	    private static int cptSt = 0;
 	    private Vector2 scrollPosition;
+        private List<GUIContent> templates_id;
 
-		private bool showStates = false;
+        private bool showStates = false;
 		private bool showActions = false;
 		private bool showOptions = false;
 
@@ -51,13 +56,29 @@ namespace FYFY_plugins.Monitoring {
 				window = EditorWindow.GetWindow(typeof(EditionView));
 				window.minSize = new Vector2 (360f, 600f);
 				// Add callback to process Undo/Redo events
-				Undo.undoRedoPerformed += window.Repaint; 
-			} else {
+				Undo.undoRedoPerformed += window.Repaint;
+                Undo.undoRedoPerformed += synchroniseMonitors;
+            } else {
 				EditorUtility.DisplayDialog ("Action aborted", "You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", "Close");
 			}
 	    }
 
-	    void OnGUI()
+        static void synchroniseMonitors()
+        {
+            if (MonitoringManager.Instance != null)
+            {
+                MonitoringManager mm = MonitoringManager.Instance;
+                for (int i = mm.c_monitors.Count-1; i >= 0; i--)
+                    if (mm.c_monitors[i] == null)
+                        mm.c_monitors.RemoveAt(i);
+                for (int i = mm.f_monitors.Count-1; i >= 0; i--)
+                    if (mm.f_monitors[i] == null)
+                        mm.f_monitors.RemoveAt(i);
+            }
+        }
+
+
+        void OnGUI()
 	    {
 			// Check if MonitoringManager is still available
 			if (MonitoringManager.Instance == null){
@@ -81,220 +102,360 @@ namespace FYFY_plugins.Monitoring {
 						// in case of monitor's GameObject is not active in hierarchy Start of ComponentMonitoring will not be called => then we force to compute unique id
 						if (!tmp.activeInHierarchy)
 							newMonitor.computeUniqueId();
-						ObjectSelectedFlag = mm.c_monitors.FindIndex(x => x.id == newMonitor.id);
-						//newMonitor.hideFlags = HideFlags.HideInInspector;
-					} else {
+						monitorSelectedFlag = mm.c_monitors.FindIndex(x => x.id == newMonitor.id);
+                        // reset filter flag
+                        petriNetFilter = 0;
+                        oldMonitorRef = -1;
+                        //newMonitor.hideFlags = HideFlags.HideInInspector;
+                    } else {
 						EditorUtility.DisplayDialog ("Action aborted", "You can't monitor the Main_Loop GameObject or one of its childs.", "Close");
 					}
 				}
 
-				List<GUIContent> go_labels = new List<GUIContent>();
-				foreach (ComponentMonitoring cm in mm.c_monitors)
-				{
-					int cpt = 0;
-					foreach(TransitionLink ctr in cm.transitionLinks)
-						cpt += ctr.links.Count;
-					go_labels.Add(new GUIContent(cm.gameObject.name+" (ref: "+cm.id+") "+(cm.PnmlFile==null?"(PN: None":"(PN: "+cm.PnmlFile.name)+"; Total link: "+cpt+")"));
-				}
-				if (go_labels.Count > 0)
-				{
+				if (mm.c_monitors.Count > 0){
 					EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 
-					EditorGUILayout.BeginHorizontal();
-					ObjectSelectedFlag = EditorGUILayout.Popup(new GUIContent("Edit Monitor:", "Select the monitor you want to configure."), ObjectSelectedFlag, go_labels.ToArray());
-					if (ObjectSelectedFlag >= go_labels.Count) // can occur with Ctrl+Z
-						ObjectSelectedFlag = go_labels.Count - 1;
-					ComponentMonitoring cm = mm.c_monitors [ObjectSelectedFlag];
-					if (GUILayout.Button (new GUIContent("X", "Remove selected monitor."), GUILayout.Width (20))) {
-						// in case of monitor's GameObject is not active in hierarchy OnDestroy of ComponentMonitoring will not be called => then we force to free unique id
-						if (!cm.gameObject.activeInHierarchy)
-							cm.freeUniqueId();
-						Undo.DestroyObjectImmediate (cm);
-						go_labels.RemoveAt(ObjectSelectedFlag);
-						if (go_labels.Count <= 0)
-							return;
-						if (ObjectSelectedFlag >= go_labels.Count)
-							ObjectSelectedFlag = go_labels.Count - 1;
-						cm = mm.c_monitors [ObjectSelectedFlag]; // reset ComponentMonitoring in case of ObjectSelectedFlag update
-					}
-					EditorGUILayout.EndHorizontal();
-					
-					if (ObjectSelectedFlag != oldFlag){
-						Selection.activeGameObject = cm.gameObject;
-						SceneView.FrameLastActiveSceneView();
-						flagTransition = 0;
-					}
-					oldFlag = ObjectSelectedFlag;
-
-					EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-					
-					// compute template list
-					List<GUIContent> templates_id = new List<GUIContent>();
-					List<ComponentMonitoring> templates_cm = new List<ComponentMonitoring>();
-					foreach (ComponentMonitoring _cm in mm.c_monitors)
+					// compute template list for filter by Petri net
+					templates_id = new List<GUIContent>();
+					templates_id.Add(new GUIContent("<No filter>"));
+					foreach (string name in mm.PetriNetsName)
+						templates_id.Add(new GUIContent(name));
+					// Display filter 
+					petriNetFilter = EditorGUILayout.Popup(new GUIContent("Petri net Filter:", "Filter monitors by Full Petri nets (This list is defined in MonitoringManager component)."), petriNetFilter, templates_id.ToArray());
+					if (petriNetFilter >= templates_id.Count) // can occur with Ctrl+Z
+						petriNetFilter = templates_id.Count - 1;
+                    // Compute list of monitor depending on filter
+					List<GUIContent> go_labels = new List<GUIContent>();
+					foreach (ComponentMonitoring cm in mm.c_monitors)
 					{
-						if (_cm.id != cm.id && _cm.PnmlFile != null){ // we exclude from the list monitor with the same id and monitors where pnmlfile is not defined (i.e. non initialized)
+						if (petriNetFilter == 0 || cm.fullPnSelected == petriNetFilter-1){
 							int cpt = 0;
-							foreach(TransitionLink ctr in _cm.transitionLinks)
+                            foreach (TransitionLink ctr in cm.transitionLinks)
 								cpt += ctr.links.Count;
-							templates_id.Add(new GUIContent(_cm.gameObject.name+" (ref: "+_cm.id+") (PN: "+_cm.PnmlFile.name+"; Total link: "+cpt+")"));
-							templates_cm.Add(_cm);
-						}
+							go_labels.Add(new GUIContent(cm.gameObject.name+" (ref: "+cm.id+") "+(cm.PnmlFile==null?"(PN: None":"(PN: "+cm.PnmlFile.name)+"; Total link: "+cpt+")"));
+                            // if we found a monitor with the same id of the previous selected, we focus on it
+                            if (cm.id == oldMonitorRef)
+                                monitorSelectedFlag = go_labels.Count - 1;
+                        }
 					}
 					
-					showOptions = EditorGUILayout.Foldout (showOptions, "Options");
-					if (showOptions) {
-						EditorGUI.indentLevel += 2;
-						EditorGUIUtility.labelWidth = 160;
-						if (templates_id.Count > 0){
-							if (TemplateSelected >= templates_id.Count)
-								TemplateSelected = templates_id.Count - 1;
-							EditorGUILayout.BeginHorizontal ();
-							TemplateSelected = EditorGUILayout.Popup(new GUIContent("Import from model:", "Select the monitor you want to use as template, all properties will be copied to the editing monitor."), TemplateSelected, templates_id.ToArray());
-							if (GUILayout.Button ("Import", GUILayout.Width (80))) {
-								// clone from template
-								cm.clone(templates_cm[TemplateSelected]);
-							}
-							EditorGUILayout.EndHorizontal ();
-						}
-						// Be sure that Petri net selected is not over the MonitoringManager list
-						if (cm.fullPnSelected >= mm.PetriNetsName.Count)
-							cm.fullPnSelected = 0;
-						templates_id = new List<GUIContent>();
-						foreach (string name in mm.PetriNetsName)
-							templates_id.Add(new GUIContent(name));
-						int pnSelected = EditorGUILayout.Popup(new GUIContent("Affect to Full Petri net:", "Add this monitor to the selected full Petri net. This list is defined in MonitoringManager component."), cm.fullPnSelected, templates_id.ToArray());
-						if (pnSelected != cm.fullPnSelected) {
-							Undo.RecordObject (cm, "Update Export Petri net");
-							cm.fullPnSelected = pnSelected;
-						}
-						EditorGUIUtility.labelWidth = 125;
-						EditorGUI.indentLevel -= 2;
-					}
-					EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-			
-					//DrawUI
-					if (cm != null)
-						DrawUI(cm);
-				}
+					if (go_labels.Count <= 0)
+						EditorGUILayout.LabelField("No Monitor found");
+                    else
+                    {
+                        EditorGUILayout.BeginHorizontal();
+                        monitorSelectedFlag = EditorGUILayout.Popup(new GUIContent("Edit Monitor:", "Select the monitor you want to configure."), monitorSelectedFlag, go_labels.ToArray());
+						if (monitorSelectedFlag >= go_labels.Count) // can occur with Ctrl+Z
+							monitorSelectedFlag = go_labels.Count - 1;
+                        // extract ref from label, just before the first ')' and after the previous space
+                        string [] tokens = go_labels[monitorSelectedFlag].text.Split(')')[0].Split(' ');
+                        int refId;
+                        if (!Int32.TryParse(tokens[tokens.Length - 1], out refId))
+                        {
+                            EditorGUILayout.EndHorizontal();
+                            GUIStyle skin = new GUIStyle(GUI.skin.label);
+                            skin.normal.textColor = new Color(1f, 0.2f, 0.2f, 1); // soft red
+                            EditorGUILayout.LabelField("Warning, unable to decode monitor reference", skin);
+                            return;
+                        }
+                        // try to get monitor with this ref id
+                        ComponentMonitoring cm = mm.c_monitors.Find(x => x.id == refId);
+                        if (cm == null)
+                        {
+                            EditorGUILayout.EndHorizontal();
+                            GUIStyle skin = new GUIStyle(GUI.skin.label);
+                            skin.normal.textColor = new Color(1f, 0.2f, 0.2f, 1); // soft red
+                            EditorGUILayout.LabelField("Warning, unable to find monitor with reference: " + refId, skin);
+                            return;
+                        }
+                        if (GUILayout.Button(new GUIContent("X", "Remove selected monitor."), GUILayout.Width(20)))
+                        {
+                            // in case of monitor's GameObject is not active in hierarchy OnDestroy of ComponentMonitoring will not be called => then we force to free unique id
+                            if (!cm.gameObject.activeInHierarchy)
+                                cm.freeUniqueId();
+                            Undo.DestroyObjectImmediate(cm);
+                            go_labels.RemoveAt(monitorSelectedFlag);
+                            if (go_labels.Count <= 0)
+                                return;
+                            if (monitorSelectedFlag >= go_labels.Count)
+                                monitorSelectedFlag = go_labels.Count - 1;
+                            // reset ComponentMonitoring in case of ObjectSelectedFlag update
+                            tokens = go_labels[monitorSelectedFlag].text.Split(')')[0].Split(' ');
+                            if (!Int32.TryParse(tokens[tokens.Length - 1], out refId))
+                            {
+                                EditorGUILayout.EndHorizontal();
+                                GUIStyle skin = new GUIStyle(GUI.skin.label);
+                                skin.normal.textColor = new Color(1f, 0.2f, 0.2f, 1); // soft red
+                                EditorGUILayout.LabelField("Warning, unable to decode monitor reference", skin);
+                                return;
+                            }
+                            cm = mm.c_monitors.Find(x => x.id == refId);
+                            if (cm == null)
+                            {
+                                EditorGUILayout.EndHorizontal();
+                                GUIStyle skin = new GUIStyle(GUI.skin.label);
+                                skin.normal.textColor = new Color(1f, 0.2f, 0.2f, 1); // soft red
+                                EditorGUILayout.LabelField("Warning, unable to find monitor with reference: " + refId, skin);
+                                return;
+                            }
+                        }
+                        EditorGUILayout.EndHorizontal();
 
+                        if (refId != oldMonitorRef)
+                        {
+                            Selection.activeGameObject = cm.gameObject;
+                            SceneView.FrameLastActiveSceneView();
+                            flagTransition = 0;
+                        }
+                        oldMonitorRef = refId;
+
+                        EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+
+                        // compute template list
+                        templates_id = new List<GUIContent>();
+                        List<ComponentMonitoring> templates_cm = new List<ComponentMonitoring>();
+                        foreach (ComponentMonitoring _cm in mm.c_monitors)
+                        {
+                            if (_cm.id != cm.id && _cm.PnmlFile != null)
+                            { // we exclude from the list monitor with the same id and monitors where pnmlfile is not defined (i.e. non initialized)
+                                int cpt = 0;
+                                foreach (TransitionLink ctr in _cm.transitionLinks)
+                                    cpt += ctr.links.Count;
+                                templates_id.Add(new GUIContent(_cm.gameObject.name + " (ref: " + _cm.id + ") (PN: " + _cm.PnmlFile.name + "; Total link: " + cpt + ")"));
+                                templates_cm.Add(_cm);
+                            }
+                        }
+
+                        showOptions = EditorGUILayout.Foldout(showOptions, "Options");
+                        if (showOptions)
+                        {
+                            EditorGUI.indentLevel += 2;
+                            EditorGUIUtility.labelWidth = 160;
+                            if (templates_id.Count > 0)
+                            {
+                                if (templateSelected >= templates_id.Count)
+                                    templateSelected = templates_id.Count - 1;
+                                EditorGUILayout.BeginHorizontal();
+                                templateSelected = EditorGUILayout.Popup(new GUIContent("Import from model:", "Select the monitor you want to use as template, all properties will be copied to the editing monitor."), templateSelected, templates_id.ToArray());
+                                if (GUILayout.Button("Import", GUILayout.Width(80)))
+                                {
+                                    // clone from template
+                                    cm.clone(templates_cm[templateSelected]);
+                                }
+                                EditorGUILayout.EndHorizontal();
+                            }
+                            // Be sure that Petri net selected is not over the MonitoringManager list
+                            if (cm.fullPnSelected >= mm.PetriNetsName.Count)
+                                cm.fullPnSelected = 0;
+                            templates_id = new List<GUIContent>();
+                            foreach (string name in mm.PetriNetsName)
+                                templates_id.Add(new GUIContent(name));
+                            int pnSelected = EditorGUILayout.Popup(new GUIContent("Affect to Full Petri net:", "Add this monitor to the selected full Petri net. This list is defined in MonitoringManager component."), cm.fullPnSelected, templates_id.ToArray());
+                            if (pnSelected != cm.fullPnSelected)
+                            {
+                                Undo.RecordObject(cm, "Update Export Petri net");
+                                cm.fullPnSelected = pnSelected;
+                            }
+                            EditorGUIUtility.labelWidth = 125;
+                            EditorGUI.indentLevel -= 2;
+                        }
+                        EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+
+                        //DrawUI
+                        if (cm != null)
+                            DrawUI(cm);
+					}
+				}
 			}
 			else if (familyMenuItemActive)
 			{
 				List<string> flabels = new List<string>();
-
-				// Build families label for each available families
-				// Parse all available families
-				foreach (MonitoringManager.FamilyAssociation fa in mm.availableFamilies)
-				{
-					// Try to find associated monitor to current available family
-					FamilyMonitoring fm = mm.getFamilyMonitoring(fa.family);
-					if (fm == null) // no monitor found
-						flabels.Add(fa.systemName+"."+fa.familyName + " (Not monitored)");
-					else {
-						// Monitor found: we compute the number of links
-						int cpt = 0;
-						foreach (TransitionLink ctr in fm.transitionLinks)
-						{
-							cpt += ctr.links.Count;
-						}
-						// build rich label
-						flabels.Add(fa.systemName+"."+fa.familyName +" (ref: "+fm.id+") "+ (fm.PnmlFile == null ? "(PN: None" : "(PN: " + fm.PnmlFile.name) + "; Total link: " + cpt + ")");
-					}
-				}
 				
 				// If at least one family is available
-				if (mm.availableFamilies.Count > 0)
-				{
-					EditorGUILayout.BeginHorizontal();
-					EditorGUIUtility.labelWidth = 125;
-					ObjectSelectedFlag = EditorGUILayout.Popup("Select a family:", ObjectSelectedFlag, flabels.ToArray());
-					// Find monitor associated with object selected
-					FamilyMonitoring fm = mm.getFamilyMonitoring(mm.availableFamilies[ObjectSelectedFlag].family);
-					if (fm != null) {
-						// If found, add button to remove monitoring
-						if (GUILayout.Button (new GUIContent("X", "Remove monitor from this family."), GUILayout.Width (20))) {
-							// in case of monitor is not active in hierarchy OnDestroy of FamilyMonitoring will not be called => then we force to free unique id
-							if (!fm.gameObject.activeInHierarchy)
-								fm.freeUniqueId();
-							Undo.DestroyObjectImmediate (fm.gameObject);
-						}
-					}
-					EditorGUILayout.EndHorizontal();
+				if (mm.availableFamilies.Count <= 0)
+                    EditorGUILayout.LabelField("No family found");
+                else
+                {
+                    FamilyMonitoring fm = null;
+                    // compute template list for filter by Petri net
+                    templates_id = new List<GUIContent>();
+                    templates_id.Add(new GUIContent("<No filter>"));
+                    foreach (string name in mm.PetriNetsName)
+                        templates_id.Add(new GUIContent(name));
+                    // Display filter 
+                    petriNetFilter = EditorGUILayout.Popup(new GUIContent("Petri net Filter:", "Filter monitors by Full Petri nets (This list is defined in MonitoringManager component)."), petriNetFilter, templates_id.ToArray());
+                    if (petriNetFilter >= templates_id.Count) // can occur with Ctrl+Z
+                        petriNetFilter = templates_id.Count - 1;
+                    // list to store systems name
+                    templates_id = new List<GUIContent>();
+                    templates_id.Add(new GUIContent("<No filter>"));
+                    // Compute template list for filter by systems' name
+                    // Parse all available families
+                    foreach (MonitoringManager.FamilyAssociation fa in mm.availableFamilies)
+                    {
+                        // store system if it is not already included
+                        if (templates_id.Find(x => x.text.StartsWith(fa.systemName)) == null)
+                            templates_id.Add(new GUIContent(fa.systemName));
+                    }
+                    // sort systems name list
+                    templates_id.Sort(delegate (GUIContent x, GUIContent y) {
+                        if (x == null && y == null)
+                            return 0;
+                        else if (x == null)
+                            return -1;
+                        else if (y == null)
+                            return 1;
+                        else
+                            return x.text.CompareTo(y.text);
+                    });
+                    // Display filter 
+                    systemFilter = EditorGUILayout.Popup(new GUIContent("System Filter:", "Filter family monitors by Systems' name."), systemFilter, templates_id.ToArray());
+                    if (systemFilter >= templates_id.Count) // can occur with Ctrl+Z
+                        systemFilter = templates_id.Count - 1;
 
-					if (fm == null)
-					{
-						// if Not found, add button to add a monitor to this family
-						EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-						if (GUILayout.Button("Add monitor to this family"))
-						{
-							GameObject go = new GameObject(mm.availableFamilies[ObjectSelectedFlag].equivWith);
-							FamilyMonitoring newMonitor = go.AddComponent<FamilyMonitoring>();
-							newMonitor.equivalentName = mm.availableFamilies[ObjectSelectedFlag].equivWith;
-							newMonitor.descriptor = mm.availableFamilies[ObjectSelectedFlag].family.getDescriptor();
-							go.transform.parent = mainLoop.transform;
-							//go.GetComponent<FamilyMonitoring>().hideFlags = HideFlags.HideInInspector;
-							Undo.RegisterCreatedObjectUndo(go, "Add monitor to family");
-						}
-					}
-					else
-					{
+                    // Build families label for each available families depending on system filter and petriNet filter
+                    // Parse all available families
+                    foreach (MonitoringManager.FamilyAssociation fa in mm.availableFamilies)
+                    {
+                        if (systemFilter == 0 || fa.systemName == templates_id[systemFilter].text)
+                        {
+                            // Try to find associated monitor to current available family
+                            fm = mm.getFamilyMonitoring(fa.family);
+                            if (fm == null && petriNetFilter == 0) // no monitor found
+                                flabels.Add(fa.systemName + "." + fa.familyName + " (Not monitored)");
+                            else
+                            {
+                                if (petriNetFilter == 0 || (fm != null && fm.fullPnSelected == petriNetFilter - 1))
+                                {
+                                    // Monitor found: we compute the number of links
+                                    int cpt = 0;
+                                    foreach (TransitionLink ctr in fm.transitionLinks)
+                                        cpt += ctr.links.Count;
+                                    // build rich label
+                                    flabels.Add(fa.systemName + "." + fa.familyName + " (ref: " + fm.id + ") " + (fm.PnmlFile == null ? "(PN: None" : "(PN: " + fm.PnmlFile.name) + "; Total link: " + cpt + ")");
+                                    // if we found a monitor with the same id of the previous selected, we focus on it
+                                    if (fm.id == oldFamilyRef)
+                                        familySelectedFlag = flabels.Count - 1;
+                                }
+                            }
+                        }
+                    }
 
-						EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-						
-						// Compute template list
-						List<GUIContent> templates_id = new List<GUIContent>();
-						List<FamilyMonitoring> templates_fm = new List<FamilyMonitoring>();
-						foreach (MonitoringManager.FamilyAssociation fa in mm.availableFamilies)
-						{
-							// Try to find associated monitor to current available family
-							FamilyMonitoring fm_template = mm.getFamilyMonitoring(fa.family);
-							if (fm_template != null && fm_template.equivalentName != fm.equivalentName && fm_template.PnmlFile != null){
-								// Monitor found: we compute the number of links
-								int cpt = 0;
-								foreach (TransitionLink ctr in fm_template.transitionLinks)
-									cpt += ctr.links.Count;
-								// build rich label
-								templates_id.Add(new GUIContent(fa.systemName+"."+fa.familyName +" (ref: "+fm.id+") (PN: " + fm_template.PnmlFile.name + "; Total link: " + cpt + ")"));
-								templates_fm.Add(fm_template);
-							}
-						}
-						
-						showOptions = EditorGUILayout.Foldout (showOptions, "Options");
-						if (showOptions) {
-							EditorGUI.indentLevel += 2;
-							EditorGUIUtility.labelWidth = 160;
-							if (templates_id.Count > 0){
-								if (TemplateSelected >= templates_id.Count)
-									TemplateSelected = templates_id.Count - 1;
-								EditorGUILayout.BeginHorizontal ();
-								TemplateSelected = EditorGUILayout.Popup(new GUIContent("Import from model:", "Select the monitor you want to use as template, all properties will be copied to the editing monitor."), TemplateSelected, templates_id.ToArray());
-								if (GUILayout.Button ("Import", GUILayout.Width (80))) {
-									// clone from template
-									fm.clone((ComponentMonitoring)templates_fm[TemplateSelected]);
-								}
-								EditorGUILayout.EndHorizontal ();
-							}
-							// Be sure that Petri net selected is not over the MonitoringManager list
-							if (fm.fullPnSelected >= mm.PetriNetsName.Count)
-								fm.fullPnSelected = 0;
-							templates_id = new List<GUIContent>();
-							foreach (string name in mm.PetriNetsName)
-								templates_id.Add(new GUIContent(name));
-							int pnSelected = EditorGUILayout.Popup(new GUIContent("Affect to Full Petri net:", "Add this monitor to the selected full Petri net. This list is defined in MonitoringManager component."), fm.fullPnSelected, templates_id.ToArray());
-							if (pnSelected != fm.fullPnSelected) {
-								Undo.RecordObject (fm, "Update Export Petri net");
-								fm.fullPnSelected = pnSelected;
-							}
-							EditorGUIUtility.labelWidth = 125;
-							EditorGUI.indentLevel -= 2;
-						}
-						EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-						DrawUI(fm);
-					}
+                    if (flabels.Count <= 0)
+                        EditorGUILayout.LabelField("No family found");
+                    else
+                    {
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUIUtility.labelWidth = 125;
+                        familySelectedFlag = EditorGUILayout.Popup(new GUIContent("Select a family:", "Select the monitor you want to configure."), familySelectedFlag, flabels.ToArray());
+                        if (familySelectedFlag >= flabels.Count) // can occur with Ctrl+Z
+                            familySelectedFlag = flabels.Count - 1;
+                        oldFamilyRef = familySelectedFlag;
+                        // Extract from selected label data useful to identify family
+                        string systemName = flabels[familySelectedFlag].Split('.')[0]; // the system name is before the first '.'
+                        string familyName = flabels[familySelectedFlag].Split('.')[1].Split(' ')[0]; // the family name is between the first '.' and before the following space
+                                                                                                     // Try to get back family based on extracted data
+                        MonitoringManager.FamilyAssociation _fa = mm.availableFamilies.Find(x => x.systemName == systemName && x.familyName == familyName);
+                        if (_fa == null)
+                        {
+                            EditorGUILayout.EndHorizontal();
+                            GUIStyle skin = new GUIStyle(GUI.skin.label);
+                            skin.normal.textColor = new Color(1f, 0.2f, 0.2f, 1); // soft red
+                            EditorGUILayout.LabelField("Warning, unable to find family", skin);
+                            return;
+                        }
+                        // Try to get monitor associated to this family
+                        fm = mm.getFamilyMonitoring(_fa.family);
+
+                        // If found, add button to remove monitoring
+                        if (fm != null)
+                        {
+                            if (GUILayout.Button(new GUIContent("X", "Remove monitor from this family."), GUILayout.Width(20)))
+                            {
+                                // in case of monitor is not active in hierarchy OnDestroy of FamilyMonitoring will not be called => then we force to free unique id
+                                if (!fm.gameObject.activeInHierarchy)
+                                    fm.freeUniqueId();
+                                Undo.DestroyObjectImmediate(fm.gameObject);
+                            }
+                        }
+                        EditorGUILayout.EndHorizontal();
+
+                        if (fm == null)
+                        {
+                            // if Not found, add button to add a monitor to this family
+                            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+                            if (GUILayout.Button("Add monitor to this family"))
+                            {
+                                GameObject go = new GameObject(_fa.equivWith);
+                                FamilyMonitoring newMonitor = go.AddComponent<FamilyMonitoring>();
+                                newMonitor.equivalentName = _fa.equivWith;
+                                newMonitor.descriptor = _fa.family.getDescriptor();
+                                go.transform.parent = mainLoop.transform;
+                                //go.GetComponent<FamilyMonitoring>().hideFlags = HideFlags.HideInInspector;
+                                Undo.RegisterCreatedObjectUndo(go, "Add monitor to family");
+                            }
+                        }
+                        else
+                        {
+                            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+
+                            // Compute template list
+                            templates_id = new List<GUIContent>();
+                            List<FamilyMonitoring> templates_fm = new List<FamilyMonitoring>();
+                            foreach (MonitoringManager.FamilyAssociation fa in mm.availableFamilies)
+                            {
+                                // Try to find associated monitor to current available family
+                                FamilyMonitoring fm_template = mm.getFamilyMonitoring(fa.family);
+                                if (fm_template != null && fm_template.equivalentName != fm.equivalentName && fm_template.PnmlFile != null)
+                                {
+                                    // Monitor found: we compute the number of links
+                                    int cpt = 0;
+                                    foreach (TransitionLink ctr in fm_template.transitionLinks)
+                                        cpt += ctr.links.Count;
+                                    // build rich label
+                                    templates_id.Add(new GUIContent(fa.systemName + "." + fa.familyName + " (ref: " + fm.id + ") (PN: " + fm_template.PnmlFile.name + "; Total link: " + cpt + ")"));
+                                    templates_fm.Add(fm_template);
+                                }
+                            }
+
+                            showOptions = EditorGUILayout.Foldout(showOptions, "Options");
+                            if (showOptions)
+                            {
+                                EditorGUI.indentLevel += 2;
+                                EditorGUIUtility.labelWidth = 160;
+                                if (templates_id.Count > 0)
+                                {
+                                    if (templateSelected >= templates_id.Count)
+                                        templateSelected = templates_id.Count - 1;
+                                    EditorGUILayout.BeginHorizontal();
+                                    templateSelected = EditorGUILayout.Popup(new GUIContent("Import from model:", "Select the monitor you want to use as template, all properties will be copied to the editing monitor."), templateSelected, templates_id.ToArray());
+                                    if (GUILayout.Button("Import", GUILayout.Width(80)))
+                                    {
+                                        // clone from template
+                                        fm.clone((ComponentMonitoring)templates_fm[templateSelected]);
+                                    }
+                                    EditorGUILayout.EndHorizontal();
+                                }
+                                // Be sure that Petri net selected is not over the MonitoringManager list
+                                if (fm.fullPnSelected >= mm.PetriNetsName.Count)
+                                    fm.fullPnSelected = 0;
+                                templates_id = new List<GUIContent>();
+                                foreach (string name in mm.PetriNetsName)
+                                    templates_id.Add(new GUIContent(name));
+                                int pnSelected = EditorGUILayout.Popup(new GUIContent("Affect to Full Petri net:", "Add this monitor to the selected full Petri net. This list is defined in MonitoringManager component."), fm.fullPnSelected, templates_id.ToArray());
+                                if (pnSelected != fm.fullPnSelected)
+                                {
+                                    Undo.RecordObject(fm, "Update Export Petri net");
+                                    fm.fullPnSelected = pnSelected;
+                                }
+                                EditorGUIUtility.labelWidth = 125;
+                                EditorGUI.indentLevel -= 2;
+                            }
+                            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+                            DrawUI(fm);
+                        }
+                    }
 				}
-				else
-					EditorGUILayout.LabelField("No family found");
 			}
 		}
 
@@ -313,8 +474,7 @@ namespace FYFY_plugins.Monitoring {
 	        {
 	            goMenuItemActive = true;
 	            familyMenuItemActive = false;
-	            ObjectSelectedFlag = 0;
-	            flagTransition = 0;
+                flagTransition = 0;
 
 	        }
 
@@ -322,8 +482,7 @@ namespace FYFY_plugins.Monitoring {
 	        {
 	            goMenuItemActive = false;
 	            familyMenuItemActive = true;
-	            ObjectSelectedFlag = 0;
-	            flagTransition = 0;
+                flagTransition = 0;
 	        }
 
 	        GUILayout.EndHorizontal();
