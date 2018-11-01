@@ -68,8 +68,10 @@ namespace FYFY_plugins.Monitoring{
 		public List<string> PetriNetsName = null;
 		/// <summary>Is analysis run in game?</summary>
 		public bool inGameAnalysis;
-		/// <summary>Full Petri nets location to use if in game analysis is enabled</summary>
-		public string fullPetriNetsPath;
+        /// <summary>Is debug logs displayed?</summary>
+        public bool debugLogs;
+        /// <summary>Full Petri nets location to use if in game analysis is enabled</summary>
+        public string fullPetriNetsPath;
 		/// <summary>Filtered Petri nets location to use if in game analysis is enabled</summary>
 		public string filteredPetriNetsPath;
 		/// <summary>Features location to use if in game analysis is enabled</summary>
@@ -289,10 +291,11 @@ namespace FYFY_plugins.Monitoring{
 						UnityEngine.Debug.LogError ("Laalys Error: in Monitoring Manager component \""+featuresPath+"\" no such directory");
 						break;
 					default:
-						UnityEngine.Debug.LogError (LaalysProcess.StandardError.ReadToEnd());
+                        if (!LaalysProcess.StandardError.EndOfStream)
+						    UnityEngine.Debug.LogError (LaalysProcess.StandardError.ReadToEnd());
 						break;
-				}
-			}
+                }
+            }
 		}
 		
 		internal void registerMonitor (ComponentMonitoring cm){
@@ -365,14 +368,16 @@ namespace FYFY_plugins.Monitoring{
 						LaalysProcess = new Process ();
 						LaalysProcess.StartInfo.FileName = "java.exe";
 						LaalysProcess.StartInfo.Arguments = "-jar "+laalysPath+" -fullPn "+fullPetriNetsPath+" -filteredPn "+filteredPetriNetsPath+" -features "+featuresPath+" -serverIP localhost -serverPort 12000";
-						// Options to capture exit code
-						LaalysProcess.StartInfo.CreateNoWindow = false;
+                        if (debugLogs)
+                            LaalysProcess.StartInfo.Arguments += " -d";
+                        // Options to capture exit code
+                        LaalysProcess.StartInfo.CreateNoWindow = false;
 						LaalysProcess.EnableRaisingEvents = true;
 						LaalysEH = new EventHandler(OnLaalysExit);
 						LaalysProcess.Exited += LaalysEH;
 						// Options to capture standard output stream
 						LaalysProcess.StartInfo.UseShellExecute = false;
-						LaalysProcess.StartInfo.RedirectStandardError = true;
+                        LaalysProcess.StartInfo.RedirectStandardError = true;
 						// Launch Laalys
 						LaalysProcess.Start();
 					}

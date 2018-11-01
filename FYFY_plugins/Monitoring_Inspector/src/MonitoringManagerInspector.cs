@@ -16,8 +16,9 @@ namespace FYFY_plugins.Monitoring {
 	public class MonitoringManagerInspector : Editor {
 
 		private SerializedProperty _pnName;	
-		private SerializedProperty _inGameAnalysis;	
-		private SerializedProperty _fullPetriNetsPath;	
+		private SerializedProperty _inGameAnalysis;
+        private SerializedProperty _debugLogs;
+        private SerializedProperty _fullPetriNetsPath;	
 		private SerializedProperty _filteredPetriNetsPath;	
 		private SerializedProperty _featuresPath;		
 		private SerializedProperty _laalysPath;
@@ -25,7 +26,8 @@ namespace FYFY_plugins.Monitoring {
 		private void OnEnable(){
 			_pnName = serializedObject.FindProperty ("PetriNetsName");
 			_inGameAnalysis = serializedObject.FindProperty ("inGameAnalysis");
-			_fullPetriNetsPath = serializedObject.FindProperty ("fullPetriNetsPath");
+            _debugLogs = serializedObject.FindProperty("debugLogs");
+            _fullPetriNetsPath = serializedObject.FindProperty ("fullPetriNetsPath");
 			_filteredPetriNetsPath = serializedObject.FindProperty ("filteredPetriNetsPath");
 			_featuresPath = serializedObject.FindProperty ("featuresPath");
 			_laalysPath = serializedObject.FindProperty ("laalysPath");
@@ -61,10 +63,16 @@ namespace FYFY_plugins.Monitoring {
 			if (newInGameAnalysis != _inGameAnalysis.boolValue) {
 				Undo.RecordObject (mm, "Update In Game Analysis");
 				_inGameAnalysis.boolValue = newInGameAnalysis;
-			}
+            }
 
-			if (!newInGameAnalysis)	GUI.enabled = false; // disable following fields if in game analysis is disabled
-			string newFullPath = EditorGUILayout.TextField (new GUIContent("Full P. nets path:", "The full Petri nets location to use in case of in game analysis is enabled (default: \"./completeNets/\")."), _fullPetriNetsPath.stringValue);
+            if (!newInGameAnalysis)	GUI.enabled = false; // disable following fields if in game analysis is disabled
+            bool newDebugLogs = EditorGUILayout.ToggleLeft(new GUIContent("Enable debug logs", "If enabled, Laalys will print debug logs."), _debugLogs.boolValue);
+            if (newDebugLogs != _debugLogs.boolValue)
+            {
+                Undo.RecordObject(mm, "Update Debug Logs");
+                _debugLogs.boolValue = newDebugLogs;
+            }
+            string newFullPath = EditorGUILayout.TextField (new GUIContent("Full P. nets path:", "The full Petri nets location to use in case of in game analysis is enabled (default: \"./completeNets/\")."), _fullPetriNetsPath.stringValue);
 			if (newFullPath != _fullPetriNetsPath.stringValue) {
 				Undo.RecordObject (mm, "Update Full Petri nets path");
 				_fullPetriNetsPath.stringValue = newFullPath;

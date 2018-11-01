@@ -28,7 +28,7 @@ namespace FYFY_plugins.Monitoring {
         private int familySelectedFlag = 0;
         private int templateSelected = 0;
 	    private int oldMonitorRef;
-        private int oldFamilyRef;
+        private string oldFamilyName;
 
         //Handling menu buttons
 
@@ -334,7 +334,7 @@ namespace FYFY_plugins.Monitoring {
                                     // build rich label
                                     flabels.Add(fa.systemName + "." + fa.familyName + " (ref: " + fm.id + ") " + (fm.PnmlFile == null ? "(PN: None" : "(PN: " + fm.PnmlFile.name) + "; Total link: " + cpt + ")");
                                     // if we found a monitor with the same id of the previous selected, we focus on it
-                                    if (fm.id == oldFamilyRef)
+                                    if (fa.systemName + "." + fa.familyName == oldFamilyName)
                                         familySelectedFlag = flabels.Count - 1;
                                 }
                             }
@@ -350,11 +350,12 @@ namespace FYFY_plugins.Monitoring {
                         familySelectedFlag = EditorGUILayout.Popup(new GUIContent("Select a family:", "Select the monitor you want to configure."), familySelectedFlag, flabels.ToArray());
                         if (familySelectedFlag >= flabels.Count) // can occur with Ctrl+Z
                             familySelectedFlag = flabels.Count - 1;
-                        oldFamilyRef = familySelectedFlag;
+
                         // Extract from selected label data useful to identify family
                         string systemName = flabels[familySelectedFlag].Split('.')[0]; // the system name is before the first '.'
                         string familyName = flabels[familySelectedFlag].Split('.')[1].Split(' ')[0]; // the family name is between the first '.' and before the following space
-                                                                                                     // Try to get back family based on extracted data
+                        oldFamilyName = systemName+"."+familyName;
+                        // Try to get back family based on extracted data
                         MonitoringManager.FamilyAssociation _fa = mm.availableFamilies.Find(x => x.systemName == systemName && x.familyName == familyName);
                         if (_fa == null)
                         {
@@ -399,28 +400,28 @@ namespace FYFY_plugins.Monitoring {
                         {
                             EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 
-                            // Compute template list
-                            templates_id = new List<GUIContent>();
-                            List<FamilyMonitoring> templates_fm = new List<FamilyMonitoring>();
-                            foreach (MonitoringManager.FamilyAssociation fa in mm.availableFamilies)
-                            {
-                                // Try to find associated monitor to current available family
-                                FamilyMonitoring fm_template = mm.getFamilyMonitoring(fa.family);
-                                if (fm_template != null && fm_template.equivalentName != fm.equivalentName && fm_template.PnmlFile != null)
-                                {
-                                    // Monitor found: we compute the number of links
-                                    int cpt = 0;
-                                    foreach (TransitionLink ctr in fm_template.transitionLinks)
-                                        cpt += ctr.links.Count;
-                                    // build rich label
-                                    templates_id.Add(new GUIContent(fa.systemName + "." + fa.familyName + " (ref: " + fm.id + ") (PN: " + fm_template.PnmlFile.name + "; Total link: " + cpt + ")"));
-                                    templates_fm.Add(fm_template);
-                                }
-                            }
-
                             showOptions = EditorGUILayout.Foldout(showOptions, "Options");
                             if (showOptions)
                             {
+                                // Compute template list for import mecanism
+                                templates_id = new List<GUIContent>();
+                                List<FamilyMonitoring> templates_fm = new List<FamilyMonitoring>();
+                                foreach (MonitoringManager.FamilyAssociation fa in mm.availableFamilies)
+                                {
+                                    // Try to find associated monitor to current available family
+                                    FamilyMonitoring fm_template = mm.getFamilyMonitoring(fa.family);
+                                    if (fm_template != null && fm_template.equivalentName != fm.equivalentName && fm_template.PnmlFile != null)
+                                    {
+                                        // Monitor found: we compute the number of links
+                                        int cpt = 0;
+                                        foreach (TransitionLink ctr in fm_template.transitionLinks)
+                                            cpt += ctr.links.Count;
+                                        // build rich label
+                                        templates_id.Add(new GUIContent(fa.systemName + "." + fa.familyName + " (ref: " + fm_template.id + ") (PN: " + fm_template.PnmlFile.name + "; Total link: " + cpt + ")"));
+                                        templates_fm.Add(fm_template);
+                                    }
+                                }
+
                                 EditorGUI.indentLevel += 2;
                                 EditorGUIUtility.labelWidth = 160;
                                 if (templates_id.Count > 0)
