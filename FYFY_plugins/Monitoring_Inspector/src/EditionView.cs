@@ -269,7 +269,7 @@ namespace FYFY_plugins.Monitoring {
 			}
 			else if (familyMenuItemActive)
 			{
-				List<string> flabels = new List<string>();
+				List<GUIContent> flabels = new List<GUIContent>();
 				
 				// If at least one family is available
 				if (mm.availableFamilies.Count <= 0)
@@ -322,7 +322,7 @@ namespace FYFY_plugins.Monitoring {
                             // Try to find associated monitor to current available family
                             fm = mm.getFamilyMonitoring(fa.family);
                             if (fm == null && petriNetFilter == 0) // no monitor found
-                                flabels.Add(fa.systemName + "." + fa.familyName + " (Not monitored)");
+                                flabels.Add(new GUIContent(fa.systemName + "." + fa.familyName + " (Not monitored)"));
                             else
                             {
                                 if (petriNetFilter == 0 || (fm != null && fm.fullPnSelected == petriNetFilter - 1))
@@ -332,7 +332,7 @@ namespace FYFY_plugins.Monitoring {
                                     foreach (TransitionLink ctr in fm.transitionLinks)
                                         cpt += ctr.links.Count;
                                     // build rich label
-                                    flabels.Add(fa.systemName + "." + fa.familyName + " (ref: " + fm.id + ") " + (fm.PnmlFile == null ? "(PN: None" : "(PN: " + fm.PnmlFile.name) + "; Total link: " + cpt + ")");
+                                    flabels.Add(new GUIContent(fa.systemName + "." + fa.familyName + " (ref: " + fm.id + ") " + (fm.PnmlFile == null ? "(PN: None" : "(PN: " + fm.PnmlFile.name) + "; Total link: " + cpt + ")"));
                                     // if we found a monitor with the same id of the previous selected, we focus on it
                                     if (fa.systemName + "." + fa.familyName == oldFamilyName)
                                         familySelectedFlag = flabels.Count - 1;
@@ -352,8 +352,8 @@ namespace FYFY_plugins.Monitoring {
                             familySelectedFlag = flabels.Count - 1;
 
                         // Extract from selected label data useful to identify family
-                        string systemName = flabels[familySelectedFlag].Split('.')[0]; // the system name is before the first '.'
-                        string familyName = flabels[familySelectedFlag].Split('.')[1].Split(' ')[0]; // the family name is between the first '.' and before the following space
+                        string systemName = flabels[familySelectedFlag].text.Split('.')[0]; // the system name is before the first '.'
+                        string familyName = flabels[familySelectedFlag].text.Split('.')[1].Split(' ')[0]; // the family name is between the first '.' and before the following space
                         oldFamilyName = systemName+"."+familyName;
                         // Try to get back family based on extracted data
                         MonitoringManager.FamilyAssociation _fa = mm.availableFamilies.Find(x => x.systemName == systemName && x.familyName == familyName);
