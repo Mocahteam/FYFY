@@ -291,6 +291,20 @@ namespace FYFY {
 
 			_delayedActions.Enqueue(new RemoveComponent(gameObject, component, exceptionStackTrace));
 		}
+
+		/// <summary>
+		/// 	Force FYFY to refresh families for this GameObject at the beginning of the next update block.
+		/// </summary>
+		public static void refresh(GameObject gameObject){
+			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
+			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
+
+			if(gameObject == null) {
+				throw new FYFY.ArgumentNullException(exceptionStackTrace);
+			}
+
+			_modifiedGameObjectIds.Add(gameObject.GetInstanceID());
+		}
 		
 		// used in pluggins (TriggerSensitive / CollisionSensitive / PointerOver)
 		internal static bool containActionFor(System.Type actionType, Transform[] goTransforms){
