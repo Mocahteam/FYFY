@@ -392,6 +392,9 @@ namespace FYFY_plugins.Monitoring{
 			if (Application.isPlaying)
 				return;
 			
+#if UNITY_EDITOR
+            while (UnityEditor.EditorApplication.isCompiling) ;
+#endif
 			// OnEnable is called after script compilation (due to [ExecuteInEditMode]). We use this mechanism to update list of available families
 			availableFamilies = new List<FamilyAssociation>();
 			// Load all FSystem included into assembly
