@@ -115,9 +115,15 @@ namespace FYFY_plugins.Monitoring{
 					} else {
 						string prefix = this.gameObject.name + "_";
 						bool linksFound = false;
-						if (groupAndByOr.Count <= 1)
+						if (groupAndByOr.Count <= 1){
 							// If logic expression is empty or contains only AND operators, linksConcerned parameter is not useful because there is no ambiguity on this transition.
 							linksFound = true;
+							if (linksConcerned.Length
+							> 0){
+								WarningException we = new WarningException ("Because logic expression includes only \"*\" operators, \"linksConcerned\" parameters are ignored. You can remove them to the call.", exceptionStackTrace);
+								UnityEngine.Debug.LogException(we);
+							}							
+						}
 						else {
 							if (!processLinks){
 								// Developer wants to ignore linksConcerned. So we trace the first one (From Laalys point of view this is not a problem because all or actions have the same public name).
