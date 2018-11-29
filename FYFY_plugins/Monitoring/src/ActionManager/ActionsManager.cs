@@ -4,11 +4,17 @@ using System;
 
 namespace FYFY_plugins.Monitoring
 {
+    /// <summary>
+    /// This system processes <c>ActionPerformed</c> components and uses <c>MonitoringManager</c> functions to build traces.
+    /// </summary>
     public class ActionsManager : FSystem
     {
 
         private Family f_actions = FamilyManager.getFamily(new AllOfComponents(typeof(ActionPerformed)));
 
+        /// <summary>
+        /// As a singleton, this system can be accessed through this static instance.
+        /// </summary>
         public static ActionsManager instance;
 
         private GameObject traces;
@@ -17,6 +23,9 @@ namespace FYFY_plugins.Monitoring
         private string tmpPerformer;
         private string[] tmpLabels;
 
+        /// <summary>
+        /// The contructor of this system.
+        /// </summary>
         public ActionsManager()
         {
             if (Application.isPlaying)
@@ -30,6 +39,10 @@ namespace FYFY_plugins.Monitoring
 
         // Use this to update member variables when system resume.
         // Advice: avoid to update your families inside this function.
+        /// <summary>
+        /// Used to update member variables when system resume.
+        /// </summary>
+        /// <param name="currentFrame"></param>
         protected override void onResume(int currentFrame)
         {
             int nbActions = f_actions.Count;
