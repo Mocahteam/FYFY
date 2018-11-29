@@ -2,7 +2,8 @@
 using FYFY;
 using System;
 
-namespace FYFY_plugins.Monitoring {
+namespace FYFY_plugins.Monitoring
+{
     public class ActionsManager : FSystem
     {
 
@@ -65,7 +66,7 @@ namespace FYFY_plugins.Monitoring {
                             }
                             if (matched > 1)
                             {
-                                Debug.LogWarning(string.Concat("Several ComponentMonitoring on ", go.name, " are matching the name \"", ap.name, "\" and the overrideName \"", ap.overrideName, "\". By default, the second one found is used to trace."));
+                                Debug.LogException(new WarningException(string.Concat("Several ComponentMonitoring on ", go.name, " are matching the name \"", ap.name, "\" and the overrideName \"", ap.overrideName, "\". By default, the second one found is used to trace."), ap.exceptionStackTrace));
                                 break;
                             }
                         }
@@ -91,7 +92,7 @@ namespace FYFY_plugins.Monitoring {
                             }
                             if (matched > 1)
                             {
-                                Debug.LogWarning(string.Concat("Several ComponentMonitoring on ", go.name, " are matching the name \"", ap.name, "\". By default, the second one found is used to trace."));
+                                Debug.LogException(new WarningException(string.Concat("Several ComponentMonitoring on ", go.name, " are matching the name \"", ap.name, "\". By default, the second one found is used to trace."), ap.exceptionStackTrace));
                                 break;
                             }
                         }
@@ -117,7 +118,7 @@ namespace FYFY_plugins.Monitoring {
                             }
                             if (matched > 1)
                             {
-                                Debug.LogWarning(string.Concat("Several ComponentMonitoring on ", go.name, " are matching the overrideName \"", ap.overrideName, "\". By default, the second one found is used to trace."));
+                                Debug.LogException(new WarningException(string.Concat("Several ComponentMonitoring on ", go.name, " are matching the overrideName \"", ap.overrideName, "\". By default, the second one found is used to trace."), ap.exceptionStackTrace));
                                 break;
                             }
                         }
@@ -160,7 +161,7 @@ namespace FYFY_plugins.Monitoring {
                             orLabels = ap.orLabels,
                             labels = tmpLabels
                         });
-                        Debug.Log(string.Concat(tmpPerformer, " ", tmpActionName, " ", go.name, System.Environment.NewLine, tmpString));
+                        //Debug.Log(string.Concat(tmpPerformer, " ", tmpActionName, " ", go.name, System.Environment.NewLine, tmpString));
                     }
                     else if (ap.family != null)
                     {
@@ -191,7 +192,7 @@ namespace FYFY_plugins.Monitoring {
                             orLabels = ap.orLabels,
                             labels = tmpLabels
                         });
-                        Debug.Log(string.Concat(tmpPerformer, " ", tmpActionName, " ", go.name, System.Environment.NewLine, tmpString));
+                        //Debug.Log(string.Concat(tmpPerformer, " ", tmpActionName, " ", go.name, System.Environment.NewLine, tmpString));
                     }
                 }
                 for (int j = nb - 1; j > -1; j--)
