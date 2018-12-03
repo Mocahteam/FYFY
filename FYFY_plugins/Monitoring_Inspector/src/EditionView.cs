@@ -147,10 +147,11 @@ namespace FYFY_plugins.Monitoring {
                         monitorSelectedFlag = EditorGUILayout.Popup(new GUIContent("Edit Monitor:", "Select the monitor you want to configure."), monitorSelectedFlag, go_labels.ToArray());
 						if (monitorSelectedFlag >= go_labels.Count) // can occur with Ctrl+Z
 							monitorSelectedFlag = go_labels.Count - 1;
-                        // extract ref from label, just before the first ')' and after the previous space
-                        string [] tokens = go_labels[monitorSelectedFlag].text.Split(')')[0].Split(' ');
+                        // extract ref from label, just after the '(ref: ' and before ')'
+						string[] refToken = { "(ref: " };
+                        string stringRefId = go_labels[monitorSelectedFlag].text.Split(refToken, System.StringSplitOptions.None)[1].Split(')')[0];
                         int refId;
-                        if (!Int32.TryParse(tokens[tokens.Length - 1], out refId))
+                        if (!Int32.TryParse(stringRefId, out refId))
                         {
                             EditorGUILayout.EndHorizontal();
                             GUIStyle skin = new GUIStyle(GUI.skin.label);
@@ -180,8 +181,8 @@ namespace FYFY_plugins.Monitoring {
                             if (monitorSelectedFlag >= go_labels.Count)
                                 monitorSelectedFlag = go_labels.Count - 1;
                             // reset ComponentMonitoring in case of ObjectSelectedFlag update
-                            tokens = go_labels[monitorSelectedFlag].text.Split(')')[0].Split(' ');
-                            if (!Int32.TryParse(tokens[tokens.Length - 1], out refId))
+							stringRefId = go_labels[monitorSelectedFlag].text.Split(refToken, System.StringSplitOptions.None)[1].Split(')')[0];
+                            if (!Int32.TryParse(stringRefId, out refId))
                             {
                                 EditorGUILayout.EndHorizontal();
                                 GUIStyle skin = new GUIStyle(GUI.skin.label);
