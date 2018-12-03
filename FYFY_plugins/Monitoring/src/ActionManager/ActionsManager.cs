@@ -4,11 +4,17 @@ using System;
 
 namespace FYFY_plugins.Monitoring
 {
+    /// <summary>
+    /// This system processes <c>ActionPerformed</c> components and uses <c>MonitoringManager</c> functions to build traces.
+    /// </summary>
     public class ActionsManager : FSystem
     {
 
         private Family f_actions = FamilyManager.getFamily(new AllOfComponents(typeof(ActionPerformed)));
 
+        /// <summary>
+        /// As a singleton, this system can be accessed through this static instance.
+        /// </summary>
         public static ActionsManager instance;
 
         private GameObject traces;
@@ -17,6 +23,9 @@ namespace FYFY_plugins.Monitoring
         private string tmpPerformer;
         private string[] tmpLabels;
 
+        /// <summary>
+        /// The contructor of this system.
+        /// </summary>
         public ActionsManager()
         {
             if (Application.isPlaying)
@@ -30,6 +39,10 @@ namespace FYFY_plugins.Monitoring
 
         // Use this to update member variables when system resume.
         // Advice: avoid to update your families inside this function.
+        /// <summary>
+        /// Used to update member variables when system resume.
+        /// </summary>
+        /// <param name="currentFrame"></param>
         protected override void onResume(int currentFrame)
         {
             int nbActions = f_actions.Count;
@@ -165,34 +178,41 @@ namespace FYFY_plugins.Monitoring
                     }
                     else if (ap.family != null)
                     {
-                        tmpActionName = ap.name;
-                        if (ap.performedBy == "system")
+                        try
                         {
-                            tmpPerformer = ap.performedBy;
+                            tmpActionName = ap.name;
+                            if (ap.performedBy == "system")
+                            {
+                                tmpPerformer = ap.performedBy;
+                            }
+                            else
+                            {
+                                tmpPerformer = "player";
+                            }
+                            if (ap.orLabels == null)
+                                tmpLabels = MonitoringManager.trace(ap.family, tmpActionName, tmpPerformer);
+                            else
+                                tmpLabels = MonitoringManager.trace(ap.family, tmpActionName, tmpPerformer, true, ap.orLabels);
+                            tmpString = tmpLabels[0];
+                            for (int i = 1; i < tmpLabels.Length; i++)
+                            {
+                                tmpString = string.Concat(tmpString, " ", tmpLabels[i]);
+                            }
+                            GameObjectManager.addComponent<Trace>(traces, new
+                            {
+                                actionName = tmpActionName,
+                                family = ap.family,
+                                performedBy = tmpPerformer,
+                                time = Time.time,
+                                orLabels = ap.orLabels,
+                                labels = tmpLabels
+                            });
+                            //Debug.Log(string.Concat(tmpPerformer, " ", tmpActionName, " ", go.name, System.Environment.NewLine, tmpString));
                         }
-                        else
+                        catch (global::System.Exception)
                         {
-                            tmpPerformer = "player";
+                            throw new InvalidTraceException(string.Concat("Unable to trace action on the family \"", ap.family.ToString(), "\" because of invald arguments in the ActionPerformed component or the family is not monitored."), ap.exceptionStackTrace);
                         }
-                        if (ap.orLabels == null)
-                            tmpLabels = MonitoringManager.trace(ap.family, tmpActionName, tmpPerformer);
-                        else
-                            tmpLabels = MonitoringManager.trace(ap.family, tmpActionName, tmpPerformer, true, ap.orLabels);
-                        tmpString = tmpLabels[0];
-                        for (int i = 1; i < tmpLabels.Length; i++)
-                        {
-                            tmpString = string.Concat(tmpString, " ", tmpLabels[i]);
-                        }
-                        GameObjectManager.addComponent<Trace>(traces, new
-                        {
-                            actionName = tmpActionName,
-                            family = ap.family,
-                            performedBy = tmpPerformer,
-                            time = Time.time,
-                            orLabels = ap.orLabels,
-                            labels = tmpLabels
-                        });
-                        //Debug.Log(string.Concat(tmpPerformer, " ", tmpActionName, " ", go.name, System.Environment.NewLine, tmpString));
                     }
                 }
                 for (int j = nb - 1; j > -1; j--)
