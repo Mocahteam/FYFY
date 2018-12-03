@@ -36,7 +36,10 @@ namespace FYFY {
 			}
 
 			T component = _gameObject.AddComponent<T>();
-			if (component != null){
+            if (componentType == typeof(ActionPerformed))
+                componentType.GetField("exceptionStackTrace").SetValue(component, System.Convert.ChangeType(_exceptionStackTrace, componentType.GetField("exceptionStackTrace").FieldType));
+
+            if (component != null){
 				if (_componentValues != null) {
 					System.Type componentValuesType = _componentValues.GetType();
 					foreach (PropertyInfo pi in componentValuesType.GetProperties()) { // in anonymous, all is get property

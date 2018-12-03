@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
-using FYFY;
 
-namespace FYFY_plugins.Monitoring {
+namespace FYFY {
     /// <summary>
     /// Data describing the traced action.
     /// The system processing these data will search on the gameobject of this component a ComponentMonitoring corresponding to the data filled and trace it.
