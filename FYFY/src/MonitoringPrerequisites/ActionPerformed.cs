@@ -5,6 +5,7 @@ namespace FYFY {
     /// Data describing the traced action.
     /// The system processing these data will search on the gameobject of this component a ComponentMonitoring corresponding to the data filled and trace it.
     /// If no ComponentMonitoring is found and a family is filled in the data, the system will trace the family.
+    /// This component is only used by FYFY_plugins.Monitoring but is attached to FYFY so the stacktrace can be save when the component is added using GameObjectManaber.AddComponent
     /// </summary>
 	public class ActionPerformed : MonoBehaviour {
 		// Advice: FYFY component aims to contain only public members (according to Entity-Component-System paradigm).
