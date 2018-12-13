@@ -298,10 +298,12 @@ namespace FYFY_plugins.Monitoring{
             }
 		}
 		
-		internal void registerMonitor (ComponentMonitoring cm){
-			if (cm is FamilyMonitoring){
-				if (!f_monitors.Contains((FamilyMonitoring)cm))
+		internal void registerMonitor (ComponentMonitoring cm)
+        {
+            if (cm is FamilyMonitoring){
+				if (!f_monitors.Contains((FamilyMonitoring)cm)) {
 					f_monitors.Add((FamilyMonitoring)cm);
+                }
 			}
 			else{
 				if (!c_monitors.Contains(cm)){
@@ -336,15 +338,19 @@ namespace FYFY_plugins.Monitoring{
 			return null;
 		}
 
-		void Awake (){
-			// Several instances of MonitoringManager are not allowed
-			if (Instance != null && Instance != this) {
+		void Awake ()
+        {
+            // Several instances of MonitoringManager are not allowed
+            if (Instance != null && Instance != this) {
 				UnityEngine.Debug.LogError ("Only one MonitoringManager component could be instantiate in a scene.");
 				DestroyImmediate (this);
 				return;
-			}
-			
-			if (PetriNetsName == null){
+            }
+            
+            c_monitors = new List<ComponentMonitoring>();
+            f_monitors = new List<FamilyMonitoring>();
+
+            if (PetriNetsName == null){
 				PetriNetsName = new List<string>();
 				PetriNetsName.Add(SceneManager.GetActiveScene().name);
 			}
@@ -387,9 +393,10 @@ namespace FYFY_plugins.Monitoring{
 			}
 		}
 		
-		void OnEnable () {
-			// avoid to inspect System in playing mode
-			if (Application.isPlaying)
+		void OnEnable ()
+        {
+            // avoid to inspect System in playing mode
+            if (Application.isPlaying)
 				return;
 			
 #if UNITY_EDITOR
@@ -437,11 +444,14 @@ namespace FYFY_plugins.Monitoring{
 					UnityEngine.Debug.LogError (systemType.FullName+": Instance creation failed (all families of this system are ignored). MonitoringManager requires to instantiate your systems in order to inspect their families. Common solution: Check in your constructor if Application.isPlaying is true.");
 				}
 			}
-			
-			// Check if associations between FamilyMonitoring components and new available families are still stable
-			for (int i = f_monitors.Count-1 ; i >= 0 ; i--){
-				bool found = false;
+
+            // Check if associations between FamilyMonitoring components and new available families are still stable
+			for (int i = f_monitors.Count-1 ; i >= 0 ; i--)
+            {
+                UnityEngine.Debug.Log(i); 
+                bool found = false;
 				foreach (FamilyAssociation fa in availableFamilies){
+                    UnityEngine.Debug.Log(f_monitors[i]);
 					if (fa.family.Equals(f_monitors[i].descriptor)){
 						found = true; // we found one
 						f_monitors[i].equivalentName = fa.equivWith;
@@ -489,8 +499,7 @@ namespace FYFY_plugins.Monitoring{
 				}
 				// Destroy all FamilyMonitorings
 				for (int i = f_monitors.Count-1 ; i >= 0 ; i--){
-					if (f_monitors[i])
-						DestroyImmediate(f_monitors[i].gameObject);
+					DestroyImmediate(f_monitors[i].gameObject);
 				}
 				
 				Instance = null;

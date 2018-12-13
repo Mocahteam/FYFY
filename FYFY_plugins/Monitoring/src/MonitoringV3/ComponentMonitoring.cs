@@ -222,7 +222,7 @@ namespace FYFY_plugins.Monitoring{
 			}
 		}
 
-		void Awake(){
+		void Start(){
 			computeUniqueId();
 		}
 		
