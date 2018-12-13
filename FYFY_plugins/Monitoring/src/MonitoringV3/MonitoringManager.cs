@@ -347,6 +347,8 @@ namespace FYFY_plugins.Monitoring{
 				return;
             }
             
+            //Clear lists to remove erroneous component
+            //The others will be registered again in their start function
             c_monitors = new List<ComponentMonitoring>();
             f_monitors = new List<FamilyMonitoring>();
 
