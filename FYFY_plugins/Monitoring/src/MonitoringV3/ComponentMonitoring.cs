@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using System;
+using System.Threading;
 
 
 namespace FYFY_plugins.Monitoring{
@@ -13,8 +14,19 @@ namespace FYFY_plugins.Monitoring{
 	[AddComponentMenu("")]
     public class ComponentMonitoring : MonoBehaviour
     {
-		/// <summary> Pnml File associated to the monitor </summary>
-		[HideInInspector]
+        private static Mutex mut = new Mutex();
+
+        /// <summary>
+        /// If true, when the garbage collector will be called this component ID will be removed from the list of IDs int he MonitoringManager
+        /// By default it is set to true
+        /// It is set to false right before the MonitoringManager clears the monitors lists and is set back to true each time the constructor is called
+        /// </summary>
+        [HideInInspector]
+        [SerializeField]
+        internal bool canFreeUniqueId = true;
+
+        /// <summary> Pnml File associated to the monitor </summary>
+        [HideInInspector]
 		public UnityEngine.Object PnmlFile;
 
 		/// <summary> Comments of this monitor </summary>
@@ -57,8 +69,54 @@ namespace FYFY_plugins.Monitoring{
 				}
 			}
 		}
-		
-		internal void clone(ComponentMonitoring template){
+
+        /// <summary>
+        /// Contructor of the ComponentMonitoring
+        /// In Editor: called at compilation, right before and right after Play/Pause, and when a new component is created
+        /// At runtime: called when a new component is created
+        /// </summary>
+        public ComponentMonitoring()
+        {
+            //Check if MonitoringManager is already instanciated
+            if (MonitoringManager.Instance != null) {
+                //Create an unique ID for the ComponentMonitoring
+                computeUniqueId(false); 
+            }
+            else
+            {
+                //Launch a thread to wait for the MonitoringManager, then create an unique ID when it is ready
+                Thread thread = new Thread(WaitMonitoringManager);
+                thread.Start();
+            }
+        }
+
+        /// <summary>
+        /// Destructor of ComponentMonitoring called by the Garbage Collector after the destruction of the component
+        /// </summary>
+        ~ComponentMonitoring()
+        {
+            /*
+             * Before the Awake function of MonitoringManager is called, every object is detroyed then instanciated by Unity
+             * Even if the object is instantanetly destroyed, the destructor is called by the garbage collector later and can be called after this Awake
+             * In that case, since we call freeUniqueID in the destructor, it happens that the ComponentMonitoring removes itself from the list after the Awake
+             * To avoid that, we set a boolean to false in the Awake and check it when the destructor is called
+             * By default canFreeUniqueId is set to true
+             * It is set to false right before the MonitoringManager clears the monitors lists and is set back to true each time the constructor is called
+             */
+            if (canFreeUniqueId)
+                freeUniqueId();
+        }
+        
+        private void WaitMonitoringManager()
+        {
+            //While MonitoringManager isn't ready
+            while (MonitoringManager.Instance == null || !MonitoringManager.Instance.ready)
+                //Wait 10 ms not to overload processors
+                Thread.Sleep(10);
+            computeUniqueId(true);
+        }
+
+        internal void clone(ComponentMonitoring template){
 			this.PnmlFile = template.PnmlFile;
 			this.comments = template.comments;
 			this.PetriNet = new PetriNet(template.petriNet); // this set init transitionLinks (see setter defined before)
@@ -173,10 +231,14 @@ namespace FYFY_plugins.Monitoring{
 			
 		}
 		
-		internal void computeUniqueId(){
-			// Check if one MonitoringManager is available
-			if (MonitoringManager.Instance != null){
-				MonitoringManager mm = MonitoringManager.Instance;
+		internal void computeUniqueId(bool launchOnThread)
+        {
+            if (launchOnThread)
+                mut.WaitOne();
+            // Check if one MonitoringManager is available
+            if (MonitoringManager.Instance != null)
+            {
+                MonitoringManager mm = MonitoringManager.Instance;
 				// Check if we have to compute a new Id.
 				// This is the case if this id is already used by an other ComponentMonitoring
 				ComponentMonitoring cm = MonitoringManager.getMonitorById(id);
@@ -210,7 +272,11 @@ namespace FYFY_plugins.Monitoring{
 				}
 				// register this monitor
 				mm.registerMonitor(this);
-			} else {
+                if (launchOnThread)
+                    mut.ReleaseMutex();
+            } else {
+                if (launchOnThread)
+                    mut.ReleaseMutex();
 				throw new NullReferenceException ("You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).");
 			}
 		}
@@ -220,10 +286,6 @@ namespace FYFY_plugins.Monitoring{
 			if (MonitoringManager.Instance != null){
 				MonitoringManager.Instance.unregisterMonitor(this);
 			}
-		}
-
-		void Start(){
-			computeUniqueId();
 		}
 		
 		void OnDestroy(){

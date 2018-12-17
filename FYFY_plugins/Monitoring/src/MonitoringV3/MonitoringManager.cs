@@ -21,19 +21,18 @@ namespace FYFY_plugins.Monitoring{
 	[ExecuteInEditMode] // Awake, OnEnable, Start, Destroy... will be call in edit mode
 	[DisallowMultipleComponent]
 	public class MonitoringManager : MonoBehaviour {
-		private static MonitoringManager _instance = null;
-		/// <summary> Get singleton instance of MonitoringManager </summary>
+        /// <summary>
+        /// Instance of the singleton MonitoringManager
+        /// The value is set in the constructor
+        /// </summary>
+		public static MonitoringManager Instance = null;
+		/// <summary> Set singleton instance of MonitoringManager </summary>
 		// singleton => only one Monitoring Manager (see Awake)
-		public static MonitoringManager Instance{
-			set{
-				_instance = value;
-			}
-			get{
-				if (_instance == null)
-					_instance = UnityEngine.Object.FindObjectOfType<MonitoringManager>();
-				return _instance;
-			}
-		}
+        public MonitoringManager()
+        {
+            if (Instance == null)
+                Instance = this;
+        }
 		internal static string NEXT_ACTION_TOKEN = "NextActionToReach"; // token used with Laalys intercommunication
 
 		/// <summary>Define the different source that can trigger a game action.</summary>
@@ -52,7 +51,7 @@ namespace FYFY_plugins.Monitoring{
 		
 		[HideInInspector]
 		[SerializeField]
-		internal List<ComponentMonitoring> c_monitors = new List<ComponentMonitoring>(); // used in EditionView
+		internal List<ComponentMonitoring> c_monitors = new List<ComponentMonitoring>(); // used in EditionView 
 		[HideInInspector]
 		[SerializeField]
 		internal List<FamilyMonitoring> f_monitors = new List<FamilyMonitoring>();
@@ -63,6 +62,7 @@ namespace FYFY_plugins.Monitoring{
 			internal Family family; // The family object
 			internal string equivWith; // formated name of the first equivalent family defined in another system
 		}
+        internal bool ready = false; //true at the end of Awake 
 
 		/// <summary>List of Petri Nets name</summary>
 		public List<string> PetriNetsName = null;
@@ -308,16 +308,6 @@ namespace FYFY_plugins.Monitoring{
 			else{
 				if (!c_monitors.Contains(cm)){
 					c_monitors.Add(cm);
-					c_monitors.Sort (delegate(ComponentMonitoring x, ComponentMonitoring y) {
-						if (x == null && y == null)
-							return 0;
-						else if (x == null)
-							return -1;
-						else if (y == null)
-							return 1;
-						else
-							return x.gameObject.name.CompareTo (y.gameObject.name);
-					});
 				}
 			}
 		}
@@ -346,7 +336,20 @@ namespace FYFY_plugins.Monitoring{
 				DestroyImmediate (this);
 				return;
             }
-            
+
+            /*
+             * Before this Awake function is called, every object is detroyed then instanciated by Unity
+             * Even if the object is instantanetly destroyed, the destructor is called by the garbage collector later and can be called after this Awake
+             * In that case, since we call freeUniqueID in the destructor, it happens that the ComponentMonitoring removes itself from the list after the Awake
+             * To avoid that, we set a boolean to false in the Awake and check it when the destructor is called
+             */
+            foreach (ComponentMonitoring cm in c_monitors)
+                if(cm)
+                    cm.canFreeUniqueId = false;
+            foreach (FamilyMonitoring fm in f_monitors)
+                if(fm)
+                    fm.canFreeUniqueId = false;
+
             //Clear lists to remove erroneous component
             //The others will be registered again in their start function
             c_monitors = new List<ComponentMonitoring>();
@@ -393,6 +396,7 @@ namespace FYFY_plugins.Monitoring{
 					UnityEngine.Debug.Log (e.Message);
 				}
 			}
+            ready = true;
 		}
 		
 		void OnEnable ()
@@ -450,10 +454,8 @@ namespace FYFY_plugins.Monitoring{
             // Check if associations between FamilyMonitoring components and new available families are still stable
 			for (int i = f_monitors.Count-1 ; i >= 0 ; i--)
             {
-                UnityEngine.Debug.Log(i); 
                 bool found = false;
 				foreach (FamilyAssociation fa in availableFamilies){
-                    UnityEngine.Debug.Log(f_monitors[i]);
 					if (fa.family.Equals(f_monitors[i].descriptor)){
 						found = true; // we found one
 						f_monitors[i].equivalentName = fa.equivWith;

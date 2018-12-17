@@ -91,6 +91,20 @@ namespace FYFY_plugins.Monitoring {
 			GameObject mainLoop = GameObject.Find("Main_Loop");
 			if (goMenuItemActive)
 			{
+                if (Event.current != null && Event.current.type == EventType.MouseDown)
+                {
+                    mm.c_monitors.Sort(delegate (ComponentMonitoring x, ComponentMonitoring y) {
+                        if (x == null && y == null)
+                            return 0;
+                        else if (x == null)
+                            return -1;
+                        else if (y == null)
+                            return 1;
+                        else
+                            return x.gameObject.name.CompareTo(y.gameObject.name);
+                    });
+                }
+
 				GameObject tmp = null;
 				EditorGUIUtility.labelWidth = 125;
 				tmp = EditorGUILayout.ObjectField(new GUIContent("Add Game Object:", "Drag&Drop a game object you want to monitor. A same game object can be added several time."), tmp, typeof(UnityEngine.Object), true) as GameObject;
@@ -99,10 +113,7 @@ namespace FYFY_plugins.Monitoring {
 					// Forbid to drag and drop child of MainLoop
 					if (!tmp.transform.IsChildOf (mainLoop.transform)) {
 						ComponentMonitoring newMonitor = Undo.AddComponent<ComponentMonitoring> (tmp);
-						// in case of monitor's GameObject is not active in hierarchy Start of ComponentMonitoring will not be called => then we force to compute unique id
-						if (!tmp.activeInHierarchy)
-							newMonitor.computeUniqueId();
-						monitorSelectedFlag = mm.c_monitors.FindIndex(x => x.id == newMonitor.id);
+                        monitorSelectedFlag = mm.c_monitors.FindIndex(x => x.id == newMonitor.id);
                         // reset filter flag
                         petriNetFilter = 0;
                         oldMonitorRef = -1;
@@ -128,7 +139,10 @@ namespace FYFY_plugins.Monitoring {
 					List<GUIContent> go_labels = new List<GUIContent>();
 					foreach (ComponentMonitoring cm in mm.c_monitors)
 					{
-						if (petriNetFilter == 0 || cm.fullPnSelected == petriNetFilter-1){
+                        //cm can be null if you remove the ComponentMonitoring of a disabled gameobject from Unity hierachy (but handled if removed from Monitoring Window)
+                        //the null cm stays in the list because it can be removed from the list from the OnDestroy (because it is not called on disabled gameobjects)
+                        //the null cm is removed on the next MonitoringManager's Awake because c_monitors is cleared
+						if (cm != null && (petriNetFilter == 0 || cm.fullPnSelected == petriNetFilter - 1)){
 							int cpt = 0;
                             foreach (TransitionLink ctr in cm.transitionLinks)
 								cpt += ctr.links.Count;
