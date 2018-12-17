@@ -256,12 +256,12 @@ namespace FYFY_plugins.Monitoring{
 						ids.Add(_cm.id);
 					foreach (FamilyMonitoring _fm in mm.f_monitors)
 						ids.Add(_fm.id);
-					ids.Sort();
+					//ids.Sort();
 					// Find the first hole available
 					int newId = 0;
 					foreach (int i in ids)
 					{
-						if (newId != i)
+						if (!ids.Contains(newId))
 							break;
 						newId++;
 					}
