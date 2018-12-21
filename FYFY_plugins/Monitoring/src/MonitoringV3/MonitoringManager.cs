@@ -62,6 +62,7 @@ namespace FYFY_plugins.Monitoring{
 			internal Family family; // The family object
 			internal string equivWith; // formated name of the first equivalent family defined in another system
 		}
+        [NonSerialized]
         internal bool ready = false; //true at the end of Awake 
 
 		/// <summary>List of Petri Nets name</summary>
@@ -78,13 +79,13 @@ namespace FYFY_plugins.Monitoring{
 		public string featuresPath;
 		/// <summary>Path to the jar file of Laalys</summary>
 		public string laalysPath;
-		
-		/// <summary>
-		/// 	Get monitor with asked id.
-		/// </summary>
-		/// <param name="id">The id of the monitor to get.</param>
-		/// <return> The ComponentMonitoring object associated to the id if it exists. Return null otherwise. <see cref="ComponentMonitoring"/> </return>
-		public static ComponentMonitoring getMonitorById (int id){
+
+        /// <summary>
+        /// 	Get monitor with asked id.
+        /// </summary>
+        /// <param name="id">The id of the monitor to get.</param>
+        /// <return> The ComponentMonitoring object associated to the id if it exists. Return null otherwise. <see cref="ComponentMonitoring"/> </return>
+        public static ComponentMonitoring getMonitorById (int id){
 			if (MonitoringManager.Instance == null)
 				throw new TraceAborted ("No MonitoringManager found. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", null);
 			
@@ -396,11 +397,11 @@ namespace FYFY_plugins.Monitoring{
 					UnityEngine.Debug.Log (e.Message);
 				}
 			}
-            ready = true;
 		}
-		
-		void OnEnable ()
+
+        void OnEnable ()
         {
+            ready = true;
             // avoid to inspect System in playing mode
             if (Application.isPlaying)
 				return;

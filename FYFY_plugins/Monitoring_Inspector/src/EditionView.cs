@@ -49,9 +49,9 @@ namespace FYFY_plugins.Monitoring {
 
 	    [MenuItem("FYFY/Edit Monitoring")]
 	    private static void ShowWindow()
-	    {
-			// be sure that MonitoringManager is instantiated
-			if (MonitoringManager.Instance != null){
+        {
+            // be sure that MonitoringManager is instantiated
+            if (MonitoringManager.Instance != null){
 				//Show existing window instance. If one doesn't exist, make one.
 				window = EditorWindow.GetWindow(typeof(EditionView));
 				window.minSize = new Vector2 (360f, 600f);
@@ -60,8 +60,8 @@ namespace FYFY_plugins.Monitoring {
                 Undo.undoRedoPerformed += synchroniseMonitors;
             } else {
 				EditorUtility.DisplayDialog ("Action aborted", "You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", "Close");
-			}
-	    }
+            }
+        }
 
         static void synchroniseMonitors()
         {
@@ -79,9 +79,9 @@ namespace FYFY_plugins.Monitoring {
 
 
         void OnGUI()
-	    {
-			// Check if MonitoringManager is still available
-			if (MonitoringManager.Instance == null){
+        {
+            // Check if MonitoringManager is still available
+            if (MonitoringManager.Instance == null){
 				window.Close();
 				return;
 			}
@@ -105,7 +105,7 @@ namespace FYFY_plugins.Monitoring {
                     });
                 }
 
-				GameObject tmp = null;
+                GameObject tmp = null;
 				EditorGUIUtility.labelWidth = 125;
 				tmp = EditorGUILayout.ObjectField(new GUIContent("Add Game Object:", "Drag&Drop a game object you want to monitor. A same game object can be added several time."), tmp, typeof(UnityEngine.Object), true) as GameObject;
 				if (tmp != null)
@@ -113,6 +113,12 @@ namespace FYFY_plugins.Monitoring {
 					// Forbid to drag and drop child of MainLoop
 					if (!tmp.transform.IsChildOf (mainLoop.transform)) {
 						ComponentMonitoring newMonitor = Undo.AddComponent<ComponentMonitoring> (tmp);
+                        // We set the "ready" to true when unity end deserialization of the component (ComponentMonitoring::OnAfterDeserialize),
+                        // but for a new ComponentMonitoring no deserialization occurs and we set "ready" to true right after the instantiation of the component
+                        newMonitor.ready = true;
+                        //The ComponentMonitoring is now processing a new id and in order to set monitorSelectedFlag we have to wait the monitor id to be defined 
+                        //TODO: we have to find a way not to block this script while we are waiting for the id
+                        while (newMonitor.id == -1) ;
                         monitorSelectedFlag = mm.c_monitors.FindIndex(x => x.id == newMonitor.id);
                         // reset filter flag
                         petriNetFilter = 0;
@@ -123,8 +129,9 @@ namespace FYFY_plugins.Monitoring {
 					}
 				}
 
-				if (mm.c_monitors.Count > 0){
-					EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+				if (mm.c_monitors.Count > 0)
+                {
+                    EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 
 					// compute template list for filter by Petri net
 					templates_id = new List<GUIContent>();
@@ -152,17 +159,19 @@ namespace FYFY_plugins.Monitoring {
                                 monitorSelectedFlag = go_labels.Count - 1;
                         }
 					}
-					
-					if (go_labels.Count <= 0)
+                    
+                    if (go_labels.Count <= 0)
 						EditorGUILayout.LabelField("No Monitor found");
                     else
                     {
+                        if (monitorSelectedFlag >= go_labels.Count)
+                            monitorSelectedFlag = go_labels.Count - 1;
                         EditorGUILayout.BeginHorizontal();
                         monitorSelectedFlag = EditorGUILayout.Popup(new GUIContent("Edit Monitor:", "Select the monitor you want to configure."), monitorSelectedFlag, go_labels.ToArray());
-						if (monitorSelectedFlag >= go_labels.Count) // can occur with Ctrl+Z
+                        if (monitorSelectedFlag >= go_labels.Count) // can occur with Ctrl+Z
 							monitorSelectedFlag = go_labels.Count - 1;
                         // extract ref from label, just after the '(ref: ' and before ')'
-						string[] refToken = { "(ref: " };
+                        string[] refToken = { "(ref: " };
                         string stringRefId = go_labels[monitorSelectedFlag].text.Split(refToken, System.StringSplitOptions.None)[1].Split(')')[0];
                         int refId;
                         if (!Int32.TryParse(stringRefId, out refId))
@@ -215,11 +224,12 @@ namespace FYFY_plugins.Monitoring {
                             }
                         }
                         EditorGUILayout.EndHorizontal();
-
+                        
                         if (refId != oldMonitorRef)
                         {
                             Selection.activeGameObject = cm.gameObject;
-                            SceneView.FrameLastActiveSceneView();
+                            if(Selection.activeGameObject.GetComponentInChildren<Renderer>() || Selection.activeGameObject.GetComponentInChildren<CanvasRenderer>())
+                                SceneView.FrameLastActiveSceneView();
                             flagTransition = 0;
                         }
                         oldMonitorRef = refId;
@@ -279,10 +289,10 @@ namespace FYFY_plugins.Monitoring {
                         //DrawUI
                         if (cm != null)
                             DrawUI(cm);
-					}
-				}
-			}
-			else if (familyMenuItemActive)
+                    }
+                }
+            }
+            else if (familyMenuItemActive)
 			{
 				List<GUIContent> flabels = new List<GUIContent>();
 				
@@ -472,12 +482,13 @@ namespace FYFY_plugins.Monitoring {
                         }
                     }
 				}
-			}
-		}
+            }
+
+        }
 
 	    void makeMenu()
-	    {
-	        if (ToggleButtonStyleNormal == null)
+        {
+            if (ToggleButtonStyleNormal == null)
 	        {
 	            ToggleButtonStyleNormal = "Button";
 	            ToggleButtonStyleToggled = new GUIStyle(ToggleButtonStyleNormal);
@@ -503,11 +514,11 @@ namespace FYFY_plugins.Monitoring {
 
 	        GUILayout.EndHorizontal();
 	        EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-	    }
+        }
 
 		private void DrawUI(ComponentMonitoring monitor)
-		{
-			scrollPosition = EditorGUILayout.BeginScrollView (scrollPosition);
+        {
+            scrollPosition = EditorGUILayout.BeginScrollView (scrollPosition);
 			// Pnml input field
 			UnityEngine.Object tmp = EditorGUILayout.ObjectField(new GUIContent("PNML file:", "Drag&Drop a file with .pnml extension."), monitor.PnmlFile, typeof(UnityEngine.Object), true);
 			if (tmp == null) {
@@ -547,12 +558,12 @@ namespace FYFY_plugins.Monitoring {
 				}
 			}
 			EditorGUILayout.EndScrollView ();
-		}
+        }
 
 		private void DrawStates(ComponentMonitoring monitor)
 		{
-			
-			showStates = EditorGUILayout.Foldout (showStates, "Set initial states");
+            
+            showStates = EditorGUILayout.Foldout (showStates, "Set initial states");
 			if (showStates) {
 				EditorGUI.indentLevel += 1;
 				if (monitor.PetriNet != null && monitor.PetriNet.places.Count == 0)
@@ -580,12 +591,12 @@ namespace FYFY_plugins.Monitoring {
 					}
 				}
 				EditorGUI.indentLevel -= 1;
-			}
-		}
+            }
+        }
 
 		private void DrawActions(ComponentMonitoring monitor)
-	    {
-			showActions = EditorGUILayout.Foldout (showActions, "Define links on actions");
+        {
+            showActions = EditorGUILayout.Foldout (showActions, "Define links on actions");
 			if (showActions) {
 				EditorGUI.indentLevel += 1;
 				if (monitor.PetriNet != null && monitor.PetriNet.getTransitionsNames().Length == 0)
@@ -805,7 +816,7 @@ namespace FYFY_plugins.Monitoring {
 					}
 				}
 				EditorGUI.indentLevel -= 1;
-	        }
-	    }
+            }
+        }
 	}
 }
