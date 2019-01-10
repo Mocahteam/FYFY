@@ -377,8 +377,12 @@ namespace FYFY_plugins.Monitoring {
                             familySelectedFlag = flabels.Count - 1;
 
                         // Extract from selected label data useful to identify family
-                        string systemName = flabels[familySelectedFlag].text.Split('.')[0]; // the system name is before the first '.'
-                        string familyName = flabels[familySelectedFlag].text.Split('.')[1].Split(' ')[0]; // the family name is between the first '.' and before the following space
+                        string[] stringArray = flabels[familySelectedFlag].text.Split('.');
+                        // the system name is before the last '.'
+                        string systemName = stringArray[0];
+                        for (int i = 1; i < stringArray.Length - 1; i++)
+                            systemName += "." + stringArray[i];
+                        string familyName = stringArray[stringArray.Length -1].Split(' ')[0]; // the family name is between the last '.' and before the following space
                         oldFamilyName = systemName+"."+familyName;
                         // Try to get back family based on extracted data
                         MonitoringManager.FamilyAssociation _fa = mm.availableFamilies.Find(x => x.systemName == systemName && x.familyName == familyName);
