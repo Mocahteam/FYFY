@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -118,7 +119,9 @@ namespace FYFY_plugins.Monitoring {
                         newMonitor.ready = true;
                         //The ComponentMonitoring is now processing a new id and in order to set monitorSelectedFlag we have to wait the monitor id to be defined 
                         //TODO: we have to find a way not to block this script while we are waiting for the id
-                        while (newMonitor.id == -1) ;
+                        while (newMonitor.id == -1)
+                            //Wait 10 ms not to overload processors
+                            Thread.Sleep(10);
                         monitorSelectedFlag = mm.c_monitors.FindIndex(x => x.id == newMonitor.id);
                         // reset filter flag
                         petriNetFilter = 0;
@@ -423,6 +426,14 @@ namespace FYFY_plugins.Monitoring {
                                 go.transform.parent = mainLoop.transform;
                                 //go.GetComponent<FamilyMonitoring>().hideFlags = HideFlags.HideInInspector;
                                 Undo.RegisterCreatedObjectUndo(go, "Add monitor to family");
+                                // We set the "ready" to true when unity end deserialization of the component (ComponentMonitoring::OnAfterDeserialize),
+                                // but for a new ComponentMonitoring no deserialization occurs and we set "ready" to true right after the instantiation of the component
+                                newMonitor.ready = true;
+                                //The ComponentMonitoring is now processing a new id and in order to set monitorSelectedFlag we have to wait the monitor id to be defined 
+                                //TODO: we have to find a way not to block this script while we are waiting for the id
+                                while (newMonitor.id == -1)
+                                    //Wait 10 ms not to overload processors
+                                    Thread.Sleep(10);
                             }
                         }
                         else

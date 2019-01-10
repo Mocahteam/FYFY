@@ -63,7 +63,7 @@ namespace FYFY_plugins.Monitoring{
 			internal string equivWith; // formated name of the first equivalent family defined in another system
 		}
         [NonSerialized]
-        internal bool ready = false; //true at the end of Awake 
+        internal bool ready = false; //true at the beginning of OnEnable 
 
 		/// <summary>List of Petri Nets name</summary>
 		public List<string> PetriNetsName = null;

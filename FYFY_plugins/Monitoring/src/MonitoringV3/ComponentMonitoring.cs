@@ -105,8 +105,11 @@ namespace FYFY_plugins.Monitoring{
         {
             //While MonitoringManager isn't ready
             while (MonitoringManager.Instance == null || !MonitoringManager.Instance.ready || !ready)
+            {
                 //Wait 10 ms not to overload processors
                 Thread.Sleep(10);
+                
+            }
             computeUniqueId();
         }
 
@@ -173,7 +176,6 @@ namespace FYFY_plugins.Monitoring{
 							if (linksConcerned.Length
 							> 0){
 								WarningException we = new WarningException ("Because logic expression includes only \"*\" operators, \"linksConcerned\" parameters are ignored. You can remove them to the call.", exceptionStackTrace);
-								UnityEngine.Debug.LogException(we);
 							}							
 						}
 						else {
@@ -245,7 +247,7 @@ namespace FYFY_plugins.Monitoring{
                 /* This registration has to be done before the id computing because we use the id in EditionView 
                  * to know if a new component is ready (-1 if not ready) and to get this id the component has to be registered*/
                 mm.registerMonitor(this);
-
+                
                 if (needNewId)
                 {
                     // Get all used ids
@@ -304,6 +306,8 @@ namespace FYFY_plugins.Monitoring{
         /// </summary>
         public void OnAfterDeserialize()
         {
+            /*Since ComputeUniqueId is called in a thread launched in the constructor we have to wait the end of deserialization of 
+            unity before looking for a new id to have the true values of the component*/
             ready = true;
         }
     }
