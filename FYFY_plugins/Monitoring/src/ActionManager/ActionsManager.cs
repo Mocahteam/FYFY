@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using FYFY;
 using System;
+using System.IO;
 
 namespace FYFY_plugins.Monitoring
 {
@@ -175,6 +176,7 @@ namespace FYFY_plugins.Monitoring
                             labels = tmpLabels
                         });
                         //Debug.Log(string.Concat(tmpPerformer, " ", tmpActionName, " ", go.name, System.Environment.NewLine, tmpString));
+                        //File.AppendAllText("Data/UnityLogs.txt", string.Concat(System.Environment.NewLine, "[", DateTime.Now.ToString("yyyy.MM.dd.hh.mm"), "] Log - ", tmpPerformer, " ", tmpActionName, " ", go.name, System.Environment.NewLine, tmpString));
                     }
                     else if (ap.family != null)
                     {
@@ -208,6 +210,7 @@ namespace FYFY_plugins.Monitoring
                                 labels = tmpLabels
                             });
                             //Debug.Log(string.Concat(tmpPerformer, " ", tmpActionName, " ", go.name, System.Environment.NewLine, tmpString));
+                            //File.AppendAllText("Data/UnityLogs.txt", string.Concat(System.Environment.NewLine, "[", DateTime.Now.ToString("yyyy.MM.dd.hh.mm"), "] Log - ", tmpPerformer, " ", tmpActionName, " ", go.name, System.Environment.NewLine, tmpString));
                         }
                         catch (global::System.Exception)
                         {

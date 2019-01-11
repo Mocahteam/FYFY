@@ -102,7 +102,12 @@ namespace FYFY_plugins.Monitoring {
                         else if (y == null)
                             return 1;
                         else
-                            return x.gameObject.name.CompareTo(y.gameObject.name);
+                        {
+                            if(x.gameObject.name == y.gameObject.name)
+                                return x.id.CompareTo(y.id);
+                            else
+                                return x.gameObject.name.CompareTo(y.gameObject.name);
+                        }
                     });
                 }
 
