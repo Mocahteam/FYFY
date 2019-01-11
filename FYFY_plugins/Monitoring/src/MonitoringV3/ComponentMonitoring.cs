@@ -36,7 +36,7 @@ namespace FYFY_plugins.Monitoring{
 		public string comments;
 
 		/// <summary> Component id </summary>
-		//[HideInInspector]
+		[HideInInspector]
 		public int id = -1;
 
 		[HideInInspector]
