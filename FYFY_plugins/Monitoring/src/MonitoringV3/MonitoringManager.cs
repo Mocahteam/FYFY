@@ -64,6 +64,10 @@ namespace FYFY_plugins.Monitoring{
 		}
         [NonSerialized]
         internal bool ready = false; //true at the beginning of OnEnable 
+        /// <summary>
+        /// This boolean is set to false when Laalys is connected or if an error occured while trying to launch Laalys
+        /// </summary>
+        public bool waitingForLaalys = true;
 
 		/// <summary>List of Petri Nets name</summary>
 		public List<string> PetriNetsName = null;
@@ -230,9 +234,10 @@ namespace FYFY_plugins.Monitoring{
 		// Extract from Laalys actions' name the associated ComponentMonitoring and game action
 		private static List<KeyValuePair<ComponentMonitoring, string>> extractTuplesFromActionsName (string [] actions){
 			List<KeyValuePair<ComponentMonitoring, string>> results = new List<KeyValuePair<ComponentMonitoring, string>>();
-			// extract Monitoring id from actions' name
-			foreach (string action in actions){
-				string[] tokens = action.Split('_');
+            // extract Monitoring id from actions' name
+            foreach (string action in actions)
+            {
+                string[] tokens = action.Split('_');
 				// last token is id
 				int id;
 				if (tokens.Length > 2 && Int32.TryParse(tokens[tokens.Length-1], out id)){
@@ -268,7 +273,10 @@ namespace FYFY_plugins.Monitoring{
 						numberOfBytesRead = networkStream.Read(receiveBytes, 0, receiveBytes.Length);
 						inLinelabels += Encoding.UTF8.GetString (receiveBytes, 0, numberOfBytesRead);
 					} while (networkStream.DataAvailable);
-					results = inLinelabels.Split('\t');
+                    //Laalys always return the new line character as last charater so we have to remove it in inLinelabels
+                    inLinelabels = inLinelabels.Replace(System.Environment.NewLine, "");
+                    if (inLinelabels != "")
+					    results = inLinelabels.Split('\t');
 				} catch (Exception e){
 					UnityEngine.Debug.Log (e.Message);
 					UnityEngine.Debug.Log (" >> Close Client Socket");
@@ -369,7 +377,10 @@ namespace FYFY_plugins.Monitoring{
 
 					// Launch Laalys
 					if (!File.Exists(laalysPath))
-						UnityEngine.Debug.LogError ("You enabled in game analysis into Monitoring Manager component but you don't defined Laalys path.");
+                    {
+                        UnityEngine.Debug.LogError("You enabled in game analysis into Monitoring Manager component but you don't defined Laalys path.");
+                        waitingForLaalys = false;
+                    }
 					else {
 						if (fullPetriNetsPath == null || fullPetriNetsPath == "")
 							fullPetriNetsPath = "./completeNets/";
@@ -392,9 +403,11 @@ namespace FYFY_plugins.Monitoring{
                         LaalysProcess.StartInfo.RedirectStandardError = true;
 						// Launch Laalys
 						LaalysProcess.Start();
-					}
-				} catch (Exception e) {
-					UnityEngine.Debug.Log (e.Message);
+                    }
+				} catch (Exception e)
+                {
+                    waitingForLaalys = false;
+                    UnityEngine.Debug.Log (e.Message);
 				}
 			}
 		}
@@ -477,7 +490,8 @@ namespace FYFY_plugins.Monitoring{
 				networkStream = clientSocket.GetStream ();
 				// Sends data immediately upon calling NetworkStream.Write.
 				clientSocket.NoDelay = true;
-			}
+                waitingForLaalys = false;
+            }
 		}
 
         void OnDestroy()

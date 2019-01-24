@@ -73,14 +73,21 @@ namespace FYFY_plugins.Monitoring
                             {
                                 if (tl.transition.label == ap.name && tl.transition.overridedLabel == ap.overrideName)
                                 {
-                                    cMonitoring = cm;
-                                    tmpActionName = ap.name;
+                                    if(matched == 0)
+                                    {
+                                        cMonitoring = cm;
+                                        tmpActionName = ap.name;
+                                        tmpString = cm.id.ToString();
+                                    }
+                                    else
+                                        tmpString = string.Concat(tmpString, ", ", cm.id);
                                     matched++;
                                 }
                             }
                             if (matched > 1)
                             {
-                                Debug.LogException(new WarningException(string.Concat("Several ComponentMonitoring on ", go.name, " are matching the name \"", ap.name, "\" and the overrideName \"", ap.overrideName, "\". By default, the second one found is used to trace."), ap.exceptionStackTrace));
+                                Debug.LogException(new WarningException(string.Concat("Several ComponentMonitoring on ", go.name, " are matching the name \"", ap.name, "\" and the overrideName \"", ap.overrideName, "\". By default, the first one found is used to trace.",
+                                    Environment.NewLine, "The ", matched, " corresponding are: ", tmpString), ap.exceptionStackTrace));
                                 break;
                             }
                         }
@@ -99,14 +106,21 @@ namespace FYFY_plugins.Monitoring
                             {
                                 if (tl.transition.label == ap.name)
                                 {
-                                    cMonitoring = cm;
-                                    tmpActionName = ap.name;
+                                    if (matched == 0)
+                                    {
+                                        cMonitoring = cm;
+                                        tmpActionName = ap.name;
+                                        tmpString = cm.id.ToString();
+                                    }
+                                    else
+                                        tmpString = string.Concat(tmpString, ", ", cm.id);
                                     matched++;
                                 }
                             }
                             if (matched > 1)
                             {
-                                Debug.LogException(new WarningException(string.Concat("Several ComponentMonitoring on ", go.name, " are matching the name \"", ap.name, "\". By default, the second one found is used to trace."), ap.exceptionStackTrace));
+                                Debug.LogException(new WarningException(string.Concat("Several ComponentMonitoring on ", go.name, " are matching the name \"", ap.name, "\". By default, the first one found is used to trace.",
+                                    Environment.NewLine, "The ", matched, " corresponding are: ", tmpString), ap.exceptionStackTrace));
                                 break;
                             }
                         }
@@ -125,14 +139,21 @@ namespace FYFY_plugins.Monitoring
                             {
                                 if (tl.transition.overridedLabel == ap.overrideName)
                                 {
-                                    cMonitoring = cm;
-                                    tmpActionName = tl.transition.label;
+                                    if (matched == 0)
+                                    {
+                                        cMonitoring = cm;
+                                        tmpActionName = tl.transition.label;
+                                        tmpString = cm.id.ToString();
+                                    }
+                                    else
+                                        tmpString = string.Concat(tmpString, ", ", cm.id);
                                     matched++;
                                 }
                             }
                             if (matched > 1)
                             {
-                                Debug.LogException(new WarningException(string.Concat("Several ComponentMonitoring on ", go.name, " are matching the overrideName \"", ap.overrideName, "\". By default, the second one found is used to trace."), ap.exceptionStackTrace));
+                                Debug.LogException(new WarningException(string.Concat("Several ComponentMonitoring on ", go.name, " are matching the overrideName \"", ap.overrideName, "\". By default, the first one found is used to trace.",
+                                    Environment.NewLine, "The ", matched, " corresponding are: ", tmpString), ap.exceptionStackTrace));
                                 break;
                             }
                         }
