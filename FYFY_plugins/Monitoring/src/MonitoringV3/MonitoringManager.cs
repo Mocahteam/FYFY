@@ -429,10 +429,11 @@ namespace FYFY_plugins.Monitoring{
 				from type in assembly.GetExportedTypes()
 				where (type.IsClass == true && type.IsAbstract == false && type.IsSubclassOf(typeof(FSystem)) == true)
 				select type).ToArray();
-			// Parse all FSystems
-			for (int i = 0; i < systemTypes.Length; ++i) {
+            // Parse all FSystems
+            for (int i = 0; i < systemTypes.Length; ++i) {
 				System.Type systemType = systemTypes [i];
 				try{
+
 					// Create instance of FSystem in order to know its Families types
 					FSystem system = (FSystem) System.Activator.CreateInstance(systemType);
 					// Load all members of this System
@@ -457,16 +458,17 @@ namespace FYFY_plugins.Monitoring{
 								else
 									entry.equivWith = "equivWith_" + entry.systemName + "_" + entry.familyName;
 								availableFamilies.Add (entry);
-							}
+                                UnityEngine.Debug.Log(entry.systemName+ "::"+ entry.familyName+ " "+ f.getInlineDescriptor()); 
+                            }
 						}
-					}
-				} catch (Exception){
+                    }
+                } catch (Exception){
 					UnityEngine.Debug.LogError (systemType.FullName+": Instance creation failed (all families of this system are ignored). MonitoringManager requires to instantiate your systems in order to inspect their families. Common solution: Check in your constructor if Application.isPlaying is true.");
 				}
-			}
+            }
 
             // Check if associations between FamilyMonitoring components and new available families are still stable
-			for (int i = f_monitors.Count-1 ; i >= 0 ; i--)
+            for (int i = f_monitors.Count-1 ; i >= 0 ; i--)
             {
                 bool found = false;
 				foreach (FamilyAssociation fa in availableFamilies){

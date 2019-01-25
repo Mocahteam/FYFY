@@ -176,6 +176,7 @@ namespace FYFY_plugins.Monitoring{
 							if (linksConcerned.Length
 							> 0){
 								WarningException we = new WarningException ("Because logic expression includes only \"*\" operators, \"linksConcerned\" parameters are ignored. You can remove them to the call.", exceptionStackTrace);
+                                Debug.LogException(we);
 							}							
 						}
 						else {

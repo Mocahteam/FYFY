@@ -213,15 +213,26 @@ namespace FYFY {
 			for (int i = 0; i < _matchers.Length; ++i)
 				descriptor.Add(_matchers[i]._descriptor);
 			return descriptor.ToArray();
-		}
-		
-		/// <summary>
-		///		Get the first Game Object included into the family
-		/// </summary>
-		/// <returns>
-		/// 	The first GameObject or null if the family is empty.
-		/// </returns>
-		public GameObject First(){
+        }
+
+        /// <summary>
+        /// 	Return a descriptor of this family
+        /// </summary>
+        public string getInlineDescriptor()
+        {
+            string descriptor = _matchers[0]._descriptor;
+            for (int i = 1; i < _matchers.Length; ++i)
+                descriptor += " " + _matchers[i]._descriptor;
+            return descriptor;
+        }
+
+        /// <summary>
+        ///		Get the first Game Object included into the family
+        /// </summary>
+        /// <returns>
+        /// 	The first GameObject or null if the family is empty.
+        /// </returns>
+        public GameObject First(){
 			IEnumerator<GameObject> goEnum = GetEnumerator();
 			if (goEnum.MoveNext())
 				return goEnum.Current;

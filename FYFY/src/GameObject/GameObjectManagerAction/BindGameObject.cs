@@ -4,19 +4,16 @@ using System.Collections.Generic;
 namespace FYFY {
 	internal class BindGameObject : IGameObjectManagerAction {
 		private readonly GameObject _gameObject;
-		private readonly string _name;
-		private readonly HashSet<uint> _componentTypeIds;
+		private readonly HashSet<string> _componentTypeNames;
 		private readonly string _exceptionStackTrace;
 
 		internal BindGameObject(GameObject gameObject, string exceptionStackTrace) {
 			_gameObject = gameObject;
-			_name = _gameObject.name;
-			_componentTypeIds = new HashSet<uint>();
+			_componentTypeNames = new HashSet<string>();
 
 			foreach(Component c in gameObject.GetComponents<Component>()) {
 				System.Type type = c.GetType();
-				uint typeId = TypeManager.getTypeId(type);
-				_componentTypeIds.Add(typeId);
+				_componentTypeNames.Add(type.FullName);
 			}
 
 			_exceptionStackTrace = exceptionStackTrace;
@@ -33,7 +30,7 @@ namespace FYFY {
 
 			int gameObjectId = _gameObject.GetInstanceID();
 			if (!GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId)){
-				GameObjectWrapper gameObjectWrapper = new GameObjectWrapper(_gameObject, _componentTypeIds);
+				GameObjectWrapper gameObjectWrapper = new GameObjectWrapper(_gameObject, _componentTypeNames);
 				GameObjectManager._gameObjectWrappers.Add(gameObjectId, gameObjectWrapper);
 				GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
 			} else

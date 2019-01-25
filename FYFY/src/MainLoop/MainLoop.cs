@@ -160,14 +160,13 @@ namespace FYFY {
 			}
 			
 			foreach(GameObject gameObject in sceneGameObjects) {
-				HashSet<uint> componentTypeIds = new HashSet<uint>();
+				HashSet<string> componentTypeNames = new HashSet<string>();
 				foreach(Component c in gameObject.GetComponents<Component>()) {
 					System.Type type = c.GetType();
-					uint typeId = TypeManager.getTypeId(type);
-					componentTypeIds.Add(typeId);
+					componentTypeNames.Add(type.FullName);
 				}
 
-				GameObjectWrapper gameObjectWrapper = new GameObjectWrapper(gameObject, componentTypeIds);
+				GameObjectWrapper gameObjectWrapper = new GameObjectWrapper(gameObject, componentTypeNames);
 				if (!GameObjectManager._gameObjectWrappers.ContainsKey(gameObject.GetInstanceID())){
 					GameObjectManager._gameObjectWrappers.Add(gameObject.GetInstanceID(), gameObjectWrapper);
 				}

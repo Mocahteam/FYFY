@@ -39,8 +39,7 @@ namespace FYFY {
 					return;
 			}
 
-			uint componentTypeId = TypeManager.getTypeId(componentType);
-			if(GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Contains(componentTypeId) == false) {
+			if(GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeNames.Contains(componentType.FullName) == false) {
 				if (_exceptionStackTrace != "")
 					throw new UnknownComponentException("You try to remove a component not registered by Fyfy. You should use \"FYFY.GameObjectManager.AddComponent\" instead of \"UnityEngine.GameObject.AddComponent\" to add a new component to a GameObject.", _exceptionStackTrace);
 				else
@@ -51,7 +50,7 @@ namespace FYFY {
 			
 			// Check if an other component of this type is already included into the GO => if no, update wrapper
 			if (_gameObject.GetComponent<T>() == null){
-				GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Remove(componentTypeId);
+				GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeNames.Remove(componentType.FullName);
 				GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
 			}
 		}
@@ -96,8 +95,7 @@ namespace FYFY {
 			}
 			
 			System.Type componentType = _component.GetType();
-			uint componentTypeId = TypeManager.getTypeId(componentType);
-			if(GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Contains(componentTypeId) == false) {
+			if(GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeNames.Contains(componentType.FullName) == false) {
 				if(_exceptionStackTrace != "")
 					throw new UnknownComponentException("You try to remove a component not registered by Fyfy. You should use \"FYFY.GameObjectManager.AddComponent\" instead of \"UnityEngine.GameObject.AddComponent\" to add a new component to a GameObject.", _exceptionStackTrace);
 				else 
@@ -108,7 +106,7 @@ namespace FYFY {
 			
 			// Check if an other component of this type is already included into the GO => if no, update wrapper
 			if (_gameObject.GetComponent(componentType) == null){
-				GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Remove(componentTypeId);
+				GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeNames.Remove(componentType.FullName);
 				GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
 			}
 		}

@@ -30,8 +30,7 @@ namespace FYFY {
 			System.Type componentType = typeof(T);
 			// Check if the component added is the first one in the GO of this type, if true update wrapper
 			if (_gameObject.GetComponent<T>() == null) {
-				uint componentTypeId = TypeManager.getTypeId(componentType);
-				GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Add(componentTypeId);
+				GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeNames.Add(componentType.FullName);
 				GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
 			}
 
@@ -95,8 +94,7 @@ namespace FYFY {
 
 			// Check if the component added is the first one in the GO of this type, if true update wrapper
 			if (_gameObject.GetComponent(_componentType) == null) {
-				uint componentTypeId = TypeManager.getTypeId(_componentType);
-				GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeIds.Add(componentTypeId);
+				GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeNames.Add(_componentType.FullName);
 				GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
 			}
 

@@ -18,7 +18,6 @@ namespace FYFY_plugins.Monitoring {
 	/// </summary>
 	public class EditionView : EditorWindow
 	{
-	    private Rect windowRect = new Rect(20, 20, 20, 20);
 		internal static EditorWindow window;
 	    private static string[] optType = new string[] { "Get", "Produce", "Require" };
 	    private static string[] optFlag = new string[] { "at least", "less than" };

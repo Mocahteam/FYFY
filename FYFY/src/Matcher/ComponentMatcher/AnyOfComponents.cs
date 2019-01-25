@@ -11,8 +11,8 @@
 		}
 
 		internal override bool matches(GameObjectWrapper gameObjectWrapper){
-			for(int i = 0; i < _componentTypeIds.Length; ++i){
-				if(gameObjectWrapper._componentTypeIds.Contains(_componentTypeIds[i]) == true){
+			for(int i = 0; i < _componentTypeNames.Length; ++i){
+				if(gameObjectWrapper._componentTypeNames.Contains(_componentTypeNames[i]) == true){
 					return true;
 				}
 			}
