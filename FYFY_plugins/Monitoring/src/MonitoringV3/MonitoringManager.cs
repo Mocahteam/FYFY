@@ -458,7 +458,6 @@ namespace FYFY_plugins.Monitoring{
 								else
 									entry.equivWith = "equivWith_" + entry.systemName + "_" + entry.familyName;
 								availableFamilies.Add (entry);
-                                UnityEngine.Debug.Log(entry.systemName+ "::"+ entry.familyName+ " "+ f.getInlineDescriptor()); 
                             }
 						}
                     }
