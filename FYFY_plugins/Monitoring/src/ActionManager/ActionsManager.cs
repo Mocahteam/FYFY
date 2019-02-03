@@ -181,12 +181,6 @@ namespace FYFY_plugins.Monitoring
                             tmpLabels = MonitoringManager.trace(cMonitoring, tmpActionName, tmpPerformer);
                         else
                             tmpLabels = MonitoringManager.trace(cMonitoring, tmpActionName, tmpPerformer, true, ap.orLabels);
-                        if (tmpLabels.Length != 0)
-                            tmpString = tmpLabels[0];
-                        for (int i = 1; i < tmpLabels.Length; i++)
-                        {
-                            tmpString = string.Concat(tmpString, " ", tmpLabels[i]);
-                        }
                         GameObjectManager.addComponent<Trace>(traces, new
                         {
                             actionName = tmpActionName,
@@ -196,6 +190,12 @@ namespace FYFY_plugins.Monitoring
                             orLabels = ap.orLabels,
                             labels = tmpLabels
                         });
+                        // if (tmpLabels.Length != 0)
+                            // tmpString = tmpLabels[0];
+                        // for (int i = 1; i < tmpLabels.Length; i++)
+                        // {
+                            // tmpString = string.Concat(tmpString, " ", tmpLabels[i]);
+                        // }
                         //Debug.Log(string.Concat(tmpPerformer, " ", tmpActionName, " ", go.name, System.Environment.NewLine, tmpString));
                         //File.AppendAllText("Data/UnityLogs.txt", string.Concat(System.Environment.NewLine, "[", DateTime.Now.ToString("yyyy.MM.dd.hh.mm"), "] Log - ", tmpPerformer, " ", tmpActionName, " ", go.name, System.Environment.NewLine, tmpString));
                     }
@@ -216,11 +216,6 @@ namespace FYFY_plugins.Monitoring
                                 tmpLabels = MonitoringManager.trace(ap.family, tmpActionName, tmpPerformer);
                             else
                                 tmpLabels = MonitoringManager.trace(ap.family, tmpActionName, tmpPerformer, true, ap.orLabels);
-                            tmpString = tmpLabels[0];
-                            for (int i = 1; i < tmpLabels.Length; i++)
-                            {
-                                tmpString = string.Concat(tmpString, " ", tmpLabels[i]);
-                            }
                             GameObjectManager.addComponent<Trace>(traces, new
                             {
                                 actionName = tmpActionName,
@@ -230,12 +225,18 @@ namespace FYFY_plugins.Monitoring
                                 orLabels = ap.orLabels,
                                 labels = tmpLabels
                             });
+							// if (tmpLabels.Length != 0)
+								// tmpString = tmpLabels[0];
+                            // for (int i = 1; i < tmpLabels.Length; i++)
+                            // {
+                                // tmpString = string.Concat(tmpString, " ", tmpLabels[i]);
+                            // }
                             //Debug.Log(string.Concat(tmpPerformer, " ", tmpActionName, " ", go.name, System.Environment.NewLine, tmpString));
                             //File.AppendAllText("Data/UnityLogs.txt", string.Concat(System.Environment.NewLine, "[", DateTime.Now.ToString("yyyy.MM.dd.hh.mm"), "] Log - ", tmpPerformer, " ", tmpActionName, " ", go.name, System.Environment.NewLine, tmpString));
                         }
                         catch (global::System.Exception)
                         {
-                            throw new InvalidTraceException(string.Concat("Unable to trace action on the family \"", ap.family.ToString(), "\" because of invald arguments in the ActionPerformed component or the family is not monitored."), ap.exceptionStackTrace);
+                            throw new InvalidTraceException(string.Concat("Unable to trace action \"", tmpActionName, "\" on the family because of invalid arguments in the ActionPerformed component or the family is not monitored."), ap.exceptionStackTrace);
                         }
                     }
                 }
