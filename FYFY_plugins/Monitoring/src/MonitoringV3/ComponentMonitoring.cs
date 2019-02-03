@@ -137,7 +137,14 @@ namespace FYFY_plugins.Monitoring{
             return null;
         }
 		
-		internal string getInternalName(string actionName, string exceptionStackTrace, bool processLinks = true, params string[] linksConcerned){
+        /// <summary>
+        /// Each list element is a set of AND links, then the main list model OR set of links.
+        /// </summary>
+		public List<List<string>> getPossibleSetOfLinks(string actionName){
+			return getPossibleSetOfLinks (actionName, "");
+		}
+
+		internal List<List<string>> getPossibleSetOfLinks(string actionName, string exceptionStackTrace){
 			TransitionLink transitionLink  = getTransitionLinkByTransitionLabel(actionName);
 			if (transitionLink != null) {
 				string logic = transitionLink.logic;
@@ -155,6 +162,22 @@ namespace FYFY_plugins.Monitoring{
 						}
 					}
 					groupAndByOr.Add (groupLinksByAnd);
+					return groupAndByOr;
+				} else {
+					throw new TraceAborted ("Logic expression for \"" + actionName + "\" action in \"" + this.gameObject.name + "\" Game Object is not valid.", exceptionStackTrace);
+				}
+			} else {
+				throw new TraceAborted ("Action \"" + actionName + "\" is not monitored by \"" + this.gameObject.name + "\" Game Object.", exceptionStackTrace);
+			}
+		}
+		
+		internal string getInternalName(string actionName, string exceptionStackTrace, bool processLinks = true, params string[] linksConcerned){
+			TransitionLink transitionLink  = getTransitionLinkByTransitionLabel(actionName);
+			if (transitionLink != null) {
+				string logic = transitionLink.logic;
+				// Check logic expression
+				if (ExpressionParser.isValid (transitionLink)) {
+					List<List<string>> groupAndByOr = getPossibleSetOfLinks (actionName, exceptionStackTrace);
 
 					// If we have to process links and linksConcerned is empty and we have at least one OR statement into logic expression (i.e. at least 2 AND groups) => problem, developer has to specify the set of links concerned by this transition.
 					if (processLinks && linksConcerned.Length == 0 && groupAndByOr.Count > 1) {
