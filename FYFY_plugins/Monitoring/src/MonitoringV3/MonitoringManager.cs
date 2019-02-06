@@ -158,7 +158,7 @@ namespace FYFY_plugins.Monitoring{
 		/// 	Get next actions to perform in order to reach targeted game action.
 		/// </summary>
 		/// <param name="monitor">The ComponentMonitoring on which you want reach action.</param>
-		/// <param name="targetedActionName">Action name you want to reach, this name has to match with a transition defined into associated Petri Net  of the "monitor" parameter <see cref="ComponentMonitoring.PnmlFile"/>.</param>
+		/// <param name="targetedActionName">Action name you want to reach, this name has to match with a transition defined into associated Petri Net of the "monitor" parameter <see cref="ComponentMonitoring.PnmlFile"/>. The special key word "##playerObjectives##" enable to target all player objective actions defined inside full Petri Net from which the monitor is part of (in this special case, "linksConcerned" parameter will be ignore).</param>
 		/// <param name="maxActions">Maximum number of actions returned.</param>
 		/// <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to look for the trace: l0 and l3 OR l1 and l3 => <code>MonitoringManager.getNextActionToReach(..., "l0", "l3");</code> OR <code>MonitoringManager.getNextActionToReach(..., "l1", "l3");</code></param>
 		/// <return>List of Pairs including a ComponentMonitoring and its associated game action useful to reach the targeted action, the number of actions returned is less or equal to maxActions parameters.</return>
@@ -170,7 +170,9 @@ namespace FYFY_plugins.Monitoring{
 			if (MonitoringManager.Instance == null)
 				throw new TraceAborted ("No MonitoringManager found. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", null);
 
-			string internalName = monitor.getInternalName(targetedActionName, exceptionStackTrace, true, linksConcerned);
+			string internalName = targetedActionName;
+			if (!targetedActionName.Equals("##playerObjectives##"))
+				internalName = monitor.getInternalName(targetedActionName, exceptionStackTrace, true, linksConcerned);
 			if (monitor.fullPnSelected >= MonitoringManager.Instance.PetriNetsName.Count)
 				monitor.fullPnSelected = 1;
 			string pnName = MonitoringManager.Instance.PetriNetsName[monitor.fullPnSelected];
@@ -181,7 +183,7 @@ namespace FYFY_plugins.Monitoring{
 		/// 	Get next actions to perform in order to reach targeted game action.
 		/// </summary>
 		/// <param name="family">The monitored Family on which you want reach action.</param>
-		/// <param name="targetedActionName">Action name you want to reach, this name has to match with a transition defined into associated Petri Net  of the "family" parameter <see cref="ComponentMonitoring.PnmlFile"/>.</param>
+		/// <param name="targetedActionName">Action name you want to reach, this name has to match with a transition defined into associated Petri Net  of the "family" parameter <see cref="ComponentMonitoring.PnmlFile"/> The special key word "##playerObjectives##" enable to target all player objective actions defined inside full Petri Net from which the monitor is part of (in this special case, "linksConcerned" parameter will be ignore).</param>
 		/// <param name="maxActions">Maximum number of actions returned.</param>
 		/// <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to look for the trace: l0 and l3 OR l1 and l3 => <code>MonitoringManager.getNextActionToReach(..., "l0", "l3");</code> OR <code>MonitoringManager.getNextActionToReach(..., "l1", "l3");</code></param>
 		/// <return>List of Pairs including a ComponentMonitoring and its associated game action useful to reach the targeted action, the number of actions returned is less or equal to maxActions parameters.</return>
@@ -197,7 +199,9 @@ namespace FYFY_plugins.Monitoring{
 			if (fm == null)
 				throw new TraceAborted ("No monitor found for this family", null);
 
-			string internalName = fm.getInternalName(targetedActionName, exceptionStackTrace, true, linksConcerned);
+			string internalName = targetedActionName;
+			if (!targetedActionName.Equals("##playerObjectives##"))
+				internalName = fm.getInternalName(targetedActionName, exceptionStackTrace, true, linksConcerned);
 			if (fm.fullPnSelected >= MonitoringManager.Instance.PetriNetsName.Count)
 				fm.fullPnSelected = 1;
 			string pnName = MonitoringManager.Instance.PetriNetsName[fm.fullPnSelected];
