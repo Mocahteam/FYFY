@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
+
+
+[assembly: InternalsVisibleTo("Monitoring")] // ugly
 
 namespace FYFY {
 	/// <summary></summary>
@@ -25,6 +29,9 @@ namespace FYFY {
 	[AddComponentMenu("")]
 	public class MainLoop : MonoBehaviour {
 		internal static MainLoop _mainLoop; // eviter davoir plusieurs composants MainLoop dans toute la scene (cf Awake)
+		
+		// this static flag is used by monitoring module to know if the scene will change
+		internal static bool sceneChanging = false;
 
 		/// <summary>List of systems defined in fixedUpdate context through the Inspector</summary>
 		public SystemDescription[] _fixedUpdateSystemDescriptions; // initialized in inspector, otherwise == null
@@ -91,6 +98,7 @@ namespace FYFY {
 			GameObjectManager._modifiedGameObjectIds.Clear();
 			GameObjectManager._sceneBuildIndex = -1;
 			GameObjectManager._sceneName = null;
+			sceneChanging = false;
 		}
 
 		private void OnDestroy(){
@@ -322,8 +330,10 @@ namespace FYFY {
 
 			if(GameObjectManager._sceneBuildIndex != -1) { // load scene if it's desired
 				UnityEngine.SceneManagement.SceneManager.LoadScene(GameObjectManager._sceneBuildIndex); // done at the beginning of the "Unity" next frame
+				sceneChanging = true;
 			} else if(GameObjectManager._sceneName != null) {
 				UnityEngine.SceneManagement.SceneManager.LoadScene(GameObjectManager._sceneName);       // done at the beginning of the "Unity" next frame
+				sceneChanging = true;
 			}
 		}
 	}

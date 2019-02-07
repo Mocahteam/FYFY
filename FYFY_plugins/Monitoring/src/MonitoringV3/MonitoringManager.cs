@@ -21,18 +21,6 @@ namespace FYFY_plugins.Monitoring{
 	[ExecuteInEditMode] // Awake, OnEnable, Start, Destroy... will be call in edit mode
 	[DisallowMultipleComponent]
 	public class MonitoringManager : MonoBehaviour {
-        /// <summary>
-        /// Instance of the singleton MonitoringManager
-        /// The value is set in the constructor
-        /// </summary>
-		public static MonitoringManager Instance = null;
-		/// <summary> Set singleton instance of MonitoringManager </summary>
-		// singleton => only one Monitoring Manager (see Awake)
-        public MonitoringManager()
-        {
-            if (Instance == null)
-                Instance = this;
-        }
 		internal static string NEXT_ACTION_TOKEN = "NextActionToReach"; // token used with Laalys intercommunication
 
 		/// <summary>Define the different source that can trigger a game action.</summary>
@@ -50,10 +38,10 @@ namespace FYFY_plugins.Monitoring{
 		private EventHandler LaalysEH = null;
 		
 		[HideInInspector]
-		[SerializeField]
+		[NonSerialized]
 		internal List<ComponentMonitoring> c_monitors = new List<ComponentMonitoring>(); // used in EditionView 
 		[HideInInspector]
-		[SerializeField]
+		[NonSerialized]
 		internal List<FamilyMonitoring> f_monitors = new List<FamilyMonitoring>();
 		internal List<FamilyAssociation> availableFamilies; // used in EditionView
 		internal class FamilyAssociation {
@@ -83,6 +71,20 @@ namespace FYFY_plugins.Monitoring{
 		public string featuresPath;
 		/// <summary>Path to the jar file of Laalys</summary>
 		public string laalysPath;
+		
+        /// <summary>
+        /// Instance of the singleton MonitoringManager
+        /// The value is set in the constructor
+        /// </summary>
+		public static MonitoringManager Instance = null;
+		
+		/// <summary> Set singleton instance of MonitoringManager </summary>
+		// singleton => only one Monitoring Manager (see Awake)
+        public MonitoringManager()
+        {
+			// Set the last object of MonitoringManager as current Instance
+			Instance = this;
+        }
 
         /// <summary>
         /// 	Get monitor with asked id.
@@ -94,10 +96,10 @@ namespace FYFY_plugins.Monitoring{
 				throw new TraceAborted ("No MonitoringManager found. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", null);
 			
 			foreach (ComponentMonitoring cm in MonitoringManager.Instance.c_monitors)
-				if (cm.id == id)
+				if (cm != null && cm.id == id)
 					return cm;
 			foreach (FamilyMonitoring fm in MonitoringManager.Instance.f_monitors)
-				if (fm.id == id)
+				if (fm != null && fm.id == id)
 					return (ComponentMonitoring) fm;
 			return null;
 		}
@@ -343,25 +345,12 @@ namespace FYFY_plugins.Monitoring{
 
 		void Awake ()
         {
-            // Several instances of MonitoringManager are not allowed
+			// Several instances of MonitoringManager are not allowed
             if (Instance != null && Instance != this) {
 				UnityEngine.Debug.LogError ("Only one MonitoringManager component could be instantiate in a scene.");
 				DestroyImmediate (this);
 				return;
             }
-
-            /*
-             * Before this Awake function is called, every object is detroyed then instanciated by Unity
-             * Even if the object is instantanetly destroyed, the destructor is called by the garbage collector later and can be called after this Awake
-             * In that case, since we call freeUniqueID in the destructor, it happens that the ComponentMonitoring removes itself from the list after the Awake
-             * To avoid that, we set a boolean to false in the Awake and check it when the destructor is called
-             */
-            foreach (ComponentMonitoring cm in c_monitors)
-                if(cm)
-                    cm.canFreeUniqueId = false;
-            foreach (FamilyMonitoring fm in f_monitors)
-                if(fm)
-                    fm.canFreeUniqueId = false;
 
             //Clear lists to remove erroneous component
             //The others will be registered again in their start function
@@ -424,7 +413,9 @@ namespace FYFY_plugins.Monitoring{
 				return;
 			
 #if UNITY_EDITOR
-            while (UnityEditor.EditorApplication.isCompiling) ;
+            while (UnityEditor.EditorApplication.isCompiling)
+				//Wait 10 ms not to overload processors
+				Thread.Sleep(10);
 #endif
 			// OnEnable is called after script compilation (due to [ExecuteInEditMode]). We use this mechanism to update list of available families
 			availableFamilies = new List<FamilyAssociation>();
@@ -482,8 +473,9 @@ namespace FYFY_plugins.Monitoring{
 						break;
 					}
 				}
-				if (!found)
+				if (!found){
 					DestroyImmediate(f_monitors[i].gameObject);
+				}
 			}
 		}
 
@@ -501,31 +493,21 @@ namespace FYFY_plugins.Monitoring{
 
         void OnDestroy()
 		{
+			// close Socket 
+			if (clientSocket != null)
+				clientSocket.Close ();
+			if (serverSocket != null)
+				serverSocket.Stop ();
+			// Stop process
+			if (LaalysProcess != null && !LaalysProcess.HasExited) {
+				// Stop to capture output stream
+				LaalysProcess.Exited -= LaalysEH;
+				LaalysProcess.Kill ();
+			}
+			// Save traces
+			if (Application.isPlaying)
+				XmlHandler.saveTraces (SceneManager.GetActiveScene().name);
 			if (Instance == this) {
-				// close Socket 
-				if (clientSocket != null)
-					clientSocket.Close ();
-				if (serverSocket != null)
-					serverSocket.Stop ();
-				// Stop process
-				if (LaalysProcess != null && !LaalysProcess.HasExited) {
-					// Stop to capture output stream
-					LaalysProcess.Exited -= LaalysEH;
-					LaalysProcess.Kill ();
-				}
-				// Save traces
-				if (Application.isPlaying)
-					XmlHandler.saveTraces (SceneManager.GetActiveScene().name);
-				
-				// Destroy all ComponentMonitors
-				for (int i = c_monitors.Count-1 ; i >= 0 ; i--){
-					DestroyImmediate(c_monitors[i]);
-				}
-				// Destroy all FamilyMonitorings
-				for (int i = f_monitors.Count-1 ; i >= 0 ; i--){
-					DestroyImmediate(f_monitors[i].gameObject);
-				}
-				
 				Instance = null;
 			}
         }

@@ -201,9 +201,6 @@ namespace FYFY_plugins.Monitoring {
                         }
                         if (GUILayout.Button(new GUIContent("X", "Remove selected monitor."), GUILayout.Width(20)))
                         {
-                            // in case of monitor's GameObject is not active in hierarchy OnDestroy of ComponentMonitoring will not be called => then we force to free unique id
-                            if (!cm.gameObject.activeInHierarchy)
-                                cm.freeUniqueId();
                             Undo.DestroyObjectImmediate(cm);
                             go_labels.RemoveAt(monitorSelectedFlag);
                             if (go_labels.Count <= 0)
@@ -248,7 +245,7 @@ namespace FYFY_plugins.Monitoring {
                         List<ComponentMonitoring> templates_cm = new List<ComponentMonitoring>();
                         foreach (ComponentMonitoring _cm in mm.c_monitors)
                         {
-                            if (_cm.id != cm.id && _cm.PnmlFile != null)
+                            if (_cm != null && _cm.id != cm.id && _cm.PnmlFile != null)
                             { // we exclude from the list monitor with the same id and monitors where pnmlfile is not defined (i.e. non initialized)
                                 int cpt = 0;
                                 foreach (TransitionLink ctr in _cm.transitionLinks)
@@ -408,12 +405,7 @@ namespace FYFY_plugins.Monitoring {
                         if (fm != null)
                         {
                             if (GUILayout.Button(new GUIContent("X", "Remove monitor from this family."), GUILayout.Width(20)))
-                            {
-                                // in case of monitor is not active in hierarchy OnDestroy of FamilyMonitoring will not be called => then we force to free unique id
-                                if (!fm.gameObject.activeInHierarchy)
-                                    fm.freeUniqueId();
                                 Undo.DestroyObjectImmediate(fm.gameObject);
-                            }
                         }
                         EditorGUILayout.EndHorizontal();
 

@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using System;
 using System.Threading;
+using FYFY;
 
 
 namespace FYFY_plugins.Monitoring{
@@ -17,15 +18,6 @@ namespace FYFY_plugins.Monitoring{
         private static Mutex mut = new Mutex();
         [NonSerialized]
         internal bool ready = false;
-
-        /// <summary>
-        /// If true, when the garbage collector will be called this component ID will be removed from the list of IDs int he MonitoringManager
-        /// By default it is set to true
-        /// It is set to false right before the MonitoringManager clears the monitors lists and is set back to true each time the constructor is called
-        /// </summary>
-        [HideInInspector]
-        [SerializeField]
-        internal bool canFreeUniqueId = true;
 
         /// <summary> Pnml File associated to the monitor </summary>
         [HideInInspector]
@@ -84,35 +76,88 @@ namespace FYFY_plugins.Monitoring{
             thread.Start();
         }
 
-        /// <summary>
-        /// Destructor of ComponentMonitoring called by the Garbage Collector after the destruction of the component
-        /// </summary>
-        ~ComponentMonitoring()
-        {
-            /*
-             * Before the Awake function of MonitoringManager is called, every object is detroyed then instanciated by Unity
-             * Even if the object is instantanetly destroyed, the destructor is called by the garbage collector later and can be called after this Awake
-             * In that case, since we call freeUniqueID in the destructor, it happens that the ComponentMonitoring removes itself from the list after the Awake
-             * To avoid that, we set a boolean to false in the Awake and check it when the destructor is called
-             * By default canFreeUniqueId is set to true
-             * It is set to false right before the MonitoringManager clears the monitors lists and is set back to true each time the constructor is called
-             */
-            if (canFreeUniqueId)
-                freeUniqueId();
-        }
-
         private void WaitMonitoringManager()
         {
-            //While MonitoringManager isn't ready
-            while (MonitoringManager.Instance == null || !MonitoringManager.Instance.ready || !ready)
+			int timeOut = 0;
+            //While MonitoringManager isn't ready or the timeout exceed 5 seconds
+            while ((MonitoringManager.Instance == null || !MonitoringManager.Instance.ready || !ready || MainLoop.sceneChanging) && timeOut < 5000)
             {
                 //Wait 10 ms not to overload processors
                 Thread.Sleep(10);
-                
+                timeOut += 10;
             }
-            computeUniqueId();
+			if (timeOut < 5000)
+				computeUniqueId();
+        }
+		
+		internal void computeUniqueId() 
+        {
+            mut.WaitOne();
+            try
+            {
+				MonitoringManager mm = MonitoringManager.Instance;
+                // Check if we have to compute a new Id.
+                if (id == -1)
+                {
+                    // Get all used ids
+                    List<int> ids = new List<int>();
+                    foreach (ComponentMonitoring _cm in mm.c_monitors)
+                        if (_cm) ids.Add(_cm.id);
+                    foreach (FamilyMonitoring _fm in mm.f_monitors)
+                        if (_fm) ids.Add(_fm.id);
+                    ids.Sort();
+                    // Find the first hole available
+                    int newId = 0;
+                    int iterationLength = ids.Count+1;
+                    for(; newId < iterationLength; newId++)
+                    {
+                        if (!ids.Contains(newId))
+                            break;
+                    }
+                    id = newId;
+
+                    // update id of petrinet
+                    if (petriNet != null)
+                        petriNet.attachID(id);
+                }
+				// register this monitor
+				mm.registerMonitor(this);
+            }
+            catch (Exception e)
+            {
+                mut.ReleaseMutex();
+                throw e;
+            }
+            mut.ReleaseMutex();
+        }
+		
+		// If we remove a component from an inactive game object, the OnDestroy callback may not be called (depending if an Awake trigger before). In this case the monitoring will not be unregister from MonitoringManager. It's not critical because next time the MonitoringManager will be reload, the list of ComponentMonitoring will be refresh. So we maintain inconsistent ComponentMonitoring only during this session
+		void OnDestroy(){
+			// When launching play, all GameObject are destroyed in editor and new Awake, Start... are launched in play mode. Same when we click on Stop button, OnDestroy is called in play mode and Awake, Start... are launched in editor mode (due to [ExecuteInEditMode] metatag) => Then we have to check if dictionary is already defined in case of MonitoringManager is destroyed before this ComponentMonitoring
+			if (MonitoringManager.Instance != null){
+				MonitoringManager.Instance.unregisterMonitor(this);
+			}
+		}
+
+        /// <summary>
+        /// This fonction is called by Unity right before it serializes data from every component
+        /// It has to be implemented because ComponentMonitoring inherits from the interface ISerializationCallbackReceiver
+        /// </summary>
+        public void OnBeforeSerialize()
+        {
+
         }
 
+        /// <summary>
+        /// This fonction is called by Unity right after it serializes data from every component
+        /// We set the ComponentMonitoring to ready when it is done
+        /// </summary>
+        public void OnAfterDeserialize()
+        {
+            // Since ComputeUniqueId is called in a thread launched in the constructor we have to wait the end of deserialization of unity before looking for a new id to have the true values of the component
+            ready = true;
+        }
+		
         internal void clone(ComponentMonitoring template){
 			this.PnmlFile = template.PnmlFile;
 			this.comments = template.comments;
@@ -248,91 +293,6 @@ namespace FYFY_plugins.Monitoring{
 			} else {
 				throw new TraceAborted ("Action \"" + actionName + "\" is not monitored by \"" + this.gameObject.name + "\" Game Object.", exceptionStackTrace);
 			}
-			
 		}
-		
-		internal void computeUniqueId()
-        {
-            mut.WaitOne();
-            try
-            {
-                MonitoringManager mm = MonitoringManager.Instance;
-                // Check if we have to compute a new Id.
-                // This is the case if this id is already used by an other ComponentMonitoring
-                ComponentMonitoring cm = MonitoringManager.getMonitorById(id);
-                bool needNewId = cm != null;
-                // If we found a monitor with the same id we check if it is not this
-                if (needNewId)
-                    needNewId = cm != this;
-                // OR if id is not initialized
-                needNewId = needNewId || id == -1;
-
-                // register this monitor
-                /* This registration has to be done before the id computing because we use the id in EditionView 
-                 * to know if a new component is ready (-1 if not ready) and to get this id the component has to be registered*/
-                mm.registerMonitor(this);
-                
-                if (needNewId)
-                {
-                    // Get all used ids
-                    List<int> ids = new List<int>();
-                    foreach (ComponentMonitoring _cm in mm.c_monitors)
-                        ids.Add(_cm.id);
-                    foreach (FamilyMonitoring _fm in mm.f_monitors)
-                        ids.Add(_fm.id);
-                    ids.Sort();
-                    // Find the first hole available
-                    int newId = 0;
-                    int iterationLength = ids.Count+1;
-                    for(; newId < iterationLength; newId++)
-                    {
-                        if (!ids.Contains(newId))
-                            break;
-                    }
-                    id = newId;
-
-                    // update id of petrinet
-                    if (petriNet != null)
-                        petriNet.attachID(id);
-                }
-            }
-            catch (Exception e)
-            {
-                mut.ReleaseMutex();
-                throw e;
-            }
-            mut.ReleaseMutex();
-        }
-		
-		internal void freeUniqueId(){
-			// When launching play, all GameObject are destroyed in editor and new Awake, Start... are launched in play mode. Same when we click on Stop button, OnDestroy is called in play mode and Awake, Start... are launched in editor mode (due to [ExecuteInEditMode] metatag) => Then we have to check if dictionary is already defined in case of MonitoringManager is destroyed before this ComponentMonitoring
-			if (MonitoringManager.Instance != null){
-				MonitoringManager.Instance.unregisterMonitor(this);
-			}
-		}
-		
-		void OnDestroy(){
-			freeUniqueId();
-		}
-
-        /// <summary>
-        /// This fonction is called by Unity right before it serializes data from every component
-        /// It has to be implemented because ComponentMonitoring inherits from the interface ISerializationCallbackReceiver
-        /// </summary>
-        public void OnBeforeSerialize()
-        {
-
-        }
-
-        /// <summary>
-        /// This fonction is called by Unity right after it serializes data from every component
-        /// We set the ComponentMonitoring to ready when it is done
-        /// </summary>
-        public void OnAfterDeserialize()
-        {
-            /*Since ComputeUniqueId is called in a thread launched in the constructor we have to wait the end of deserialization of 
-            unity before looking for a new id to have the true values of the component*/
-            ready = true;
-        }
     }
 }
