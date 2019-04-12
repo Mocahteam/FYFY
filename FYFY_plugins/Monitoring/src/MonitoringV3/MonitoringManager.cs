@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Diagnostics;
 using System.Reflection;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using FYFY;
@@ -23,6 +24,8 @@ namespace FYFY_plugins.Monitoring{
 	public class MonitoringManager : MonoBehaviour {
 		internal static string NEXT_ACTION_TOKEN = "NextActionToReach"; // token used with Laalys intercommunication
 
+		private static Mutex mut = new Mutex();
+		
 		/// <summary>Define the different source that can trigger a game action.</summary>
 		public static class Source {
 			/// <summary></summary>
@@ -210,6 +213,26 @@ namespace FYFY_plugins.Monitoring{
 			return MonitoringManager.getNextActionsToReach (pnName, internalName, maxActions);
 		}
 		
+		/// <summary>
+		/// 	Get next actions to perform in order to reach the player objective of the Petri net.
+		/// </summary>
+		/// <param name="pnName">The Petri net name to process.</param>
+		/// <param name="maxActions">Maximum number of actions returned.</param>
+		/// <return>List of Pairs including a ComponentMonitoring and its associated game action useful to reach the player objective, the number of actions returned is less or equal to maxActions parameters.</return>
+		public static List<KeyValuePair<ComponentMonitoring, string>> getNextActionsToReachPlayerObjective(string pnName, int maxActions)
+		{
+			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame (1, true);										// get caller stackFrame with informations
+			string exceptionStackTrace = "(at " + stackFrame.GetFileName () + ":" + stackFrame.GetFileLineNumber ().ToString () + ")";	// to point where this function was called
+			if (MonitoringManager.Instance == null)
+				throw new TraceAborted ("No MonitoringManager found. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", null);
+			
+			if (!MonitoringManager.Instance.PetriNetsName.Contains(pnName))
+				throw new TraceAborted ("No Petri net with name \""+pnName+"\" found", null);
+
+			string internalName = "##playerObjectives##";
+			return MonitoringManager.getNextActionsToReach (pnName, internalName, maxActions);
+		}
+		
 		/// <summary>Ask to Laalys to provide all triggerable actions</summary>
 		/// <return>List of Pairs including a ComponentMonitoring and its associated game action that may be triggered.</return>
 		public static List<KeyValuePair<ComponentMonitoring, string>> getTriggerableActions(){
@@ -261,9 +284,9 @@ namespace FYFY_plugins.Monitoring{
 		}
 
 		internal string [] analyseToken (string token, params string[] options){
+			mut.WaitOne(); // in case of analyseToken is called by several thread, control access in order to avoid that the threads read bytes from an other analyses
 			string[] results = new string[] {};
-
-			if (networkStream != null) {
+			if (networkStream != null && clientSocket != null) {
 				try{
 					// Aggregate options into the token
 					foreach (string option in options)
@@ -290,6 +313,8 @@ namespace FYFY_plugins.Monitoring{
 					clientSocket = null;
 				}
 			}
+			mut.ReleaseMutex();
+			
 			return results;
 		}
 		

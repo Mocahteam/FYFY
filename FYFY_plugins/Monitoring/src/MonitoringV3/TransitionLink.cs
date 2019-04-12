@@ -25,11 +25,12 @@ namespace FYFY_plugins.Monitoring{
 			links = new List<Link>();
 		}
 		
-		// copy all data from template except transition because its a reference of PetriNet
+		// copy all data from template except transition because its a reference of PetriNet (just init overridedName)
 		internal void import(TransitionLink template){
 			this.links = new List<Link>();
 			foreach (Link l in template.links)
 				this.links.Add(new Link(l));
+			this.transition.overridedLabel = template.transition.overridedLabel;
 			this.isSystemAction = template.isSystemAction;
 			this.isEndAction = template.isEndAction;
 			this.logic = template.logic;

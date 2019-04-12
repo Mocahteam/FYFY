@@ -34,6 +34,7 @@ namespace FYFY_plugins.Monitoring {
 
         private static GUIStyle ToggleButtonStyleNormal = null;
 	    private static GUIStyle ToggleButtonStyleToggled = null;
+		private static GUIStyle wordWrapStyle = null;
 
 	    private bool goMenuItemActive = true;
 	    private bool familyMenuItemActive = false;
@@ -42,6 +43,10 @@ namespace FYFY_plugins.Monitoring {
 	    private static int cptSt = 0;
 	    private Vector2 scrollPosition;
         private List<GUIContent> templates_id;
+		private string filter = "";
+		private string filterRef = "";
+		private string importFilter = "";
+		private string importFilterRef = "";
 
         private bool showStates = false;
 		private bool showActions = false;
@@ -139,24 +144,26 @@ namespace FYFY_plugins.Monitoring {
 				if (mm.c_monitors.Count > 0)
                 {
                     EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
-
-					// compute template list for filter by Petri net
-					templates_id = new List<GUIContent>();
-					templates_id.Add(new GUIContent("<No filter>"));
-					foreach (string name in mm.PetriNetsName)
-						templates_id.Add(new GUIContent(name));
-					// Display filter 
-					petriNetFilter = EditorGUILayout.Popup(new GUIContent("Petri net Filter:", "Filter monitors by Full Petri nets (This list is defined in MonitoringManager component)."), petriNetFilter, templates_id.ToArray());
-					if (petriNetFilter >= templates_id.Count) // can occur with Ctrl+Z
-						petriNetFilter = templates_id.Count - 1;
-                    // Compute list of monitor depending on filter
+					
+					// input text to filter by name
+					filter = EditorGUILayout.TextField (new GUIContent("Filter by names:", "Filter monitors by full Petri net name, PNML name or Game Object name."), filter);
+					// input text to filter by monitor reference
+					filterRef = EditorGUILayout.TextField (new GUIContent("Filter by ref.:", "Filter monitors by freference."), filterRef);
+					
+					// list all full Petri net name containing the filter
+					List <int> availableFullPetriNets = new List<int>();
+					for (int i = 0 ; i < mm.PetriNetsName.Count ; i++)
+						if (mm.PetriNetsName[i].ToUpper() == filter.ToUpper())
+							availableFullPetriNets.Add(i);
+					
+                    // Compute list of monitor depending on filters
 					List<GUIContent> go_labels = new List<GUIContent>();
 					foreach (ComponentMonitoring cm in mm.c_monitors)
 					{
                         //cm can be null if you remove the ComponentMonitoring of a disabled gameobject from Unity hierachy (but handled if removed from Monitoring Window)
                         //the null cm stays in the list because it can be removed from the list from the OnDestroy (because it is not called on disabled gameobjects)
                         //the null cm is removed on the next MonitoringManager's Awake because c_monitors is cleared
-						if (cm != null && (petriNetFilter == 0 || cm.fullPnSelected == petriNetFilter - 1)){
+						if (cm != null && (filter == "" || availableFullPetriNets.Contains(cm.fullPnSelected) || cm.PnmlFile.name.Contains(filter) || cm.gameObject.name.ToUpper().Contains(filter.ToUpper())) && (filterRef == "" || cm.id.ToString() == filterRef)){
 							int cpt = 0;
                             foreach (TransitionLink ctr in cm.transitionLinks)
 								cpt += ctr.links.Count;
@@ -240,39 +247,53 @@ namespace FYFY_plugins.Monitoring {
 
                         EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 
-                        // compute template list
-                        templates_id = new List<GUIContent>();
-                        List<ComponentMonitoring> templates_cm = new List<ComponentMonitoring>();
-                        foreach (ComponentMonitoring _cm in mm.c_monitors)
-                        {
-                            if (_cm != null && _cm.id != cm.id && _cm.PnmlFile != null)
-                            { // we exclude from the list monitor with the same id and monitors where pnmlfile is not defined (i.e. non initialized)
-                                int cpt = 0;
-                                foreach (TransitionLink ctr in _cm.transitionLinks)
-                                    cpt += ctr.links.Count;
-                                templates_id.Add(new GUIContent(_cm.gameObject.name + " (ref: " + _cm.id + ") (PN: " + _cm.PnmlFile.name + "; Total link: " + cpt + ")"));
-                                templates_cm.Add(_cm);
-                            }
-                        }
-
                         showOptions = EditorGUILayout.Foldout(showOptions, "Options");
                         if (showOptions)
                         {
                             EditorGUI.indentLevel += 2;
                             EditorGUIUtility.labelWidth = 160;
-                            if (templates_id.Count > 0)
-                            {
-                                if (templateSelected >= templates_id.Count)
-                                    templateSelected = templates_id.Count - 1;
-                                EditorGUILayout.BeginHorizontal();
-                                templateSelected = EditorGUILayout.Popup(new GUIContent("Import from model:", "Select the monitor you want to use as template, all properties will be copied to the editing monitor."), templateSelected, templates_id.ToArray());
-                                if (GUILayout.Button("Import", GUILayout.Width(80)))
-                                {
-                                    // clone from template
-                                    cm.clone(templates_cm[templateSelected]);
-                                }
-                                EditorGUILayout.EndHorizontal();
-                            }
+							
+							// input text to filter by name
+							importFilter = EditorGUILayout.TextField (new GUIContent("Filter by names:", "Filter monitors by full Petri net name, PNML name or Game Object name."), importFilter);
+							// input text to filter by monitor reference
+							importFilterRef = EditorGUILayout.TextField (new GUIContent("Filter by ref.:", "Filter monitors by freference."), importFilterRef);
+							
+							availableFullPetriNets = new List<int>();
+							for (int i = 0 ; i < mm.PetriNetsName.Count ; i++)
+								if (mm.PetriNetsName[i].ToUpper() == importFilter.ToUpper())
+									availableFullPetriNets.Add(i);
+
+							// compute template list
+							templates_id = new List<GUIContent>();
+							List<ComponentMonitoring> templates_cm = new List<ComponentMonitoring>();
+							foreach (ComponentMonitoring _cm in mm.c_monitors)
+							{
+								if (_cm != null && _cm.id != cm.id && _cm.PnmlFile != null && (importFilter == "" || availableFullPetriNets.Contains(_cm.fullPnSelected) || _cm.PnmlFile.name.Contains(importFilter) || _cm.gameObject.name.ToUpper().Contains(importFilter.ToUpper())) && (importFilterRef == "" || _cm.id.ToString() == importFilterRef))
+								{ // we exclude from the list monitor with the same id and monitors where pnmlfile is not defined (i.e. non initialized)
+									int cpt = 0;
+									foreach (TransitionLink ctr in _cm.transitionLinks)
+										cpt += ctr.links.Count;
+									templates_id.Add(new GUIContent(_cm.gameObject.name + " (ref: " + _cm.id + ") (PN: " + _cm.PnmlFile.name + "; Total link: " + cpt + ")"));
+									templates_cm.Add(_cm);
+								}
+							}
+							
+                            if (templates_id.Count <= 0)
+								GUI.enabled = false;
+							if (templateSelected >= templates_id.Count)
+								templateSelected = templates_id.Count - 1;
+							if (templateSelected < 0 && templates_id.Count > 0)
+								templateSelected = 0;
+							EditorGUILayout.BeginHorizontal();
+							templateSelected = EditorGUILayout.Popup(new GUIContent("Import from model:", "Select the monitor you want to use as template, all properties will be copied to the editing monitor."), templateSelected, templates_id.ToArray());
+							if (GUILayout.Button("Import", GUILayout.Width(80)))
+							{
+								// clone from template
+								cm.clone(templates_cm[templateSelected]);
+							}
+							EditorGUILayout.EndHorizontal();
+							GUI.enabled = true;
+							
                             // Be sure that Petri net selected is not over the MonitoringManager list
                             if (cm.fullPnSelected >= mm.PetriNetsName.Count)
                                 cm.fullPnSelected = 0;
@@ -506,6 +527,12 @@ namespace FYFY_plugins.Monitoring {
 	            ToggleButtonStyleToggled.normal.background = ToggleButtonStyleToggled.active.background;
 
 	        }
+			
+			if (wordWrapStyle == null)
+			{
+				wordWrapStyle = new GUIStyle(EditorStyles.textArea);
+				wordWrapStyle.wordWrap = true;
+			}
 
 	        GUILayout.BeginHorizontal();
 	        if (GUILayout.Button("GameObjects", goMenuItemActive ? ToggleButtonStyleToggled : ToggleButtonStyleNormal))
@@ -554,7 +581,7 @@ namespace FYFY_plugins.Monitoring {
 					}
 					// Add comments field
 					EditorGUILayout.LabelField ("Comments:");
-					string newComment = EditorGUILayout.TextArea (monitor.comments);
+					string newComment = EditorGUILayout.TextArea (monitor.comments, wordWrapStyle);
 					if (newComment != monitor.comments) {
 						Undo.RecordObject (monitor, "Update Comments");
 						monitor.comments = newComment;
@@ -628,7 +655,7 @@ namespace FYFY_plugins.Monitoring {
 					TransitionLink tLink = monitor.transitionLinks [flagTransition];
 					
 					// Add override field
-					string newTrLabel = EditorGUILayout.TextField (new GUIContent("Override name:", "You can define a more explicit name (only used in Laalys UI)."), tLink.transition.overridedLabel);
+					string newTrLabel = EditorGUILayout.TextField (new GUIContent("Override name:", "You can define a more explicit name (usefull for traces and in Laalys UI)."), tLink.transition.overridedLabel);
 					if (newTrLabel != tLink.transition.overridedLabel) {
 						Undo.RecordObject (monitor, "Update Override Label");
 						tLink.transition.overridedLabel = newTrLabel;
