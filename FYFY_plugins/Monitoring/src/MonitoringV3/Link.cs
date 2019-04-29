@@ -57,7 +57,7 @@ namespace FYFY_plugins.Monitoring{
 				foreach (ComponentMonitoring m in linkedObject.GetComponents<ComponentMonitoring> ()) {
 					if (m.PetriNet != null && m.PnmlFile != null){
 						foreach (string newItem in m.PetriNet.getPlacesNames ())
-							places.Add (newItem+" ("+m.PnmlFile.name+")");
+							places.Add (newItem+" ("+m.PnmlFile.name+" - Full ref: "+m.fullPnSelected+")");
 					}
 				}
 			}

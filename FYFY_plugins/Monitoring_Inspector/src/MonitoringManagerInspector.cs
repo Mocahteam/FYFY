@@ -120,7 +120,7 @@ namespace FYFY_plugins.Monitoring {
 			foreach (ComponentMonitoring monitor in Resources.FindObjectsOfTypeAll<ComponentMonitoring> ()) {
 				// Get full Petri net for this monitor
 				if (monitor.fullPnSelected >= mm.PetriNetsName.Count)
-					monitor.fullPnSelected = 1;
+					monitor.fullPnSelected = 0;
 				string fullName = mm.PetriNetsName[monitor.fullPnSelected];
 				if (!petriNets.ContainsKey(fullName))
 					petriNets[fullName] = new KeyValuePair<PetriNet, float>(new PetriNet(), 0);
