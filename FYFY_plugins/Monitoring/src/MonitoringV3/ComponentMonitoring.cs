@@ -188,6 +188,19 @@ namespace FYFY_plugins.Monitoring{
 		public List<List<string>> getPossibleSetOfLinks(string actionName){
 			return getPossibleSetOfLinks (actionName, "");
 		}
+		
+		///	<summary>
+		/// Check if action named actionName is still reachable inside the Petri net associated to this monitor
+		/// </summary>
+		public bool isStillReachable (string actionName){
+			List<List<string>> setOfLinksConcerned = getPossibleSetOfLinks (actionName);
+			foreach (List<string> linksConcerned in setOfLinksConcerned)
+			{
+				if (MonitoringManager.getNextActionsToReach(this, actionName, int.MaxValue, linksConcerned.ToArray()).Count != 0)
+					return true;
+			}
+			return false;
+		}
 
 		internal List<List<string>> getPossibleSetOfLinks(string actionName, string exceptionStackTrace){
 			TransitionLink transitionLink  = getTransitionLinkByTransitionLabel(actionName);
