@@ -170,10 +170,11 @@ namespace FYFY {
 			foreach(GameObject gameObject in sceneGameObjects) {
 				HashSet<string> componentTypeNames = new HashSet<string>();
 				foreach(Component c in gameObject.GetComponents<Component>()) {
-					System.Type type = c.GetType();
-					componentTypeNames.Add(type.FullName);
+					if (c != null){ // it is possible if a GameObject contains a breaked component (Missing script)
+						System.Type type = c.GetType();
+						componentTypeNames.Add(type.FullName);
+					}
 				}
-
 				GameObjectWrapper gameObjectWrapper = new GameObjectWrapper(gameObject, componentTypeNames);
 				if (!GameObjectManager._gameObjectWrappers.ContainsKey(gameObject.GetInstanceID())){
 					GameObjectManager._gameObjectWrappers.Add(gameObject.GetInstanceID(), gameObjectWrapper);
