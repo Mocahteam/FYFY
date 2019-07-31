@@ -123,8 +123,11 @@ namespace FYFY_Inspector {
 				string fullTypeName = _lateUpdateSystemDescriptions.GetArrayElementAtIndex(i).FindPropertyRelative("_typeFullName").stringValue;
 				selectedSystemTypeNames.Add(fullTypeName);
 			}
-
+#if NET3_5
 			System.Type[] systemTypes = (from assembly in System.AppDomain.CurrentDomain.GetAssemblies() // impossible de le mettre autre part car peut pas garantir que ca na pas change
+#else
+			System.Type[] systemTypes = (from assembly in System.AppDomain.CurrentDomain.GetAssemblies().Where(p => !p.IsDynamic) // impossible de le mettre autre part car peut pas garantir que ca na pas change
+#endif
 				from type in assembly.GetExportedTypes()
 				where (type.IsClass == true && type.IsAbstract == false && type.IsSubclassOf(typeof(FSystem)) == true)
 				select type).ToArray();

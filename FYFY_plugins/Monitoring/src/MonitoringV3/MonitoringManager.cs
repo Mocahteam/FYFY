@@ -445,7 +445,12 @@ namespace FYFY_plugins.Monitoring{
 			// OnEnable is called after script compilation (due to [ExecuteInEditMode]). We use this mechanism to update list of available families
 			availableFamilies = new List<FamilyAssociation>();
 			// Load all FSystem included into assembly
+			
+#if NET3_5
 			System.Type[] systemTypes = (from assembly in System.AppDomain.CurrentDomain.GetAssemblies()
+#else
+			System.Type[] systemTypes = (from assembly in System.AppDomain.CurrentDomain.GetAssemblies().Where(p => !p.IsDynamic)
+#endif
 				from type in assembly.GetExportedTypes()
 				where (type.IsClass == true && type.IsAbstract == false && type.IsSubclassOf(typeof(FSystem)) == true)
 				select type).ToArray();

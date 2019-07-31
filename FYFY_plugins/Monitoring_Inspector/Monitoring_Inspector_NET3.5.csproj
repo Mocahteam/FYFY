@@ -4,14 +4,15 @@
 
   <PropertyGroup>
     <SrcPath>src</SrcPath>
-    <OutputPath>bin</OutputPath>
+    <OutputPath>bin_NET3.5</OutputPath>
+	<BaseIntermediateOutputPath>obj_NET3.5</BaseIntermediateOutputPath>
     <RootNamespace>FYFY_plugins.Monitoring</RootNamespace>
     <AssemblyName>Monitoring_Inspector</AssemblyName>
     <UnityEnginePath>C:\Program Files\Unity\Editor\Data\Managed\UnityEngine.dll</UnityEnginePath>
     <UnityEditorPath>C:\Program Files\Unity\Editor\Data\Managed\UnityEditor.dll</UnityEditorPath>
-    <FYFYPath>..\..\FYFY\bin\FYFY.dll</FYFYPath>
-    <MonitoringPath>..\Monitoring\bin\Monitoring.dll</MonitoringPath>
-    <DocumentationFile>doc\$(AssemblyName).xml</DocumentationFile>
+    <FYFYPath>..\..\FYFY\bin_NET3.5\FYFY.dll</FYFYPath>
+    <MonitoringPath>..\Monitoring\bin_NET3.5\Monitoring.dll</MonitoringPath>
+    <DocumentationFile>doc_NET3.5\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -21,6 +22,7 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
     <StopOnFirstFailure>true</StopOnFirstFailure>
+	<DefineConstants>NET3_5</DefineConstants>
   </PropertyGroup>
   
   <ItemGroup>

@@ -4,19 +4,20 @@
 
   <PropertyGroup>
     <SrcPath>src</SrcPath>
-    <OutputPath>bin</OutputPath>
+    <OutputPath>bin_NET4.X</OutputPath>
+	<BaseIntermediateOutputPath>obj_NET4.X</BaseIntermediateOutputPath>
     <RootNamespace>FYFY_plugins.PointerManager</RootNamespace>
     <AssemblyName>PointerManager</AssemblyName>
-    <UnityEnginePath>C:\Program Files\Unity\Editor\Data\Managed\UnityEngine.dll</UnityEnginePath>
-	<UnityEngineUIPath>C:\Program Files\Unity\Editor\Data\UnityExtensions\Unity\GUISystem\UnityEngine.UI.dll</UnityEngineUIPath>
-    <FYFYPath>..\..\FYFY\bin\FYFY.dll</FYFYPath>
-    <DocumentationFile>doc\$(AssemblyName).xml</DocumentationFile>
+    <UnityEnginePath>C:\Program Files\Unity2019\Editor\Data\Managed\UnityEngine.dll</UnityEnginePath>
+	<UnityEngineUIPath>C:\Program Files\Unity2019\Editor\Data\UnityExtensions\Unity\GUISystem\UnityEngine.UI.dll</UnityEngineUIPath>
+    <FYFYPath>..\..\FYFY\bin_NET4.X\FYFY.dll</FYFYPath>
+    <DocumentationFile>doc_NET4.X\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup>
     <Configuration>Release</Configuration>
     <OutputType>Library</OutputType>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
     <StopOnFirstFailure>true</StopOnFirstFailure>

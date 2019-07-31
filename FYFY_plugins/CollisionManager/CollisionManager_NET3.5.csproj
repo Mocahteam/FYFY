@@ -4,12 +4,13 @@
 
   <PropertyGroup>
     <SrcPath>src</SrcPath>
-    <OutputPath>bin</OutputPath>
-    <RootNamespace>FYFY_plugins.TriggerManager</RootNamespace>
-    <AssemblyName>TriggerManager</AssemblyName>
+    <OutputPath>bin_NET3.5</OutputPath>
+	<BaseIntermediateOutputPath>obj_NET3.5</BaseIntermediateOutputPath>
+    <RootNamespace>FYFY_plugins.CollisionManager</RootNamespace>
+    <AssemblyName>CollisionManager</AssemblyName>
     <UnityEnginePath>C:\Program Files\Unity\Editor\Data\Managed\UnityEngine.dll</UnityEnginePath>
-    <FYFYPath>..\..\FYFY\bin\FYFY.dll</FYFYPath>
-    <DocumentationFile>doc\$(AssemblyName).xml</DocumentationFile>
+    <FYFYPath>..\..\FYFY\bin_NET3.5\FYFY.dll</FYFYPath>
+    <DocumentationFile>doc_NET3.5\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -19,6 +20,7 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
     <StopOnFirstFailure>true</StopOnFirstFailure>
+	<DefineConstants>NET3_5</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
