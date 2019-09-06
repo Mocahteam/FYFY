@@ -168,6 +168,10 @@ namespace FYFY {
 			}
 			
 			foreach(GameObject gameObject in sceneGameObjects) {
+				// In case of GameObject state (enable/disable) is controlled by Unity tools (animators for instance) Fyfy is not notified from this change => solution add a special component that catch Unity events and submit update to FYFY
+				gameObject.AddComponent<FyfyBridge>();
+				
+				// Compute Wrappers
 				HashSet<string> componentTypeNames = new HashSet<string>();
 				foreach(Component c in gameObject.GetComponents<Component>()) {
 					if (c != null){ // it is possible if a GameObject contains a breaked component (Missing script)
@@ -292,7 +296,7 @@ namespace FYFY {
 			if(Application.isPlaying == false){
 				return;
 			}
-
+			
 			this.preprocess();
 
 			_stopwatch.Reset ();

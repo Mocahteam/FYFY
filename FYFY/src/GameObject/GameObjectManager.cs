@@ -302,8 +302,21 @@ namespace FYFY {
 			if(gameObject == null) {
 				throw new FYFY.ArgumentNullException(exceptionStackTrace);
 			}
+			
+			// Check if gameObject is binded to FYFY
+			if (_gameObjectWrappers.ContainsKey(gameObject.GetInstanceID())){
+				// rebuild wrappers
+				HashSet<string> componentTypeNames = new HashSet<string>();
+				foreach(Component c in gameObject.GetComponents<Component>()) {
+					if (c != null){ // it is possible if a GameObject contains a breaked component (Missing script)
+						System.Type type = c.GetType();
+						componentTypeNames.Add(type.FullName);
+					}
+				}
+				_gameObjectWrappers[gameObject.GetInstanceID()] = new GameObjectWrapper(gameObject, componentTypeNames);
 
-			_modifiedGameObjectIds.Add(gameObject.GetInstanceID());
+				_modifiedGameObjectIds.Add(gameObject.GetInstanceID());
+			}
 		}
 		
 		// used in pluggins (TriggerSensitive / CollisionSensitive / PointerOver)

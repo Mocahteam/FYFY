@@ -33,6 +33,9 @@ namespace FYFY {
 				GameObjectWrapper gameObjectWrapper = new GameObjectWrapper(_gameObject, _componentTypeNames);
 				GameObjectManager._gameObjectWrappers.Add(gameObjectId, gameObjectWrapper);
 				GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
+				// Add the bridge if not already added
+				if (!_gameObject.GetComponent<FyfyBridge>())
+					_gameObject.AddComponent<FyfyBridge>();
 			} else
 				throw new FyfyException("A game object can be binded to Fyfy only once. The game object \""+_gameObject.name+"\" is already binded.", _exceptionStackTrace);
 		}

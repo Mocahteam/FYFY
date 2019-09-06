@@ -24,6 +24,10 @@ namespace FYFY {
 
 			GameObjectManager._gameObjectWrappers.Remove(_gameObjectId);
 			GameObjectManager._unbindedGameObjectIds.Add(_gameObjectId);
+			// Remove the bridge if it was added
+			FyfyBridge fb = _gameObject.GetComponent<FyfyBridge>();
+			if (fb)
+				MonoBehaviour.Destroy(fb);
 		}
 	}
 }

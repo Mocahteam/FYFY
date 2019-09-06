@@ -16,6 +16,8 @@ namespace FYFY_Inspector {
 			}
 			
 			mainLoop.AddComponent<FYFY.MainLoop>();
+			if (!mainLoop.GetComponent<MainLoopEditorScanner>())
+				mainLoop.AddComponent<MainLoopEditorScanner>();
 			Undo.RegisterCreatedObjectUndo(mainLoop, "Create MainLoop");
 		}
 

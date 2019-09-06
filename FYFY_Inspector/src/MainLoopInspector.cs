@@ -299,6 +299,31 @@ namespace FYFY_Inspector {
 				ml.showSystemProfiler = EditorGUILayout.Foldout (ml.showSystemProfiler, "FSystem profiler (ms)");
 				if (ml.showSystemProfiler)
 					_systemsMonitor.Draw (_fixedUpdateStatsHistory.ToArray (), _updateStatsHistory.ToArray (), _lateUpdateStatsHistory.ToArray (), 100f);
+				
+				EditorGUILayout.Space ();
+				EditorGUILayout.LabelField("Bind tools");
+				EditorGUI.indentLevel += 1;
+				GameObject tmp = null;
+				tmp = EditorGUILayout.ObjectField(new GUIContent("Bind Game Object:", "Drag&Drop a game object you want to dynamically bind."), tmp, typeof(UnityEngine.Object), true) as GameObject;
+				if (tmp != null)
+				{
+					if (GameObjectManager._gameObjectWrappers.ContainsKey(tmp.GetInstanceID())){
+						EditorUtility.DisplayDialog("Invalid operation", tmp.name+" is already binded to Fyfy", "Ok", "");
+					} else {
+						GameObjectManager.bind(tmp);
+					}
+				}
+				tmp = null;
+				tmp = EditorGUILayout.ObjectField(new GUIContent("Unbind Game Object:", "Drag&Drop a game object you want to dynamically unbind."), tmp, typeof(UnityEngine.Object), true) as GameObject;
+				if (tmp != null)
+				{
+					if (!GameObjectManager._gameObjectWrappers.ContainsKey(tmp.GetInstanceID())){
+						EditorUtility.DisplayDialog("Invalid operation", tmp.name+" is not currently binded to Fyfy", "Ok", "");
+					} else {
+						GameObjectManager.unbind(tmp);
+					}
+				}
+				EditorGUI.indentLevel -= 1;
 
 				EditorGUILayout.Space ();
 				ml.showFamilyInspector = EditorGUILayout.Foldout (ml.showFamilyInspector, "Families inspector");
