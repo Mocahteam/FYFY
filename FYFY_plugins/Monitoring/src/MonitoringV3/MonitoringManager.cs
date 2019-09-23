@@ -359,7 +359,12 @@ namespace FYFY_plugins.Monitoring{
 				c_monitors.Remove(cm);
 		}
 		
-		internal FamilyMonitoring getFamilyMonitoring (Family family){
+		/// <summary>
+		/// 	Get the FamilyMonitoring associated to a family if it exists.
+		/// </summary>
+		/// <param name="family">The Family to ask for.</param>
+		/// <return>The FamilyMonitoring associated to the family if it exists. Null otherwise.</return>
+		public FamilyMonitoring getFamilyMonitoring (Family family){
 			foreach (FamilyMonitoring fm in f_monitors){
 				if (family.Equals(fm.descriptor)){
 					return fm;
