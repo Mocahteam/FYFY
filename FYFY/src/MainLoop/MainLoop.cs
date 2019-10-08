@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.IO;
+using System.Reflection;
 
 
 [assembly: InternalsVisibleTo("Monitoring")] // ugly
@@ -99,6 +102,144 @@ namespace FYFY {
 			GameObjectManager._sceneBuildIndex = -1;
 			GameObjectManager._sceneName = null;
 			sceneChanging = false;
+		}
+		
+		
+		/// <summary>Call function "functionName" defined inside "systemName" system with "parameter" parameter </summary>
+		public static void callAppropriateSystemMethod(string systemName, string functionName, object parameter)
+		{
+			// Get instances of all systems
+			List<FSystem> allSystems = new List<FSystem>(FSystemManager.fixedUpdateSystems());
+			allSystems.AddRange(FSystemManager.updateSystems());
+			allSystems.AddRange(FSystemManager.lateUpdateSystems());
+			// Parse all system to find the one associated to first parameter
+			foreach (FSystem system in allSystems)
+			{
+				Type systemType = system.GetType();
+				if (systemType.Name == systemName)
+				{
+					// We found the system, now found the target funcion
+					MethodInfo systemMethod = systemType.GetMethod(functionName, new Type[] { parameter.GetType() });
+					if (systemMethod != null)
+						// We found the function, then we invoke it
+						systemMethod.Invoke(system, new object[] { parameter });
+				}
+			}
+		}
+		
+		/// <summary>Synchronize systems' wrappers</summary>
+		public bool synchronizeWrappers(){
+
+			bool needRefresh = false;
+
+			// Get FSystem type and all public methods. This list is used to exclude inheritance methods from FSystem.
+			Type fSystemType = typeof(FSystem);
+			List<string> fSystemMethodsName = new List<string>();
+			MethodInfo[] fSystemMethods = fSystemType.GetMethods();
+			foreach (MethodInfo mi in fSystemMethods)
+				fSystemMethodsName.Add(mi.Name);
+
+			// Get all systems' Type affected to one FYFY execution context
+			List<SystemDescription> allSystemsDescription = new List<SystemDescription>(_fixedUpdateSystemDescriptions);
+			allSystemsDescription.AddRange(_updateSystemDescriptions);
+			allSystemsDescription.AddRange(_lateUpdateSystemDescriptions);
+
+			List<string> allSystemsName = new List<string>();
+			foreach (SystemDescription systemDesc in allSystemsDescription)
+			{
+				// Get current system Type
+				Type systemType = Type.GetType(systemDesc._typeAssemblyQualifiedName);
+				allSystemsName.Add(systemType.FullName);
+
+				string cSharpCode = "using UnityEngine;\n";
+				cSharpCode += "using FYFY;\n\n";
+				cSharpCode += "[ExecuteInEditMode]\n";
+				cSharpCode += "public class " + systemType.FullName + "_wrapper : MonoBehaviour\n{\n";
+				cSharpCode += "\tprivate void Start()\n";
+				cSharpCode += "\t{\n";
+				cSharpCode += "\t\tthis.hideFlags = HideFlags.HideInInspector; // Hide this component in Inspector\n";
+				cSharpCode += "\t}\n\n";
+
+				// Load all methods of this System
+				MethodInfo[] methodsInfo = systemType.GetMethods();
+				foreach (MethodInfo methodInfo in methodsInfo)
+				{
+					// Do not process inhéritance methods from FSystem
+					if (!fSystemMethodsName.Contains(methodInfo.Name))
+					{
+						ParameterInfo[] parametersInfo = methodInfo.GetParameters();
+						// Unity accept only void functions with only one parameter, so we don't process non void functions and functions with more than one parmater
+						if (methodInfo.ReturnType == typeof(void) && parametersInfo.Length < 2)
+						{
+							cSharpCode += "\tpublic void " + methodInfo.Name + "(";
+							// Store the optional parameter
+							List<Type> parametersType = new List<Type>();
+							if (parametersInfo.Length == 1)
+								cSharpCode += parametersInfo[0].ParameterType + " " + parametersInfo[0].Name;
+							cSharpCode += ")\n\t{\n";
+							cSharpCode += "\t\tMainLoop.callAppropriateSystemMethod (\"" + systemType.FullName + "\", \"" + methodInfo.Name + "\", " + (parametersInfo.Length == 1 ? parametersInfo[0].Name : "null") + ");\n";
+							cSharpCode += "\t}\n\n";
+						}
+					}
+				}
+				cSharpCode += "}";
+				// Write .cs file inside Assets/AutomaticScript/
+				Directory.CreateDirectory("Assets/AutomaticScript");
+				if (File.Exists("Assets/AutomaticScript/" + systemType.FullName + "_wrapper.cs"))
+				{
+					if (cSharpCode != File.ReadAllText("Assets/AutomaticScript/" + systemType.FullName + "_wrapper.cs"))
+					{
+						needRefresh = true;
+						File.WriteAllText("Assets/AutomaticScript/" + systemType.FullName + "_wrapper.cs", cSharpCode);
+					}
+				}
+				else
+				{
+					needRefresh = true;
+					File.WriteAllText("Assets/AutomaticScript/" + systemType.FullName + "_wrapper.cs", cSharpCode);
+				}
+			}
+
+			if (!needRefresh){
+				// Add components to the MainLoop for each system registered
+				foreach (string systemName in allSystemsName)
+					if (gameObject.GetComponent(systemName + "_wrapper") == null)
+						// the ", Assembly-CSharp" enable to find the type that is not included into FYFY namespace (indead it is user type defined inside Unity project)
+						gameObject.AddComponent(Type.GetType(systemName + "_wrapper, Assembly-CSharp")); // Because we are in editmode, we don't use GameObjectManager
+			}
+
+			// Remove components from the MainLoop for each system that is not registered to the MainLoop
+			List<MonoBehaviour> currentsComponents = new List<MonoBehaviour>(gameObject.GetComponents<MonoBehaviour>());
+			foreach (MonoBehaviour currentComponent in currentsComponents)
+			{
+				// Check if current component is a system wrapper
+				Type componentType = currentComponent.GetType();
+				if (componentType.FullName.EndsWith("_wrapper"))
+				{
+					bool found = false;
+					for (int i = 0; i < allSystemsName.Count && !found; i++)
+						found = componentType.FullName == allSystemsName[i] + "_wrapper";
+					if (!found)
+						DestroyImmediate(currentComponent);  // Because we are in editmode, we don't use GameObjectManager
+				}
+			}
+
+			// Remove .cs files that didn't refer existing system
+			List<string> fileList = new List<string>(Directory.GetFiles("Assets/AutomaticScript", "*.cs"));
+			foreach (string fileName in fileList)
+			{
+				bool found = false;
+				for (int i = 0; i < allSystemsName.Count && !found; i++)
+					found = fileName.EndsWith(allSystemsName[i] + "_wrapper.cs");
+				if (!found)
+				{
+					File.Delete(fileName);
+					File.Delete(fileName + ".meta");
+					needRefresh = true;
+				}
+			}
+
+			return needRefresh;
 		}
 
 		private void OnDestroy(){

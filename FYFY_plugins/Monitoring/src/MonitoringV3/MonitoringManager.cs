@@ -54,7 +54,7 @@ namespace FYFY_plugins.Monitoring{
 			internal string equivWith; // formated name of the first equivalent family defined in another system
 		}
         [NonSerialized]
-        internal bool ready = false; //true at the beginning of OnEnable 
+        internal bool ready = false; //true at the beginning of OnEnable and used in ComponentMonitoring
         /// <summary>
         /// This boolean is set to false when Laalys is connected or if an error occured while trying to launch Laalys
         /// </summary>
@@ -435,22 +435,15 @@ namespace FYFY_plugins.Monitoring{
 			}
 		}
 
-        void OnEnable ()
-        {
-            ready = true;
+		internal void synchronizeFamilies(){
+			ready = true;
             // avoid to inspect System in playing mode
             if (Application.isPlaying)
 				return;
 			
-#if UNITY_EDITOR
-            while (UnityEditor.EditorApplication.isCompiling)
-				//Wait 10 ms not to overload processors
-				Thread.Sleep(10);
-#endif
-			// OnEnable is called after script compilation (due to [ExecuteInEditMode]). We use this mechanism to update list of available families
 			availableFamilies = new List<FamilyAssociation>();
-			// Load all FSystem included into assembly
 			
+			// Load all FSystem included into assembly
 #if NET3_5
 			System.Type[] systemTypes = (from assembly in System.AppDomain.CurrentDomain.GetAssemblies()
 #else
