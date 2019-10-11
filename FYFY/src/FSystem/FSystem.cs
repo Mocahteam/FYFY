@@ -43,7 +43,7 @@ namespace FYFY {
 						this.onPause(UnityEngine.Time.frameCount);
 					}
 
-					MainLoop._mainLoop._forceUpdateInspector++;
+					MainLoop.instance._forceUpdateInspector++;
 				}
 			}
 		}

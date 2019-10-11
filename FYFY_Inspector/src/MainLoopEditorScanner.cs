@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using FYFY;
+using System.Threading;
 
 namespace FYFY_Inspector {
 	
@@ -20,6 +21,19 @@ namespace FYFY_Inspector {
 				return;
 			}
 			_mainLoopScanner = this;
+		}
+		
+		private void OnEnable(){
+			if(Application.isPlaying)
+				return;
+			
+			// OnEnable is called after script compilation. We use this mechanism to synchronize systems public functions
+			while (EditorApplication.isCompiling)
+				//Wait 10 ms not to overload processors
+				Thread.Sleep(10);
+			
+			if (MainLoop.instance.synchronizeWrappers())
+				AssetDatabase.Refresh();
 		}
 
 		private void OnDestroy(){

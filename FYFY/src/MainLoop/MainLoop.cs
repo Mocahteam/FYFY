@@ -31,7 +31,8 @@ namespace FYFY {
 	[DisallowMultipleComponent]
 	[AddComponentMenu("")]
 	public class MainLoop : MonoBehaviour {
-		internal static MainLoop _mainLoop; // eviter davoir plusieurs composants MainLoop dans toute la scene (cf Awake)
+		/// <summary>MainLoop instance (singleton)</summary>
+		public static MainLoop instance; // eviter davoir plusieurs composants MainLoop dans toute la scene (cf Awake)
 		
 		// this static flag is used by monitoring module to know if the scene will change
 		internal static bool sceneChanging = false;
@@ -79,12 +80,12 @@ namespace FYFY {
 		// Parse scene to get all entities.
 		private void Awake() {
 			// Severals instances of MainLoop are not allowed.
-			if(_mainLoop != null) {
+			if(instance != null) {
 				DestroyImmediate(this);
 				return;
 			}
 
-			_mainLoop = this;
+			instance = this;
 
 			if(Application.isPlaying == false){
 				return;
@@ -143,18 +144,20 @@ namespace FYFY {
 			List<SystemDescription> allSystemsDescription = new List<SystemDescription>(_fixedUpdateSystemDescriptions);
 			allSystemsDescription.AddRange(_updateSystemDescriptions);
 			allSystemsDescription.AddRange(_lateUpdateSystemDescriptions);
-
+			
 			List<string> allSystemsName = new List<string>();
 			foreach (SystemDescription systemDesc in allSystemsDescription)
 			{
 				// Get current system Type
 				Type systemType = Type.GetType(systemDesc._typeAssemblyQualifiedName);
 				allSystemsName.Add(systemType.FullName);
+				
+				string compilableName = systemType.FullName.Replace('.', '_'); // class name can't contains '.' character and it could be the case for systems included inside libraries
 
 				string cSharpCode = "using UnityEngine;\n";
 				cSharpCode += "using FYFY;\n\n";
 				cSharpCode += "[ExecuteInEditMode]\n";
-				cSharpCode += "public class " + systemType.FullName + "_wrapper : MonoBehaviour\n{\n";
+				cSharpCode += "public class " + compilableName + "_wrapper : MonoBehaviour\n{\n"; 
 				cSharpCode += "\tprivate void Start()\n";
 				cSharpCode += "\t{\n";
 				cSharpCode += "\t\tthis.hideFlags = HideFlags.HideInInspector; // Hide this component in Inspector\n";
@@ -185,27 +188,30 @@ namespace FYFY {
 				cSharpCode += "}";
 				// Write .cs file inside Assets/AutomaticScript/
 				Directory.CreateDirectory("Assets/AutomaticScript");
-				if (File.Exists("Assets/AutomaticScript/" + systemType.FullName + "_wrapper.cs"))
+				if (File.Exists("Assets/AutomaticScript/" + compilableName + "_wrapper.cs"))
 				{
-					if (cSharpCode != File.ReadAllText("Assets/AutomaticScript/" + systemType.FullName + "_wrapper.cs"))
+					if (cSharpCode != File.ReadAllText("Assets/AutomaticScript/" + compilableName + "_wrapper.cs"))
 					{
 						needRefresh = true;
-						File.WriteAllText("Assets/AutomaticScript/" + systemType.FullName + "_wrapper.cs", cSharpCode);
+						File.WriteAllText("Assets/AutomaticScript/" + compilableName + "_wrapper.cs", cSharpCode);
 					}
 				}
 				else
 				{
 					needRefresh = true;
-					File.WriteAllText("Assets/AutomaticScript/" + systemType.FullName + "_wrapper.cs", cSharpCode);
+					File.WriteAllText("Assets/AutomaticScript/" + compilableName + "_wrapper.cs", cSharpCode);
 				}
 			}
 
 			if (!needRefresh){
 				// Add components to the MainLoop for each system registered
-				foreach (string systemName in allSystemsName)
-					if (gameObject.GetComponent(systemName + "_wrapper") == null)
+				foreach (string systemName in allSystemsName){
+					string compilableName = systemName.Replace('.', '_'); // class name can't contains '.' character and it could be the case for systems included inside libraries
+					if (gameObject.GetComponent(compilableName + "_wrapper") == null){
 						// the ", Assembly-CSharp" enable to find the type that is not included into FYFY namespace (indead it is user type defined inside Unity project)
-						gameObject.AddComponent(Type.GetType(systemName + "_wrapper, Assembly-CSharp")); // Because we are in editmode, we don't use GameObjectManager
+						gameObject.AddComponent(Type.GetType(compilableName + "_wrapper, Assembly-CSharp")); // Because we are in editmode, we don't use GameObjectManager
+					}
+				}
 			}
 
 			// Remove components from the MainLoop for each system that is not registered to the MainLoop
@@ -218,9 +224,10 @@ namespace FYFY {
 				{
 					bool found = false;
 					for (int i = 0; i < allSystemsName.Count && !found; i++)
-						found = componentType.FullName == allSystemsName[i] + "_wrapper";
-					if (!found)
+						found = (componentType.FullName == (allSystemsName[i].Replace('.', '_') + "_wrapper"));
+					if (!found){
 						DestroyImmediate(currentComponent);  // Because we are in editmode, we don't use GameObjectManager
+					}
 				}
 			}
 
@@ -230,7 +237,7 @@ namespace FYFY {
 			{
 				bool found = false;
 				for (int i = 0; i < allSystemsName.Count && !found; i++)
-					found = fileName.EndsWith(allSystemsName[i] + "_wrapper.cs");
+					found = fileName.EndsWith(allSystemsName[i].Replace('.', '_') + "_wrapper.cs");
 				if (!found)
 				{
 					File.Delete(fileName);
@@ -243,8 +250,8 @@ namespace FYFY {
 		}
 
 		private void OnDestroy(){
-			if(_mainLoop == this) {
-				_mainLoop = null;
+			if(instance == this) {
+				instance = null;
 			}
 		}
 
@@ -260,6 +267,13 @@ namespace FYFY {
 
 			return system;
 		}
+		
+		private void OnEnable(){
+			// if upgrade FYFY from old version instance could be null, we set instance reference properly
+			if(instance == null)
+				instance = this;
+		}
+		
 
 		// Parse scene and bind all GameObjects to FYFY
 		// Create all systems

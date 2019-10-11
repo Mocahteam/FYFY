@@ -5,7 +5,6 @@ using UnityEditor.SceneManagement;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using FYFY;
 
 namespace FYFY_Inspector {
@@ -192,16 +191,6 @@ namespace FYFY_Inspector {
 			_fixedUpdateDrawingList.onAddDropdownCallback = createMenu;
 			_updateDrawingList.onAddDropdownCallback = createMenu;
 			_lateUpdateDrawingList.onAddDropdownCallback = createMenu;
-			
-			if(Application.isPlaying)
-				return;
-			
-			// OnEnable is called after script compilation. We use this mechanism to synchronize systems public functions
-			while (EditorApplication.isCompiling)
-				//Wait 10 ms not to overload processors
-				Thread.Sleep(10);
-			if ((target as MainLoop).synchronizeWrappers())
-				AssetDatabase.Refresh();
 		}
 		
 		private void refreshWrappers()
