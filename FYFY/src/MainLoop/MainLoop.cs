@@ -34,6 +34,13 @@ namespace FYFY {
 		/// <summary>MainLoop instance (singleton)</summary>
 		public static MainLoop instance; // eviter davoir plusieurs composants MainLoop dans toute la scene (cf Awake)
 		
+		/// <summary>
+		///		Reference to the mainLoopEditorScanner defined into FYFY_Inspector package. Because we have not access
+		///		to this package here, we use super class type (MonoBehaviour). This reference will not be null if 
+		///		MainLoopEditorScanner.OnEnable start before MainLoop.OnEnable.
+		/// </summary>
+		internal static MonoBehaviour mainLoopEditorScanner = null;
+		
 		// this static flag is used by monitoring module to know if the scene will change
 		internal static bool sceneChanging = false;
 
@@ -120,10 +127,18 @@ namespace FYFY {
 				if (systemType.Name == systemName)
 				{
 					// We found the system, now found the target funcion
-					MethodInfo systemMethod = systemType.GetMethod(functionName, new Type[] { parameter.GetType() });
-					if (systemMethod != null)
+					MethodInfo systemMethod;
+					if (parameter != null)
+						systemMethod = systemType.GetMethod(functionName, new Type[] { parameter.GetType() });
+					else
+						systemMethod = systemType.GetMethod(functionName, new Type[] { });
+					if (systemMethod != null){
 						// We found the function, then we invoke it
-						systemMethod.Invoke(system, new object[] { parameter });
+						if (parameter != null)
+							systemMethod.Invoke(system, new object[] { parameter });
+						else
+							systemMethod.Invoke(system, new object[] { });
+					}
 				}
 			}
 		}
@@ -250,9 +265,8 @@ namespace FYFY {
 		}
 
 		private void OnDestroy(){
-			if(instance == this) {
+			if(instance == this)
 				instance = null;
-			}
 		}
 
 		private FSystem createSystemInstance(SystemDescription systemDescription){
@@ -269,9 +283,15 @@ namespace FYFY {
 		}
 		
 		private void OnEnable(){
-			// if upgrade FYFY from old version instance could be null, we set instance reference properly
+			// if upgrade FYFY, old version instance could be null because Awake is not called again, we set instance reference properly
 			if(instance == null)
 				instance = this;
+			// Check if we have to call back MainLoopEditorScanner OnEnable
+			if(mainLoopEditorScanner != null){
+				// Yes, we have to do so we do it
+				mainLoopEditorScanner.Invoke("OnEnable", 0);
+				mainLoopEditorScanner = null;
+			}
 		}
 		
 

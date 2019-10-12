@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Diagnostics;
-using System.Threading;
 using FYFY;
 
 namespace FYFY_plugins.Monitoring {
@@ -32,13 +31,6 @@ namespace FYFY_plugins.Monitoring {
 			_filteredPetriNetsPath = serializedObject.FindProperty ("filteredPetriNetsPath");
 			_featuresPath = serializedObject.FindProperty ("featuresPath");
 			_laalysPath = serializedObject.FindProperty ("laalysPath");
-			
-			// OnEnable is called after script compilation. We use this mechanism to synchronize families
-            while (EditorApplication.isCompiling)
-				//Wait 10 ms not to overload processors
-				Thread.Sleep(10);
-			
-			(target as MonitoringManager).synchronizeFamilies();
 		}
 		
 		private void OnDestroy(){
@@ -111,7 +103,7 @@ namespace FYFY_plugins.Monitoring {
 				LaalysProcess.StartInfo.Arguments = "-jar "+_laalysPath.stringValue;
 				LaalysProcess.Start();
 			}
-
+			
 			serializedObject.ApplyModifiedProperties();
 		}
 

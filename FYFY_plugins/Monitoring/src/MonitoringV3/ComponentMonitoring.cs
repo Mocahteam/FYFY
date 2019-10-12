@@ -78,16 +78,11 @@ namespace FYFY_plugins.Monitoring{
 
         private void WaitMonitoringManager()
         {
-			int timeOut = 0;
-            //While MonitoringManager isn't ready or the timeout exceed 5 seconds
-            while ((MonitoringManager.Instance == null || !MonitoringManager.Instance.ready || !ready || MainLoop.sceneChanging) && timeOut < 5000)
-            {
+            //While MonitoringManager isn't ready
+            while (MonitoringManager.Instance == null || !MonitoringManager.Instance.ready || !ready || MainLoop.sceneChanging)
                 //Wait 10 ms not to overload processors
                 Thread.Sleep(10);
-                timeOut += 10;
-            }
-			if (timeOut < 5000)
-				computeUniqueId();
+			computeUniqueId();
         }
 		
 		internal void computeUniqueId() 

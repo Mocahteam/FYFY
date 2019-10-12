@@ -99,8 +99,9 @@ namespace FYFY_plugins.Monitoring{
 				throw new TraceAborted ("No MonitoringManager found. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", null);
 			
 			foreach (ComponentMonitoring cm in MonitoringManager.Instance.c_monitors)
-				if (cm != null && cm.id == id)
+				if (cm != null && cm.id == id){
 					return cm;
+				}
 			foreach (FamilyMonitoring fm in MonitoringManager.Instance.f_monitors)
 				if (fm != null && fm.id == id)
 					return (ComponentMonitoring) fm;
@@ -434,9 +435,13 @@ namespace FYFY_plugins.Monitoring{
 				}
 			}
 		}
-
-		internal void synchronizeFamilies(){
+		
+		void OnEnable(){
 			ready = true;
+		}
+		
+		/// <summary>Parse all systems and inspect their families</summary>
+		public void synchronizeFamilies(){
             // avoid to inspect System in playing mode
             if (Application.isPlaying)
 				return;
