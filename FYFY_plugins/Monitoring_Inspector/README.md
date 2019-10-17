@@ -6,8 +6,7 @@ This plugin provides UI to assist building of PetriNet.
 Build requirements
 ------------------
 
-- Unity3D 5.3.4
-- Microsoft .Net Framework 4.0
+- Monitoring.dll
 - FYFY.dll
 
 Build
