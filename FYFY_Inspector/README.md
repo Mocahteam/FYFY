@@ -6,8 +6,6 @@ This part of the project includes source code to easily manage FYFY in Unity edi
 Build requirements
 ------------------
 
-- Unity3D 5.3.4
-- Microsoft .Net Framework 4.0
 - FYFY.dll
 
 Build the library
