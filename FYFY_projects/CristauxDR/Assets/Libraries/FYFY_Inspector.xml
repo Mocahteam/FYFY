@@ -9,6 +9,14 @@
             	Class automatically loaded by Unity Editor to create the FYFY menu.
             </summary>
         </member>
+        <member name="T:FYFY_Inspector.MainLoopEditorScanner">
+            <summary>
+            	Refresh current active Game Object to be aware from user changes inside inspector
+            </summary>
+        </member>
+        <member name="M:FYFY_Inspector.MainLoopEditorScanner.OnEnable">
+            <summary></summary>
+        </member>
         <member name="T:FYFY_Inspector.MainLoopInspector">
             <summary>
             	Custom inspector automatically used by Unity Editor when a <see cref="T:FYFY.MainLoop"/> is find in inspector view.

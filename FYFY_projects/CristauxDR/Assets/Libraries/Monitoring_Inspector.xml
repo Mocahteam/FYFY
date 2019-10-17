@@ -17,5 +17,20 @@
         <member name="M:FYFY_plugins.Monitoring.MonitoringManagerInspector.OnInspectorGUI">
             <summary></summary>
         </member>
+        <member name="T:ReadOnlyDrawer">
+            <summary>
+            	Avoid to modify property in Inspector if [ReadOnly] meta tag is used
+            </summary>
+        </member>
+        <member name="M:ReadOnlyDrawer.GetPropertyHeight(UnityEditor.SerializedProperty,UnityEngine.GUIContent)">
+            <summary>
+            	
+            </summary>
+        </member>
+        <member name="M:ReadOnlyDrawer.OnGUI(UnityEngine.Rect,UnityEditor.SerializedProperty,UnityEngine.GUIContent)">
+            <summary>
+            	
+            </summary>
+        </member>
     </members>
 </doc>

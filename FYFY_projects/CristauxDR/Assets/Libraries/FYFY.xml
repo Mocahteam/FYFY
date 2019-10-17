@@ -197,6 +197,11 @@
             	Return a descriptor of this family
             </summary>
         </member>
+        <member name="M:FYFY.Family.getInlineDescriptor">
+            <summary>
+            	Return a descriptor of this family
+            </summary>
+        </member>
         <member name="M:FYFY.Family.First">
             <summary>
             	Get the first Game Object included into the family
@@ -464,9 +469,19 @@
             	Removes the component from its game object at the beginning of the next update block.
             </summary>
         </member>
+        <member name="M:FYFY.GameObjectManager.refresh(UnityEngine.GameObject)">
+            <summary>
+            	Force FYFY to refresh families for this GameObject at the beginning of the next update block.
+            </summary>
+        </member>
         <member name="P:FYFY.GameObjectManager.Count">
             <summary>
             	Gets the number of <c>GameObjects</c> of the scene known by FYFY.
+            </summary>
+        </member>
+        <member name="T:FYFY.FyfyBridge">
+            <summary>
+            Notify Fyfy for each Unity callback usefull to update families
             </summary>
         </member>
         <member name="T:FYFY.SystemDescription">
@@ -487,6 +502,16 @@
              (1) to set systems into the three contexts (fixedUpdate, update and lateUpdate)
              (2) to define which game object binding on start
              (3) to follow system load and families content during playing mode
+            </summary>
+        </member>
+        <member name="F:FYFY.MainLoop.instance">
+            <summary>MainLoop instance (singleton)</summary>
+        </member>
+        <member name="F:FYFY.MainLoop.mainLoopEditorScanner">
+            <summary>
+            	Reference to the mainLoopEditorScanner defined into FYFY_Inspector package. Because we have not access
+            	to this package here, we use super class type (MonoBehaviour). This reference will not be null if 
+            	MainLoopEditorScanner.OnEnable start before MainLoop.OnEnable.
             </summary>
         </member>
         <member name="F:FYFY.MainLoop._fixedUpdateSystemDescriptions">
@@ -535,6 +560,12 @@
         <member name="F:FYFY.MainLoop.lateUpdateStats">
             <summary>How much time (ms) the previous late update execution lasted</summary>
         </member>
+        <member name="M:FYFY.MainLoop.callAppropriateSystemMethod(System.String,System.String,System.Object)">
+            <summary>Call function "functionName" defined inside "systemName" system with "parameter" parameter </summary>
+        </member>
+        <member name="M:FYFY.MainLoop.synchronizeWrappers">
+            <summary>Synchronize systems' wrappers</summary>
+        </member>
         <member name="T:FYFY.AllOfComponents">
             <summary>
             	Matcher used to exclude all the <c>GameObjects</c> which don't have
@@ -562,7 +593,7 @@
             	It is composed of its type and the values on which it operates.
             </remarks>
         </member>
-        <member name="F:FYFY.ComponentMatcher._componentTypeIds">
+        <member name="F:FYFY.ComponentMatcher._componentTypeNames">
             <summary>
             	Targets used to match.
             </summary>
@@ -732,6 +763,49 @@
         <member name="M:FYFY.NoneOfTags.#ctor(System.String[])">
             <summary>
             	Initializes a new instance of the <see cref="T:FYFY.NoneOfTags"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY.ActionPerformed">
+            <summary>
+            Data describing the traced action.
+            The system processing these data will search on the gameobject of this component a ComponentMonitoring corresponding to the data filled and trace it.
+            If no ComponentMonitoring is found and a family is filled in the data, the system will trace the family.
+            This component is only used by FYFY_plugins.Monitoring but is attached to FYFY so the stacktrace can be save when the component is added using GameObjectManaber.AddComponent
+            </summary>
+        </member>
+        <member name="F:FYFY.ActionPerformed.name">
+            <summary>
+            Name of the traced action matching a transition in the Petri net of the ComponentMonitoring.
+            </summary>
+        </member>
+        <member name="F:FYFY.ActionPerformed.overrideName">
+            <summary>
+            Name overriding the name of the traced transition in the Monitoring Editor.
+            </summary>
+        </member>
+        <member name="F:FYFY.ActionPerformed.performedBy">
+            <summary>
+            Specify who perform this action, the player or the system. If not filled or different than "player" or "system", it will be set to "player" by default.
+            </summary>
+        </member>
+        <member name="F:FYFY.ActionPerformed.orLabels">
+            <summary>
+            links label concerned by this action. You can leave empty if only "*" operators
+            are used in logic expression. Must be defined if logic expression associated
+            to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3"
+            you have to indicate which links to use to build the trace: l0 and l3 OR l1 and
+            l3 => orLabels = new string[] {..., "l0", "l3"}; OR orLabels = new string[] {..., "l1", "l3"};
+            </summary>
+        </member>
+        <member name="F:FYFY.ActionPerformed.family">
+            <summary>
+            The monitored Family to use to build trace.
+            If there is a ComponentMonitoring matching the name and/or the overrideName filled, this field will be ignored.
+            </summary>
+        </member>
+        <member name="F:FYFY.ActionPerformed.exceptionStackTrace">
+            <summary>
+            String that describes the immediate frames of the call stack when this component is added to a GameObject.
             </summary>
         </member>
     </members>
