@@ -6,8 +6,6 @@ This plugin provides tools to build PetriNets and their specifications and to pr
 Build requirements
 ------------------
 
-- Unity3D 5.3.4
-- Microsoft .Net Framework 4.0
 - FYFY.dll
 
 Build
