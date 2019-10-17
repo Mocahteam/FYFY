@@ -1,7 +1,7 @@
-Cristaux DR exemple
+Cristaux DR example
 =======================
 
-This is a short exemple using FYFY libraries
+This is a short example using FYFY libraries
 
 You control an avatar and you have to try to pass the ice wall...
 
