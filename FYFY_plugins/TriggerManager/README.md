@@ -3,11 +3,13 @@ TriggerManager
 
 This plugin provides components to manage Unity triggers in a consistent manner with ECS formalism.
 
+Add a **TriggerSensitive** to a GameObject and each time a collision occurs, a component **Triggered** will be automatically attached to the GameObject. Then, you can use these data to define your families and detect triggered game objects.
+
+The **Triggered** component will be automatically added only if physics engine of Unity detect collision, be sure your component contains appropriate **Collider** and/or **RigidBody**.
+
 Build requirements
 ------------------
 
-- Unity3D 5.3.4
-- Microsoft .Net Framework 4.0
 - FYFY.dll
 
 Build
