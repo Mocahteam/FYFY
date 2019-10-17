@@ -3,11 +3,13 @@ PointerManager
 
 This plugin provides components to manage Pointer in a consistent manner with ECS formalism.
 
+Add a **PointerSensitive** to a GameObject and each time a pointer enter on the game object, a component **PointerOver** will be automatically attached to the GameObject. Then, you can use these data to define your families and detect focused game objects.
+
+The **PointerOver** component will be automatically added only if physics engine of Unity detect collision, be sure your component contains appropriate **GUIElement** or **Collider**.
+
 Build requirements
 ------------------
 
-- Unity3D 5.3.4
-- Microsoft .Net Framework 4.0
 - FYFY.dll
 
 Build
