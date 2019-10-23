@@ -52,7 +52,7 @@ namespace FYFY_plugins.Monitoring {
 		private bool showActions = false;
 		private bool showOptions = false;
 
-	    [MenuItem("FYFY/Edit Monitoring")]
+	    [MenuItem("Tools/FYFY/Edit Monitoring")]
 	    private static void ShowWindow()
         {
             // be sure that MonitoringManager is instantiated

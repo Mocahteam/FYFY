@@ -156,9 +156,13 @@ namespace FYFY {
 				fSystemMethodsName.Add(mi.Name);
 
 			// Get all systems' Type affected to one FYFY execution context
-			List<SystemDescription> allSystemsDescription = new List<SystemDescription>(_fixedUpdateSystemDescriptions);
-			allSystemsDescription.AddRange(_updateSystemDescriptions);
-			allSystemsDescription.AddRange(_lateUpdateSystemDescriptions);
+			List<SystemDescription> allSystemsDescription = new List<SystemDescription>();
+			if (_fixedUpdateSystemDescriptions != null)
+				allSystemsDescription.AddRange(_fixedUpdateSystemDescriptions);
+			if (_updateSystemDescriptions != null)
+				allSystemsDescription.AddRange(_updateSystemDescriptions);
+			if (_lateUpdateSystemDescriptions != null)
+				allSystemsDescription.AddRange(_lateUpdateSystemDescriptions);
 			
 			List<string> allSystemsName = new List<string>();
 			foreach (SystemDescription systemDesc in allSystemsDescription)
@@ -243,21 +247,6 @@ namespace FYFY {
 					if (!found){
 						DestroyImmediate(currentComponent);  // Because we are in editmode, we don't use GameObjectManager
 					}
-				}
-			}
-
-			// Remove .cs files that didn't refer existing system
-			List<string> fileList = new List<string>(Directory.GetFiles("Assets/AutomaticScript", "*.cs"));
-			foreach (string fileName in fileList)
-			{
-				bool found = false;
-				for (int i = 0; i < allSystemsName.Count && !found; i++)
-					found = fileName.EndsWith(allSystemsName[i].Replace('.', '_') + "_wrapper.cs");
-				if (!found)
-				{
-					File.Delete(fileName);
-					File.Delete(fileName + ".meta");
-					needRefresh = true;
 				}
 			}
 

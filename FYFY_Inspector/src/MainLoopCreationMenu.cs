@@ -6,7 +6,7 @@ namespace FYFY_Inspector {
 	/// 	Class automatically loaded by Unity Editor to create the FYFY menu.
 	/// </summary>
 	public static class MainLoopCreationMenu {
-		[MenuItem("FYFY/Create Main Loop %m")]
+		[MenuItem("Tools/FYFY/Create Main Loop %m")]
 		private static void createMainLoop() {
 			string name = "Main_Loop";
 			GameObject mainLoop = GameObject.Find(name);
