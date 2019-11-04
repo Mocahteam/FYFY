@@ -82,14 +82,14 @@ public class FYFYSystemExample : FSystem {
 ```
 
 ## What are families? ##
-Family is the mecanism that enables systems to access entities (GameObjects). Families are built by the FamilyManager with the help of a set of matchers:
+Family is the mechanism that enables systems to access entities (GameObjects). Families are built by the FamilyManager with the help of a set of matchers:
 ### Matchers on components ###
 * AllOfComponents enables to filter GameObjects that contain all of specified components.
 ```C#
 // Define a family that selects all GameObjects that contain Move and RandomTarget components
 Family myFamily = FamilyManager.getFamily(new AllOfComponents(typeof(Move), typeof(RandomTarget)));
 ```
-* AnyOfComponents enables to filter GameObjects that contain at least on of the specified components.
+* AnyOfComponents enables to filter GameObjects that contain at least one of the specified components.
 ```C#
 // Define a family that selects all GameObjects that contain Move or RandomTarget components (or both)
 Family myFamily = FamilyManager.getFamily(new AnyOfComponents(typeof(Move), typeof(RandomTarget)));
@@ -142,7 +142,7 @@ Family myFamily = FamilyManager.getFamily(new NoneOfProperties(PropertyMatcher.P
                       PropertyMatcher.PROPERTY.HAS_PARENT));
 ```
 ### Matchers combination ###
-It is possible to combine matcher to build the system appropiate filter. For instance following family will contain all GameObjects active in hierarchy with components Move and RandomTarget and not Velocity, and part of layer 3 or 7
+It is possible to combine matcher to build the system appropriate filter. For instance, following family will contain all GameObjects active in hierarchy with components Move and RandomTarget and not Velocity, and part of layer 3 or 7
 ```C#
 Family myFamily = FamilyManager.getFamily(
     new AllOfProperties(PropertyMatcher.PROPERTY.ACTIVE_IN_HIERARCHY),
