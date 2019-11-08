@@ -278,7 +278,19 @@ namespace FYFY {
 			// Check if we have to call back MainLoopEditorScanner OnEnable
 			if(mainLoopEditorScanner != null){
 				// Yes, we have to do so we do it
-				mainLoopEditorScanner.Invoke("OnEnable", 0);
+				// Because we are here in game context we can't use class defined in inspector context (build will fail)
+				// So we have to inspect types dynamically, first we try to find the MainLoopEditorScanner type (it will be the
+				// case if we are in Unity editor context
+				Type MainLoopEditorScanner_Type = Type.GetType("FYFY_Inspector.MainLoopEditorScanner, FYFY_Inspector");
+				if (MainLoopEditorScanner_Type != null){ // could be null if we are not in Unity editor context (game built)
+					// Here we found the MainLoopEditorScanner type, so we inspect it to find "OnEnable" method
+					MethodInfo OnEnable_Method = MainLoopEditorScanner_Type.GetMethod("OnEnable", new Type[] { });
+					if (OnEnable_Method != null)
+						// And call the method on the Instance field
+						OnEnable_Method.Invoke(mainLoopEditorScanner, new object[] { });
+					else
+						UnityEngine.Debug.LogError("Warning, inconsistent method inside FYFY_Inspector.MainLoopEditorScanner, \"OnEnable\" method is not defined.");
+				}
 				mainLoopEditorScanner = null;
 			}
 		}

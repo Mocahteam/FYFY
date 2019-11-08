@@ -3,6 +3,7 @@ using UnityEditor;
 using FYFY;
 using System;
 using System.Threading;
+using System.Reflection;
 
 namespace FYFY_Inspector {
 	
@@ -45,10 +46,16 @@ namespace FYFY_Inspector {
 				if (mmInstanceField != null){
 					// Here we found MonitoringManager.Instance and we have to check if it is not null.
 					// It could be null if user add Monitoring plugin but don't add MonitoringManager component to the scene
-					MonoBehaviour monitoringManager_Class = (mmInstanceField.GetValue(null) as MonoBehaviour);
-					if (monitoringManager_Class != null)
+					if (mmInstanceField.GetValue(null) != null){
 						// We found the Type, we found its static field "Instance", so we can call the function to synchronize families
-						monitoringManager_Class.Invoke("synchronizeFamilies", 0);
+						// First we have to find the "synchronizeFamilies" method defined inside MonitoringManager type
+						MethodInfo synchronizeFamilies = monitoringManager_Type.GetMethod("synchronizeFamilies", new Type[] { });
+						if (synchronizeFamilies != null)
+							// And call the method on the Instance field
+							synchronizeFamilies.Invoke(mmInstanceField.GetValue(null), new object[] { });
+						else
+							UnityEngine.Debug.LogError("Warning, inconsistent method inside FYFY_plugins.Monitoring.MonitoringManager.Instance, \"synchronizeFamilies\" method is not defined.");
+					}
 				} else
 					UnityEngine.Debug.LogError("Warning, inconsistent field inside FYFY_plugins.Monitoring.MonitoringManager, \"Instance\" field require.");
 			}
