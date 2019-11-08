@@ -29,18 +29,13 @@ namespace FYFY_Inspector {
 		public void OnEnable(){
 			if(Application.isPlaying)
 				return;
-			
-			// OnEnable is called after script compilation. We use this mechanism to synchronize systems public functions and families
-			while (EditorApplication.isCompiling)
-				//Wait 10 ms not to overload processors
-				Thread.Sleep(10);
-				
+	
 			// After each compilations we have to synchronize families in case of user update them inside systems.
 			// Because we are here in FYFY_Inspector package we have no garanty that user use Monitoring plugin.
 			// So we have to inspect types dynamically, first we try to find the Monitoring type (it will be the
 			// case if user drag&drop the Monitoring libraries inside its Unity project
 			Type monitoringManager_Type = Type.GetType("FYFY_plugins.Monitoring.MonitoringManager, Monitoring");
-			if (monitoringManager_Type != null){ // could be null if user doesn't use Monitoring plugin
+			if (monitoringManager_Type != null && !EditorApplication.isCompiling){ // could be null if user doesn't use Monitoring plugin and be sure compiling is finished before synchronize families
 				// Here we found the MonitoringManager type, so we inspect it to find "Instance" field
 				System.Reflection.FieldInfo mmInstanceField = monitoringManager_Type.GetField("Instance");
 				if (mmInstanceField != null){
