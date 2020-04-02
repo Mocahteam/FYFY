@@ -37,7 +37,7 @@ namespace FYFY {
 				if (!_gameObject.GetComponent<FyfyBridge>())
 					_gameObject.AddComponent<FyfyBridge>();
 			} else
-				throw new FyfyException("A game object can be binded to Fyfy only once. The game object \""+_gameObject.name+"\" is already binded.", _exceptionStackTrace);
+				throw new FyfyException("A game object can be binded to Fyfy only once. The game object \""+_gameObject.name+"\" (instance id:"+gameObjectId+") is already binded.", _exceptionStackTrace);
 		}
 	}
 }

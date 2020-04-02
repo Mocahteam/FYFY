@@ -238,7 +238,7 @@ namespace FYFY_Inspector {
 							FieldInfo field = (FieldInfo)member;
 							if (field.FieldType == typeof(FYFY.Family)) {
 								Family f = (Family)field.GetValue (system);
-								f.showContent = EditorGUILayout.Foldout (f.showContent, field.Name);
+								f.showContent = EditorGUILayout.Foldout (f.showContent, field.Name+" ("+f.Count+")");
 								if (f.showContent) {
 									EditorGUI.indentLevel += 1;
 									foreach (GameObject go in f)
