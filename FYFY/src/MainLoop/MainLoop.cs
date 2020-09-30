@@ -83,6 +83,9 @@ namespace FYFY {
 		private Stopwatch _stopwatch;
 
 		private int _familiesUpdateCount = 0;
+		
+		/// <summary>Directory to store wrapper to system's public functions</summary>
+		public string _outputWrappers = "Assets/AutomaticScript";
 
 		// Parse scene to get all entities.
 		private void Awake() {
@@ -205,20 +208,20 @@ namespace FYFY {
 					}
 				}
 				cSharpCode += "}";
-				// Write .cs file inside Assets/AutomaticScript/
-				Directory.CreateDirectory("Assets/AutomaticScript");
-				if (File.Exists("Assets/AutomaticScript/" + compilableName + "_wrapper.cs"))
+				// Write .cs file inside _outputWrappers directory
+				Directory.CreateDirectory(_outputWrappers);
+				if (File.Exists(_outputWrappers + "/" + compilableName + "_wrapper.cs"))
 				{
-					if (cSharpCode != File.ReadAllText("Assets/AutomaticScript/" + compilableName + "_wrapper.cs"))
+					if (cSharpCode != File.ReadAllText(_outputWrappers + "/" + compilableName + "_wrapper.cs"))
 					{
 						needRefresh = true;
-						File.WriteAllText("Assets/AutomaticScript/" + compilableName + "_wrapper.cs", cSharpCode);
+						File.WriteAllText(_outputWrappers + "/" + compilableName + "_wrapper.cs", cSharpCode);
 					}
 				}
 				else
 				{
 					needRefresh = true;
-					File.WriteAllText("Assets/AutomaticScript/" + compilableName + "_wrapper.cs", cSharpCode);
+					File.WriteAllText(_outputWrappers + "/" + compilableName + "_wrapper.cs", cSharpCode);
 				}
 			}
 
@@ -237,15 +240,17 @@ namespace FYFY {
 			List<MonoBehaviour> currentsComponents = new List<MonoBehaviour>(gameObject.GetComponents<MonoBehaviour>());
 			foreach (MonoBehaviour currentComponent in currentsComponents)
 			{
-				// Check if current component is a system wrapper
-				Type componentType = currentComponent.GetType();
-				if (componentType.FullName.EndsWith("_wrapper"))
-				{
-					bool found = false;
-					for (int i = 0; i < allSystemsName.Count && !found; i++)
-						found = (componentType.FullName == (allSystemsName[i].Replace('.', '_') + "_wrapper"));
-					if (!found){
-						DestroyImmediate(currentComponent);  // Because we are in editmode, we don't use GameObjectManager
+				if (currentComponent != null){
+					// Check if current component is a system wrapper
+					Type componentType = currentComponent.GetType();
+					if (componentType.FullName.EndsWith("_wrapper"))
+					{
+						bool found = false;
+						for (int i = 0; i < allSystemsName.Count && !found; i++)
+							found = (componentType.FullName == (allSystemsName[i].Replace('.', '_') + "_wrapper"));
+						if (!found){
+							DestroyImmediate(currentComponent);  // Because we are in editmode, we don't use GameObjectManager
+						}
 					}
 				}
 			}

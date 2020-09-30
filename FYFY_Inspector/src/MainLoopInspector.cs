@@ -2,8 +2,10 @@
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEditor.SceneManagement;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Reflection;
 using FYFY;
 
@@ -19,6 +21,7 @@ namespace FYFY_Inspector {
 		private SerializedProperty _lateUpdateSystemDescriptions;
 		private SerializedProperty _loadingState;
 		private SerializedProperty _specialGameObjects;
+		private SerializedProperty _outputWrappers;
 
 		private ReorderableList _fixedUpdateDrawingList;
 		private ReorderableList _updateDrawingList;
@@ -173,6 +176,7 @@ namespace FYFY_Inspector {
 			_lateUpdateSystemDescriptions = serializedObject.FindProperty("_lateUpdateSystemDescriptions");
 			_loadingState = serializedObject.FindProperty("_loadingState");
 			_specialGameObjects = serializedObject.FindProperty("_specialGameObjects");
+			_outputWrappers = serializedObject.FindProperty("_outputWrappers");
 
 			_fixedUpdateDrawingList = new ReorderableList(serializedObject, _fixedUpdateSystemDescriptions, true, false, true, false);
 			_updateDrawingList  = new ReorderableList(serializedObject, _updateSystemDescriptions, true, false, true, false);
@@ -286,6 +290,32 @@ namespace FYFY_Inspector {
 				_specialGameObjects.GetArrayElementAtIndex (0).objectReferenceValue = (GameObject)EditorGUILayout.ObjectField (null, typeof(GameObject), true);
 
 				EditorGUI.indentLevel -= 1;
+				
+				string newWrapperPath = EditorGUILayout.DelayedTextField (new GUIContent("Wrappers directory", "The path where wrappers are stored."), _outputWrappers.stringValue);
+				if (newWrapperPath != _outputWrappers.stringValue){
+					if (EditorUtility.DisplayDialog("Warning", "If you change FYFY wrappers' directory, all events linked with systems' functions will be lost. Are you sure to continue?", "Yes, remove old directory", "Cancel")){
+						// remove all wrappers
+						List<MonoBehaviour> currentsComponents = new List<MonoBehaviour>(((MainLoop)target).GetComponents<MonoBehaviour>());
+						foreach (MonoBehaviour currentComponent in currentsComponents)
+						{
+							if (currentComponent != null){
+								// Check if current component is a system wrapper
+								Type componentType = currentComponent.GetType();
+								if (componentType.FullName.EndsWith("_wrapper"))
+									DestroyImmediate(currentComponent);  // Because we are in editmode, we don't use GameObjectManager
+							}
+						}
+						
+						// remove directory
+						if(Directory.Exists(_outputWrappers.stringValue))
+							Directory.Delete(_outputWrappers.stringValue, true);
+						if(File.Exists(_outputWrappers.stringValue+".meta"))
+							File.Delete(_outputWrappers.stringValue+".meta");
+						_outputWrappers.stringValue = newWrapperPath;
+						AssetDatabase.Refresh();
+					} else
+						_outputWrappers.stringValue = _outputWrappers.stringValue; // reset value
+				}
 			} else {
 				MainLoop ml = (MainLoop)target;
 				// init monitor if required
