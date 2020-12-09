@@ -12,8 +12,10 @@ namespace FYFY {
 			_componentTypeNames = new HashSet<string>();
 
 			foreach(Component c in gameObject.GetComponents<Component>()) {
-				System.Type type = c.GetType();
-				_componentTypeNames.Add(type.FullName);
+				if (c != null){ // it is possible if a GameObject contains a breaked component (Missing script)
+					System.Type type = c.GetType();
+					_componentTypeNames.Add(type.FullName);
+				}
 			}
 
 			_exceptionStackTrace = exceptionStackTrace;

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -43,6 +44,13 @@ namespace FYFY {
 		
 		// this static flag is used by monitoring module to know if the scene will change
 		internal static bool sceneChanging = false;
+		
+		/// <summary>Defined in GameObjectManager to know the last frame number a scene is loaded</summary>
+		internal int lastFrameSceneLoaded = -1;
+		/// <summary>List of scene id to parse</summary>
+		internal List<int> loadedSceneById;
+		/// <summary>List of scene name to parse</summary>
+		internal List<string> loadedSceneByName;
 
 		/// <summary>List of systems defined in fixedUpdate context through the Inspector</summary>
 		public SystemDescription[] _fixedUpdateSystemDescriptions; // initialized in inspector, otherwise == null
@@ -110,9 +118,9 @@ namespace FYFY {
 			GameObjectManager._delayedActions.Clear();
 			GameObjectManager._unbindedGameObjectIds.Clear();
 			GameObjectManager._modifiedGameObjectIds.Clear();
-			GameObjectManager._sceneBuildIndex = -1;
-			GameObjectManager._sceneName = null;
 			sceneChanging = false;
+			loadedSceneById = new List<int>();
+			loadedSceneByName = new List<string>();
 		}
 		
 		
@@ -127,7 +135,7 @@ namespace FYFY {
 			foreach (FSystem system in allSystems)
 			{
 				Type systemType = system.GetType();
-				if (systemType.Name == systemName)
+				if (systemType.FullName == systemName)
 				{
 					// We found the system, now found the target funcion
 					MethodInfo systemMethod;
@@ -178,8 +186,10 @@ namespace FYFY {
 
 				string cSharpCode = "using UnityEngine;\n";
 				cSharpCode += "using FYFY;\n\n";
+				
 				cSharpCode += "[ExecuteInEditMode]\n";
-				cSharpCode += "public class " + compilableName + "_wrapper : MonoBehaviour\n{\n"; 
+				cSharpCode += "public class " + compilableName + "_wrapper : MonoBehaviour\n";
+				cSharpCode += "{\n"; 
 				cSharpCode += "\tprivate void Start()\n";
 				cSharpCode += "\t{\n";
 				cSharpCode += "\t\tthis.hideFlags = HideFlags.HideInInspector; // Hide this component in Inspector\n";
@@ -201,13 +211,15 @@ namespace FYFY {
 							List<Type> parametersType = new List<Type>();
 							if (parametersInfo.Length == 1)
 								cSharpCode += parametersInfo[0].ParameterType + " " + parametersInfo[0].Name;
-							cSharpCode += ")\n\t{\n";
+							cSharpCode += ")\n";
+							cSharpCode += "\t{\n";
 							cSharpCode += "\t\tMainLoop.callAppropriateSystemMethod (\"" + systemType.FullName + "\", \"" + methodInfo.Name + "\", " + (parametersInfo.Length == 1 ? parametersInfo[0].Name : "null") + ");\n";
 							cSharpCode += "\t}\n\n";
 						}
 					}
 				}
-				cSharpCode += "}";
+				cSharpCode += "}\n";
+				
 				// Write .cs file inside _outputWrappers directory
 				Directory.CreateDirectory(_outputWrappers);
 				if (File.Exists(_outputWrappers + "/" + compilableName + "_wrapper.cs"))
@@ -350,7 +362,8 @@ namespace FYFY {
 			
 			foreach(GameObject gameObject in sceneGameObjects) {
 				// In case of GameObject state (enable/disable) is controlled by Unity tools (animators for instance) Fyfy is not notified from this change => solution add a special component that catch Unity events and submit update to FYFY
-				gameObject.AddComponent<FyfyBridge>();
+				if (!gameObject.GetComponent<FyfyBridge>())
+					gameObject.AddComponent<FyfyBridge>();
 				
 				// Compute Wrappers
 				HashSet<string> componentTypeNames = new HashSet<string>();
@@ -513,13 +526,22 @@ namespace FYFY {
 				}
 			_stopwatch.Stop ();
 			lateUpdateStats = _stopwatch.ElapsedMilliseconds;
-
-			if(GameObjectManager._sceneBuildIndex != -1) { // load scene if it's desired
-				UnityEngine.SceneManagement.SceneManager.LoadScene(GameObjectManager._sceneBuildIndex); // done at the beginning of the "Unity" next frame
-				sceneChanging = true;
-			} else if(GameObjectManager._sceneName != null) {
-				UnityEngine.SceneManagement.SceneManager.LoadScene(GameObjectManager._sceneName);       // done at the beginning of the "Unity" next frame
-				sceneChanging = true;
+			
+			if (Time.frameCount -1 == lastFrameSceneLoaded && lastFrameSceneLoaded != -1)
+			{
+				foreach (int sceneId in loadedSceneById){
+					GameObject[] roots = SceneManager.GetSceneByBuildIndex(sceneId).GetRootGameObjects();
+					foreach (GameObject root in roots)
+						GameObjectManager.bind(root);
+				}
+				foreach (string sceneName in loadedSceneByName){
+					GameObject[] roots = SceneManager.GetSceneByName(sceneName).GetRootGameObjects();
+					foreach (GameObject root in roots)
+						GameObjectManager.bind(root);
+				}
+				loadedSceneById.Clear();
+				loadedSceneByName.Clear();
+				lastFrameSceneLoaded = -1;
 			}
 		}
 	}

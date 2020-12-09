@@ -27,9 +27,6 @@ namespace FYFY {
 		internal static readonly Queue<IGameObjectManagerAction> _delayedActions        = new Queue<IGameObjectManagerAction>();
 		internal static readonly HashSet<int> _unbindedGameObjectIds                    = new HashSet<int>();                       // unbindGO
 		internal static readonly HashSet<int> _modifiedGameObjectIds                    = new HashSet<int>();                       // bindGO or addComponent or removeComponent
-
-		internal static int _sceneBuildIndex = -1; // used in MainLoop LateUpdate
-		internal static string _sceneName = null;  // used in MainLoop LateUpdate
 		
 		internal static HashSet<GameObject> _ddolObjects = new HashSet<GameObject>(); // used to manage DontDestroyOnLoad mechanism => used in MainLoop Start
 
@@ -47,8 +44,17 @@ namespace FYFY {
 		/// <param name="sceneBuildIndex">
 		/// 	Index of the scene in the Build Settings to load.
 		/// </param>
-		public static void loadScene(int sceneBuildIndex) {
-			_sceneBuildIndex = sceneBuildIndex;
+		/// <param name="mode">
+		/// 	Allows you to specify whether or not to load the Scene additively. See UnityEngine.SceneManagement.LoadSceneMode for more information about the options.
+		/// </param>
+		public static void loadScene(int sceneBuildIndex, UnityEngine.SceneManagement.LoadSceneMode mode = UnityEngine.SceneManagement.LoadSceneMode.Single) {
+			UnityEngine.SceneManagement.SceneManager.LoadScene(sceneBuildIndex, mode); // done at the beginning of the "Unity" next frame
+			if (mode == UnityEngine.SceneManagement.LoadSceneMode.Single)
+				MainLoop.sceneChanging = true;
+			else if (mode == UnityEngine.SceneManagement.LoadSceneMode.Additive){
+				MainLoop.instance.lastFrameSceneLoaded = Time.frameCount;
+				MainLoop.instance.loadedSceneById.Add (sceneBuildIndex);
+			}
 		}
 
 		/// <summary>
@@ -60,8 +66,17 @@ namespace FYFY {
 		/// <param name="sceneName">
 		/// 	Name of the scene to load.
 		/// </param>
-		public static void loadScene(string sceneName) {
-			_sceneName = sceneName;
+		/// <param name="mode">
+		/// 	Allows you to specify whether or not to load the Scene additively. See UnityEngine.SceneManagement.LoadSceneMode for more information about the options.
+		/// </param>
+		public static void loadScene(string sceneName, UnityEngine.SceneManagement.LoadSceneMode mode = UnityEngine.SceneManagement.LoadSceneMode.Single) {
+			UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName, mode); // done at the beginning of the "Unity" next frame
+			if (mode == UnityEngine.SceneManagement.LoadSceneMode.Single)
+				MainLoop.sceneChanging = true;
+			else if (mode == UnityEngine.SceneManagement.LoadSceneMode.Additive){
+				MainLoop.instance.lastFrameSceneLoaded = Time.frameCount;
+				MainLoop.instance.loadedSceneByName.Add (sceneName);
+			}
 		}
 
 		/// <summary>
