@@ -38,9 +38,6 @@ namespace FYFY {
 		/// <summary>
 		/// 	Loads the specified scene at the beginning of the next update block.
 		/// </summary>
-		/// <remarks>
-		/// 	The scene is always loaded after closing the current scene.
-		/// </remarks>
 		/// <param name="sceneBuildIndex">
 		/// 	Index of the scene in the Build Settings to load.
 		/// </param>
@@ -60,9 +57,6 @@ namespace FYFY {
 		/// <summary>
 		/// 	Loads the scene at the beginning of the next update block.
 		/// </summary>
-		/// <remarks>
-		/// 	The scene is always loaded after closing the current scene.
-		/// </remarks>
 		/// <param name="sceneName">
 		/// 	Name of the scene to load.
 		/// </param>
@@ -77,6 +71,26 @@ namespace FYFY {
 				MainLoop.instance.lastFrameSceneLoaded = Time.frameCount;
 				MainLoop.instance.loadedSceneByName.Add (sceneName);
 			}
+		}
+		
+		/// <summary>
+		///		Destroys all GameObjects associated with the given Scene and removes the Scene from the SceneManager.
+		/// </summary>
+		/// <param name="sceneName">
+		/// 	Name of the scene to load.
+		/// </param>
+		public static void unloadScene(string sceneName){
+			MainLoop.instance.unloadedSceneByName.Add (sceneName);
+		}
+		
+		/// <summary>
+		///		Destroys all GameObjects associated with the given Scene and removes the Scene from the SceneManager.
+		/// </summary>
+		/// <param name="sceneBuildIndex">
+		/// 	Index of the scene in the Build Settings to load.
+		/// </param>
+		public static void unloadScene(int sceneBuildIndex){
+			MainLoop.instance.unloadedSceneById.Add (sceneBuildIndex);
 		}
 
 		/// <summary>

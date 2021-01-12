@@ -702,7 +702,6 @@ namespace FYFY_plugins.Monitoring {
 						{
 							rect.x = rect.x - 5 + EditorGUI.indentLevel * 20;
 							rect.width = rect.width - 18 - EditorGUI.indentLevel * 20;
-							EditorGUI.DrawRect (rect, new Color (0.9f, 0.9f, 0.9f, 1));
 							
 							EditorGUILayout.BeginVertical ();
 							{
@@ -829,9 +828,8 @@ namespace FYFY_plugins.Monitoring {
 							}
 						}
 						EditorGUILayout.EndHorizontal ();
+						EditorGUILayout.LabelField ("", GUI.skin.horizontalSlider);
 					}
-
-					EditorGUILayout.LabelField ("", GUI.skin.horizontalSlider);
 
 					EditorGUIUtility.labelWidth = 170;
 					string newExpr = EditorGUILayout.TextField ("Logic expression of links:", tLink.logic);

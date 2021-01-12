@@ -51,6 +51,10 @@ namespace FYFY {
 		internal List<int> loadedSceneById;
 		/// <summary>List of scene name to parse</summary>
 		internal List<string> loadedSceneByName;
+		/// <summary>List of scene id to unload</summary>
+		internal List<int> unloadedSceneById;
+		/// <summary>List of scene name to unload</summary>
+		internal List<string> unloadedSceneByName;
 
 		/// <summary>List of systems defined in fixedUpdate context through the Inspector</summary>
 		public SystemDescription[] _fixedUpdateSystemDescriptions; // initialized in inspector, otherwise == null
@@ -121,6 +125,8 @@ namespace FYFY {
 			sceneChanging = false;
 			loadedSceneById = new List<int>();
 			loadedSceneByName = new List<string>();
+			unloadedSceneById = new List<int>();
+			unloadedSceneByName = new List<string>();
 		}
 		
 		
@@ -436,6 +442,25 @@ namespace FYFY {
 			// of the remove action at the origin of the OnDestroy calling.
 			// Same principle inside Actions.perform function.
 			//
+			
+			// Load scenes
+			if (lastFrameSceneLoaded != -1 && lastFrameSceneLoaded == Time.frameCount - 1)
+			{
+				foreach (int sceneId in loadedSceneById){
+					GameObject[] roots = SceneManager.GetSceneByBuildIndex(sceneId).GetRootGameObjects();
+					foreach (GameObject root in roots)
+						GameObjectManager.bind(root);
+				}
+				foreach (string sceneName in loadedSceneByName){
+					GameObject[] roots = SceneManager.GetSceneByName(sceneName).GetRootGameObjects();
+					foreach (GameObject root in roots)
+						GameObjectManager.bind(root);
+				}
+				loadedSceneById.Clear();
+				loadedSceneByName.Clear();
+				lastFrameSceneLoaded = -1;
+			}
+			
 			while (GameObjectManager._delayedActions.Count != 0) {
 				// During the action perform (and so the Unity callbacks), the current action is always present on the queue top.
 				// This is used in TriggerManager && CollisionManager dlls.
@@ -527,22 +552,33 @@ namespace FYFY {
 			_stopwatch.Stop ();
 			lateUpdateStats = _stopwatch.ElapsedMilliseconds;
 			
-			if (Time.frameCount -1 == lastFrameSceneLoaded && lastFrameSceneLoaded != -1)
-			{
-				foreach (int sceneId in loadedSceneById){
-					GameObject[] roots = SceneManager.GetSceneByBuildIndex(sceneId).GetRootGameObjects();
-					foreach (GameObject root in roots)
-						GameObjectManager.bind(root);
+			// Unload scenes
+			foreach (int sceneId in unloadedSceneById){
+				GameObject[] roots = SceneManager.GetSceneByBuildIndex(sceneId).GetRootGameObjects();
+				foreach (GameObject root in roots){
+					foreach(Transform t in root.GetComponentsInChildren<Transform>(true)) { // gameobject.transform is include		
+						int _gameObjectId = t.gameObject.GetInstanceID();
+						GameObjectManager._gameObjectWrappers.Remove(_gameObjectId);
+						GameObjectManager._unbindedGameObjectIds.Add(_gameObjectId);
+					}
 				}
-				foreach (string sceneName in loadedSceneByName){
-					GameObject[] roots = SceneManager.GetSceneByName(sceneName).GetRootGameObjects();
-					foreach (GameObject root in roots)
-						GameObjectManager.bind(root);
-				}
-				loadedSceneById.Clear();
-				loadedSceneByName.Clear();
-				lastFrameSceneLoaded = -1;
+				SceneManager.UnloadSceneAsync(sceneId);
 			}
+			foreach (string sceneName in unloadedSceneByName){
+				GameObject[] roots = SceneManager.GetSceneByName(sceneName).GetRootGameObjects();
+				foreach (GameObject root in roots){
+					foreach(Transform t in root.GetComponentsInChildren<Transform>(true)) { // gameobject.transform is include		
+						int _gameObjectId = t.gameObject.GetInstanceID();
+						GameObjectManager._gameObjectWrappers.Remove(_gameObjectId);
+						GameObjectManager._unbindedGameObjectIds.Add(_gameObjectId);
+					}
+				}
+				SceneManager.UnloadSceneAsync(sceneName);
+			}
+			if (unloadedSceneById.Count > 0)
+				unloadedSceneById.Clear();
+			if (unloadedSceneByName.Count > 0)
+				unloadedSceneByName.Clear();
 		}
 	}
 }
