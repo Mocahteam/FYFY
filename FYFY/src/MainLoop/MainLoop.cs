@@ -478,8 +478,11 @@ namespace FYFY {
 			}
 			GameObjectManager._unbindedGameObjectIds.Clear();
 
-			foreach(int gameObjectId in GameObjectManager._modifiedGameObjectIds)
+			// Working on a copy to avoid collection was modified during enumeration
+			HashSet<int> copy = new HashSet<int>(GameObjectManager._modifiedGameObjectIds);
+			foreach(int gameObjectId in copy){
 				FamilyManager.updateAfterGameObjectModified(gameObjectId);
+			}
 			GameObjectManager._modifiedGameObjectIds.Clear();
 
 			++_familiesUpdateCount;
