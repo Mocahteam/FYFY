@@ -39,8 +39,8 @@ namespace FYFY_plugins.Monitoring {
 	            )
 	        );
 
-	        System.IO.Directory.CreateDirectory("logs");
-	        doc.Save("logs\\"+name+"_logs_"+ timeStamp+".xml");
+	        System.IO.Directory.CreateDirectory("./logs");
+	        doc.Save("./logs/"+name+"_logs_"+ timeStamp+".xml");
 	        xTraceList.Clear();
 	    }
 
@@ -72,8 +72,8 @@ namespace FYFY_plugins.Monitoring {
 					)
 				);
 
-				System.IO.Directory.CreateDirectory("features");
-				doc.Save("features\\"+spec.Key+".xml");
+				System.IO.Directory.CreateDirectory("./features");
+				doc.Save("./features/"+spec.Key+".xml");
 			}
 			xFeatureList.Clear();
 	    }

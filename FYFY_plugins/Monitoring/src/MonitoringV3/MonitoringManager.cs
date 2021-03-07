@@ -413,7 +413,7 @@ namespace FYFY_plugins.Monitoring{
 						if (featuresPath == null || featuresPath == "")
 							featuresPath = "./features/";
 						LaalysProcess = new Process ();
-						LaalysProcess.StartInfo.FileName = "java.exe";
+						LaalysProcess.StartInfo.FileName = "java";
 						LaalysProcess.StartInfo.Arguments = "-jar "+laalysPath+" -fullPn "+fullPetriNetsPath+" -filteredPn "+filteredPetriNetsPath+" -features "+featuresPath+" -serverIP localhost -serverPort 12000";
                         if (debugLogs)
                             LaalysProcess.StartInfo.Arguments += " -d";
@@ -513,15 +513,17 @@ namespace FYFY_plugins.Monitoring{
 		}
 
 		void Update (){
-			// wait client connection
-			if (serverSocket != null && clientSocket == null && serverSocket.Pending ()) {
-				// client connection pending => accept this new connection
-				clientSocket = serverSocket.AcceptTcpClient ();
-				networkStream = clientSocket.GetStream ();
-				// Sends data immediately upon calling NetworkStream.Write.
-				clientSocket.NoDelay = true;
-                waitingForLaalys = false;
-            }
+			if (Application.isPlaying && inGameAnalysis){
+				// wait client connection
+				if (serverSocket != null && clientSocket == null && serverSocket.Pending ()) {
+					// client connection pending => accept this new connection
+					clientSocket = serverSocket.AcceptTcpClient ();
+					networkStream = clientSocket.GetStream ();
+					// Sends data immediately upon calling NetworkStream.Write.
+					clientSocket.NoDelay = true;
+					waitingForLaalys = false;
+				}
+			}
 		}
 
         void OnDestroy()

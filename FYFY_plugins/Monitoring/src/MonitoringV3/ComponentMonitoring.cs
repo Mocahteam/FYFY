@@ -14,10 +14,13 @@ namespace FYFY_plugins.Monitoring{
 	[ExecuteInEditMode] // Awake, Start... will be call in edit mode
 	[AddComponentMenu("")]
     public class ComponentMonitoring : MonoBehaviour, ISerializationCallbackReceiver
-    {
+    {	
         private static Mutex mut = new Mutex();
         [NonSerialized]
         internal bool ready = false;
+		// in case of ComponentMonitoring is destroy while thread still waiting MonitoringManager
+		private bool forceStop = false;
+		private Thread thread;
 
         /// <summary> Pnml File associated to the monitor </summary>
         [HideInInspector]
@@ -72,17 +75,18 @@ namespace FYFY_plugins.Monitoring{
         public ComponentMonitoring()
         {
             //Launch a thread to wait for the MonitoringManager, then create an unique ID when it is ready
-            Thread thread = new Thread(WaitMonitoringManager);
+            thread = new Thread(WaitMonitoringManager);
             thread.Start();
         }
 
         private void WaitMonitoringManager()
         {
-            //While MonitoringManager isn't ready
-            while (MonitoringManager.Instance == null || !MonitoringManager.Instance.ready || !ready || MainLoop.sceneChanging)
+            //While MonitoringManager isn't ready and this not ready
+            while ((MonitoringManager.Instance == null || !MonitoringManager.Instance.ready || !ready || MainLoop.sceneChanging) && !forceStop)
                 //Wait 10 ms not to overload processors
                 Thread.Sleep(10);
-			computeUniqueId();
+			if (!forceStop)
+				computeUniqueId();
         }
 		
 		internal void computeUniqueId() 
@@ -132,6 +136,8 @@ namespace FYFY_plugins.Monitoring{
 			if (MonitoringManager.Instance != null){
 				MonitoringManager.Instance.unregisterMonitor(this);
 			}
+			forceStop = true;
+			thread.Join();
 		}
 
         /// <summary>

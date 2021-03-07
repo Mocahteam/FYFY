@@ -151,8 +151,8 @@ namespace FYFY_plugins.Monitoring{
 					)
 				)
 			);
-            System.IO.Directory.CreateDirectory("completeNets");
-            doc.Save ("completeNets/"+path);
+            System.IO.Directory.CreateDirectory("./completeNets");
+            doc.Save ("./completeNets/"+path);
 		}
 	}
 }
