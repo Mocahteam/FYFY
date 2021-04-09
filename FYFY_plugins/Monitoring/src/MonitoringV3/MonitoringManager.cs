@@ -553,6 +553,11 @@ namespace FYFY_plugins.Monitoring{
 
         void OnDestroy()
 		{
+			// ask Laalys to quit
+			if (networkStream != null){
+				byte[] sendBytes = Encoding.UTF8.GetBytes ("Quit");
+				networkStream.Write (sendBytes, 0, sendBytes.Length);
+			}
 			// close Socket 
 			if (clientSocket != null)
 				clientSocket.Close ();
@@ -562,7 +567,7 @@ namespace FYFY_plugins.Monitoring{
 			if (LaalysProcess != null && !LaalysProcess.HasExited) {
 				// Stop to capture output stream
 				LaalysProcess.Exited -= LaalysEH;
-				LaalysProcess.Kill ();
+				LaalysProcess.Kill();
 			}
 			// Save traces
 			if (Application.isPlaying)

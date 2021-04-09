@@ -33,18 +33,15 @@ namespace FYFY_plugins.Monitoring
             {
                 traces = new GameObject("Traces");
                 GameObjectManager.bind(traces);
-                f_actions.addEntryCallback(ActionProcessing);
             }
             instance = this;
         }
+		
 
-        // Use this to update member variables when system resume.
-        // Advice: avoid to update your families inside this function.
         /// <summary>
-        /// Used to update member variables when system resume.
+        /// Use to process your families.
         /// </summary>
-        /// <param name="currentFrame"></param>
-        protected override void onResume(int currentFrame)
+		protected override void onProcess(int familiesUpdateCount)
         {
             int nbActions = f_actions.Count;
             for (int i = 0; i < nbActions; i++)
