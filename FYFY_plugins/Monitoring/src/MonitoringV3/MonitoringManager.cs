@@ -438,7 +438,10 @@ namespace FYFY_plugins.Monitoring{
 						if (featuresPath == null || featuresPath == "")
 							featuresPath = "./features/";
 						LaalysProcess = new Process ();
-						LaalysProcess.StartInfo.FileName = "java";
+						if (!debugLogs && SystemInfo.operatingSystem.Contains("Windows"))
+							LaalysProcess.StartInfo.FileName = "javaw";
+						else
+							LaalysProcess.StartInfo.FileName = "java";
 						LaalysProcess.StartInfo.Arguments = "-jar "+laalysPath+" -fullPn "+fullPetriNetsPath+" -filteredPn "+filteredPetriNetsPath+" -features "+featuresPath+" -serverIP localhost -serverPort 12000";
                         if (debugLogs)
                             LaalysProcess.StartInfo.Arguments += " -d";

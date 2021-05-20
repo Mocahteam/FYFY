@@ -70,9 +70,9 @@ namespace FYFY_Inspector {
 		}
 
 		private void OnEnableInPlayingMode() {
-			_fixedUpdateDrawingList = new ReorderableList(FYFY.FSystemManager._fixedUpdateSystems, typeof(FSystem), true, true, false, false);
-			_updateDrawingList = new ReorderableList(FYFY.FSystemManager._updateSystems, typeof(FSystem), true, true, false, false);
-			_lateUpdateDrawingList = new ReorderableList(FYFY.FSystemManager._lateUpdateSystems, typeof(FSystem), true, true, false, false);
+			_fixedUpdateDrawingList = new ReorderableList(FYFY.FSystemManager._fixedUpdateSystems, typeof(FSystem), false, true, false, false);
+			_updateDrawingList = new ReorderableList(FYFY.FSystemManager._updateSystems, typeof(FSystem), false, true, false, false);
+			_lateUpdateDrawingList = new ReorderableList(FYFY.FSystemManager._lateUpdateSystems, typeof(FSystem), false, true, false, false);
 
 			_fixedUpdateDrawingList.drawElementCallback = delegate(Rect rect, int index, bool isActive, bool isFocused) {
 				this.playingModeDrawElementCallBack(FYFY.FSystemManager._fixedUpdateSystems[index], rect);
@@ -86,9 +86,6 @@ namespace FYFY_Inspector {
 		}
 
 		private void editingModeDrawElementCallBack(SerializedProperty systemDescriptions, int index, Rect rect) {
-			if(index >= systemDescriptions.arraySize) // bug when deleteArrayElementAtIndex -> index passed to the callback (reorderablelist) not update immediatly ??????
-				return; 
-
 			SerializedProperty systemDescription = systemDescriptions.GetArrayElementAtIndex(index);
 			SerializedProperty typeFullName = systemDescription.FindPropertyRelative("_typeFullName");
 			SerializedProperty pause = systemDescription.FindPropertyRelative("_pause");
@@ -103,14 +100,6 @@ namespace FYFY_Inspector {
 
 			Rect textArea = new Rect (rect.x + buttonSize + 5, rect.y + 1.35f, rect.width - (buttonSize + 35), buttonSize);
 			EditorGUI.LabelField(textArea, findFittableString(typeFullName.stringValue, textArea));
-
-			GUIStyle buttonStyle = new GUIStyle();
-			buttonStyle.alignment = TextAnchor.MiddleCenter;
-			if(GUI.Button(new Rect (rect.x + rect.width - 25, rect.y + 1.35f, 30 /* largeur du bouton add par defaut*/, buttonSize), "\u2718", buttonStyle)){ // bold cross unicode
-				systemDescriptions.DeleteArrayElementAtIndex(index);
-				serializedObject.ApplyModifiedProperties();
-				refreshWrappers();
-			}
 		}
 
 		private void createMenu(Rect buttonRect, ReorderableList list) {
@@ -178,9 +167,9 @@ namespace FYFY_Inspector {
 			_specialGameObjects = serializedObject.FindProperty("_specialGameObjects");
 			_outputWrappers = serializedObject.FindProperty("_outputWrappers");
 
-			_fixedUpdateDrawingList = new ReorderableList(serializedObject, _fixedUpdateSystemDescriptions, true, false, true, false);
-			_updateDrawingList  = new ReorderableList(serializedObject, _updateSystemDescriptions, true, false, true, false);
-			_lateUpdateDrawingList = new ReorderableList(serializedObject, _lateUpdateSystemDescriptions, true, false, true, false);
+			_fixedUpdateDrawingList = new ReorderableList(serializedObject, _fixedUpdateSystemDescriptions, true, true, true, true);
+			_updateDrawingList  = new ReorderableList(serializedObject, _updateSystemDescriptions, true, true, true, true);
+			_lateUpdateDrawingList = new ReorderableList(serializedObject, _lateUpdateSystemDescriptions, true, true, true, true);
 
 			_fixedUpdateDrawingList.drawElementCallback = delegate(Rect rect, int index, bool isActive, bool isFocused) {
 				this.editingModeDrawElementCallBack(_fixedUpdateSystemDescriptions, index, rect);
@@ -195,6 +184,22 @@ namespace FYFY_Inspector {
 			_fixedUpdateDrawingList.onAddDropdownCallback = createMenu;
 			_updateDrawingList.onAddDropdownCallback = createMenu;
 			_lateUpdateDrawingList.onAddDropdownCallback = createMenu;
+
+			_fixedUpdateDrawingList.onRemoveCallback = delegate (ReorderableList list) {
+				_fixedUpdateSystemDescriptions.DeleteArrayElementAtIndex(list.index);
+				serializedObject.ApplyModifiedProperties();
+				refreshWrappers();
+			};
+			_updateDrawingList.onRemoveCallback = delegate (ReorderableList list) {
+				_updateSystemDescriptions.DeleteArrayElementAtIndex(list.index);
+				serializedObject.ApplyModifiedProperties();
+				refreshWrappers();
+			};
+			_lateUpdateDrawingList.onRemoveCallback = delegate (ReorderableList list) {
+				_lateUpdateSystemDescriptions.DeleteArrayElementAtIndex(list.index);
+				serializedObject.ApplyModifiedProperties();
+				refreshWrappers();
+			};
 		}
 		
 		private void refreshWrappers()
@@ -211,22 +216,28 @@ namespace FYFY_Inspector {
 			}
 
 			_fixedUpdateDrawingList.drawHeaderCallback = delegate(Rect rect) {
-				GUIStyle style = new GUIStyle();
-				if (Application.isPlaying)
+				if (Application.isPlaying){
+					GUIStyle style = new GUIStyle();
 					style.normal.textColor = Color.magenta;
-				EditorGUI.LabelField(rect, "FSystems in FixedUpdate", style);
+					EditorGUI.LabelField(rect, "FSystems in FixedUpdate", style);
+				} else
+					EditorGUI.LabelField(rect, "FSystems in FixedUpdate");
 			};
 			_updateDrawingList.drawHeaderCallback = delegate(Rect rect) {
-				GUIStyle style = new GUIStyle();
-				if (Application.isPlaying)
+				if (Application.isPlaying){
+					GUIStyle style = new GUIStyle();
 					style.normal.textColor = new Color(255, 215, 0); // gold
-				EditorGUI.LabelField(rect, "FSystems in Update", style);
+					EditorGUI.LabelField(rect, "FSystems in Update", style);
+				} else
+					EditorGUI.LabelField(rect, "FSystems in Update");
 			};
 			_lateUpdateDrawingList.drawHeaderCallback = delegate(Rect rect) {
-				GUIStyle style = new GUIStyle();
-				if (Application.isPlaying)
+				if (Application.isPlaying){
+					GUIStyle style = new GUIStyle();
 					style.normal.textColor = new Color(0, 139, 139); // dark cyan
-				EditorGUI.LabelField(rect, "FSystems in LateUpdate", style);
+					EditorGUI.LabelField(rect, "FSystems in LateUpdate", style);
+				} else
+					EditorGUI.LabelField(rect, "FSystems in LateUpdate");
 			};
 		}
 
