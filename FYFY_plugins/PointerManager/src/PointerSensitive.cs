@@ -16,17 +16,18 @@ namespace FYFY_plugins.PointerManager {
 	[DisallowMultipleComponent]
 	public class PointerSensitive : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
 		
-		private int _cptBk = 0;
-		private int _frame = 0;
-		private int _cpt = 0;
+		private int _frame = -1;
+		private enum Way {PointerEnter, MouseEnter, Undefined}
+		private Way way = Way.Undefined;
+		private Way way_bk;
+		private bool pointerOverExists_bk;
 		
 		private void OnDisable(){
-			// back up counter and frameCount in case of OnEnable will be called in the same frame => then we will restore current _cpt
-			_cptBk = _cpt;
+			// back up frameCount in case of OnEnable will be called in the same frame
 			_frame = Time.frameCount;
-			// force counter to 1 and ask to remove pointerOver if one exists
-			_cpt = 1;
-			removePointerOver();
+			way_bk = way;
+			// ask to remove pointerOver if one exists
+			pointerOverExists_bk = removePointerOver();
 		}
 		
 		// WARNING bug identified and not resolved: If we move mouse pointer over a game object with a PointerSensitive and this.enabled is set to false and finally to true, no PointerOver will be added to the game object even if mouse pointer is still over the game object.
@@ -39,18 +40,18 @@ namespace FYFY_plugins.PointerManager {
 		// But if we use this.enabled, no one On..Enter/Exit functions will be call. In this case even if the mouse pointer is over the game object when enabling is set, no PointerOver will be added...
 		// The problem is not for disabling step, indeed in both cases we want to remove existing PointerOver. The problem occurs on enabling step, if enabling is due to this.gameObject.SetActive nothing is required but if enabling is due to this.enabled we would emulate On...Enter functions (with Raycast for instance). But because we don't know which case fired OnEnable function, we don't know if we have to call Raycast.
 		private void OnEnable(){
-			// if OnDisable was call previously but in the same frame and _cpt was greater than 0 => we have to restore PointerOver
-			if (_cptBk > 0 && _frame == Time.frameCount){
+			// if OnDisable was call previously but in the same frame we have to restore PointerOver
+			if (_frame == Time.frameCount && pointerOverExists_bk){
 				// force adding PointerOver
-				_cpt = 0;
 				addPointerOver();
-				// reset counter
-				_cpt = _cptBk;
+				// reset back up
+				_frame = -1;
+				way = way_bk;
 			}
 		}
 		
 		private void OnDestroy(){
-			_cpt = 1; // force counter to 1 to force PointerOver removing if one exists
+			// PointerOver removing if one exists
 			removePointerOver();
 		}
 		
@@ -62,16 +63,20 @@ namespace FYFY_plugins.PointerManager {
 		/// 	Callback automatically called by Unity.
 		/// </summary>
 		public void OnPointerEnter(PointerEventData eventData) {
-			if (this.isActiveAndEnabled)
+			if (this.isActiveAndEnabled && way == Way.Undefined){
+				way = Way.PointerEnter;
 				addPointerOver();
+			}
 		}
 		/// <summary>
 		/// 	Called when the pointer is not any longer over the GameObject.
 		/// 	Callback automatically called by Unity.
 		/// </summary>
 		public void OnPointerExit(PointerEventData eventData) {
-			if (this.isActiveAndEnabled)
+			if (this.isActiveAndEnabled && way == Way.PointerEnter){
+				way = Way.Undefined;
 				removePointerOver();
+			}
 		}
 		
 		///////////////////////////////////////////////////////
@@ -80,19 +85,24 @@ namespace FYFY_plugins.PointerManager {
 		// Called when the mouse enters the GameObject.
 		// Callback automatically called by Unity.
 		private void OnMouseEnter() {
-			if (this.isActiveAndEnabled)
+			if (this.isActiveAndEnabled && (way == Way.Undefined || way == Way.PointerEnter)){
+				way = Way.MouseEnter;
 				addPointerOver();
+			}
 		}
 		// Called when the mouse is not any longer over the GameObject.
 		// Callback automatically called by Unity.
 		private void OnMouseExit() {
-			if (this.isActiveAndEnabled)
+			if (this.isActiveAndEnabled && way == Way.MouseEnter){
+				way = Way.Undefined;
 				removePointerOver();
+			}
 		}
 		
-		private void removePointerOver(){
-			// We ask to remove PointerOver if local counter is equal to 1 and we have at least a PointerOver already included inside gameObject OR a PointerOver will be added during next FYFY update
-			if (_cpt == 1 && (this.gameObject.GetComponent<PointerOver>() != null || GameObjectManager.containActionFor(typeof(AddComponent<PointerOver>), new Transform [] {this.gameObject.transform}))){
+		// return true if PointerOver is removed
+		private bool removePointerOver(){
+			// We ask to remove PointerOver if we have at least a PointerOver already included inside gameObject OR a PointerOver will be added during next FYFY update
+			if (this.gameObject.GetComponent<PointerOver>() != null || GameObjectManager.containActionFor(typeof(AddComponent<PointerOver>), new Transform [] {this.gameObject.transform})){
 				// We check if there is an UnbindGameObject action on my gameobject or on my parents.
 				// If not, we have to use FYFY to remove PointerOver in order to keep families synchronized.
 				// If so, we can't use FYFY because "remove" action will be queued after unbind and will not be able to proceed (unknown game object). Then we have to remove PointerOver component thanks to classic Unity function.
@@ -108,14 +118,14 @@ namespace FYFY_plugins.PointerManager {
 					// See MainLoop.preprocess for details.
 					GameObjectManager.removeComponent<PointerOver>(this.gameObject, true);
 				}
+				return true;
 			}
-			if (_cpt > 0)
-				_cpt--;
+			return false;
 		}
 		
 		private void addPointerOver(){
-			// We ask to add PointerOver if local counter is equal to 0 and we haven't a PointerOver already included inside gameObject OR a PointerOver will be removed during next FYFY update
-			if (_cpt == 0 && (this.gameObject.GetComponent<PointerOver>() == null || GameObjectManager.containActionFor(typeof(RemoveComponent<PointerOver>), new Transform [] {this.gameObject.transform}))){
+			// We ask to add PointerOver if we haven't a PointerOver already included inside gameObject OR a PointerOver will be removed during next FYFY update
+			if (this.gameObject.GetComponent<PointerOver>() == null || GameObjectManager.containActionFor(typeof(RemoveComponent<PointerOver>), new Transform [] {this.gameObject.transform})){
 				// We check if there is an UnbindGameObject action on my gameobject or on my parents.
 				// If not, we have to use FYFY to add PointerOver in order to keep families synchronized.
 				// If so, we don't add this action because it will be queued after unbind and will not be able to proceed (unknown game object).
@@ -125,7 +135,6 @@ namespace FYFY_plugins.PointerManager {
 					GameObjectManager.addComponent<PointerOver>(this.gameObject, true);
 				}
 			}
-			_cpt++;
 		}
 	}
 }

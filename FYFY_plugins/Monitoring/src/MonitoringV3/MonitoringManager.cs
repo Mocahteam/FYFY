@@ -340,7 +340,16 @@ namespace FYFY_plugins.Monitoring{
 				}
 			}
 			mut.ReleaseMutex();
-			
+			if (debugLogs){
+				string _debug = "send \"" + token + "\" with options:";
+				foreach (string option in options){
+					_debug += " "+option;
+				}
+				_debug += "\n\tResults:";
+				foreach (string result in results)
+					_debug += " "+result;
+				UnityEngine.Debug.Log (_debug);
+			}
 			return results;
 		}
 		
@@ -573,7 +582,7 @@ namespace FYFY_plugins.Monitoring{
 				LaalysProcess.Kill();
 			}
 			// Save traces
-			if (Application.isPlaying)
+			if (Application.isPlaying && debugLogs)
 				XmlHandler.saveTraces (SceneManager.GetActiveScene().name);
 			if (Instance == this) {
 				Instance = null;
