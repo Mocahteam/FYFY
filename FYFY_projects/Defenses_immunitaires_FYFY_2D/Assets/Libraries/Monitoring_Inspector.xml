@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Monitoring_Inspector</name>
+    </assembly>
+    <members>
+        <member name="T:FYFY_plugins.Monitoring.EditionView">
+            <summary>
+            	Custom UI for editing monitoring.
+            </summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.MonitoringManagerInspector">
+            <summary>
+            	Custom inspector automatically used by Unity Editor when a <see cref="T:FYFY_plugins.Monitoring.MonitoringManager"/> is found in inspector view.
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.MonitoringManagerInspector.OnInspectorGUI">
+            <summary></summary>
+        </member>
+        <member name="T:ReadOnlyDrawer">
+            <summary>
+            	Avoid to modify property in Inspector if [ReadOnly] meta tag is used
+            </summary>
+        </member>
+        <member name="M:ReadOnlyDrawer.GetPropertyHeight(UnityEditor.SerializedProperty,UnityEngine.GUIContent)">
+            <summary>
+            	
+            </summary>
+        </member>
+        <member name="M:ReadOnlyDrawer.OnGUI(UnityEngine.Rect,UnityEditor.SerializedProperty,UnityEngine.GUIContent)">
+            <summary>
+            	
+            </summary>
+        </member>
+    </members>
+</doc>

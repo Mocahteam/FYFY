@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>PointerManager</name>
+    </assembly>
+    <members>
+        <member name="T:FYFY_plugins.PointerManager.PointerOver">
+            <summary>
+            	Component specifying that the pointer is over the <c>GameObject</c>.
+            </summary>
+            <remarks>
+            	Automatically added or removed by the relative <see cref="T:FYFY_plugins.PointerManager.PointerSensitive">component</see>.
+            </remarks>
+        </member>
+        <member name="T:FYFY_plugins.PointerManager.PointerSensitive">
+            <summary>
+            	Component allowing <c>GameObject</c> to be sensitive to the pointer.
+            	Add automatically a <see cref="T:FYFY_plugins.PointerManager.PointerOver">component</see> when the pointer points the <c>GameObject</c>.
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.PointerManager.PointerSensitive.OnPointerEnter(UnityEngine.EventSystems.PointerEventData)">
+            <summary>
+            	Called when the pointer enters the GameObject.
+            	Callback automatically called by Unity.
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.PointerManager.PointerSensitive.OnPointerExit(UnityEngine.EventSystems.PointerEventData)">
+            <summary>
+            	Called when the pointer is not any longer over the GameObject.
+            	Callback automatically called by Unity.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TriggerManager</name>
+    </assembly>
+    <members>
+        <member name="T:FYFY_plugins.TriggerManager.Triggered2D">
+            <summary>
+            	Component specifying that the GameObject is in contact with at least one other GameObject.
+            </summary>
+            <remarks>
+            	<para>! AUTOMATICALLY ADDED, UPDATED OR REMOVED !</para>
+            	<para>! DO NOT TOUCH MANUALLY OTHERWISE WE CAN'T GUARANTEE THE COMPORTMENT !</para>
+            </remarks>
+        </member>
+        <member name="P:FYFY_plugins.TriggerManager.Triggered2D.Targets">
+            <summary>
+            	Gets all the GameObjects in contact with this GameObject.
+            </summary>
+        </member>
+        <member name="T:FYFY_plugins.TriggerManager.Triggered3D">
+            <summary>
+            	Component specifying that the GameObject is in contact with at least one other GameObject.
+            </summary>
+            <remarks>
+            	<para>! AUTOMATICALLY ADDED, UPDATED OR REMOVED !</para>
+            	<para>! DO NOT TOUCH MANUALLY OTHERWISE WE CAN'T GUARANTEE THE COMPORTMENT !</para>
+            </remarks>
+        </member>
+        <member name="P:FYFY_plugins.TriggerManager.Triggered3D.Targets">
+            <summary>
+            	Gets all the GameObjects in contact with this GameObject.
+            </summary>
+        </member>
+        <member name="T:FYFY_plugins.TriggerManager.TriggerSensitive2D">
+            <summary>
+            	TriggerSensitive2D allows GameObject to be noticed when it is in contact with another GameObject.
+                In this case the Triggered2d component (dynamically added) provides the list of GameObject in contact with him.
+            </summary>
+        </member>
+        <member name="T:FYFY_plugins.TriggerManager.TriggerSensitive2DTarget">
+            <summary></summary>
+        </member>
+        <member name="F:FYFY_plugins.TriggerManager.TriggerSensitive2DTarget._source">
+            <summary></summary>
+        </member>
+        <member name="T:FYFY_plugins.TriggerManager.TriggerSensitive3D">
+            <summary>
+            	TriggerSensitive3D allows GameObject to be noticed when it is in contact with another GameObject.
+                In this case the Triggered3d component (dynamically added) provides the list of GameObject in contact with him.
+            </summary>
+        </member>
+        <member name="T:FYFY_plugins.TriggerManager.TriggerSensitive3DTarget">
+            <summary></summary>
+        </member>
+        <member name="F:FYFY_plugins.TriggerManager.TriggerSensitive3DTarget._source">
+            <summary></summary>
+        </member>
+    </members>
+</doc>

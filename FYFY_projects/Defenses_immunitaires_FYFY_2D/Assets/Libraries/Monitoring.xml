@@ -1,0 +1,454 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Monitoring</name>
+    </assembly>
+    <members>
+        <member name="T:FYFY_plugins.Monitoring.ActionsManager">
+            <summary>
+            This system processes <c>ActionPerformed</c> components and uses <c>MonitoringManager</c> functions to build traces.
+            </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.ActionsManager.instance">
+            <summary>
+            As a singleton, this system can be accessed through this static instance.
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.ActionsManager.#ctor">
+            <summary>
+            The contructor of this system.
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.ActionsManager.onProcess(System.Int32)">
+            <summary>
+            Use to process your families.
+            </summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.Trace">
+            <summary>
+            Data describing the trace built.
+            </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Trace.labels">
+            <summary>
+            Labels found for this traced game action if in game analysis is enabled (see: MonitoringManager). return empty Array else
+            </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Trace.time">
+            <summary>
+            Birth date of the trace.
+            </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Trace.componentMonitoring">
+            <summary>
+            The ComponentMonitoring used to build this trace.
+            </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Trace.actionName">
+            <summary>
+            Name of the traced action matching a transition in the Petri net of the ComponentMonitoring
+            </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Trace.performedBy">
+            <summary>
+            Specify who performed this action, the player or the system.
+            </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Trace.orlabels">
+            <summary>
+            links label concerned by this action. You can leave empty if only "*" operators
+            are used in logic expression. Must be defined if logic expression associated
+            to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3"
+            you have to indicate which links to use to build the trace: l0 and l3 OR l1 and
+            l3 => orLabels = new string[] {..., "l0", "l3"}; OR orLabels = new string[] {..., "l1", "l3"};
+            </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Trace.family">
+            <summary>
+            The monitored Family to used to build trace. Null if the field ComponentMonitoring is filled.
+            </summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.ExpressionParser">
+            <summary>Parser of logic expressions.</summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.ExpressionParser.checkPrerequisite(System.String)">
+            <summary>Check if a linkLabel doesn't contain one of these reserved tokens "()[]*+ ".</summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.ExpressionParser.isValid(FYFY_plugins.Monitoring.TransitionLink)">
+            <summary>Check if a transitionLink contains a valid logix expression.</summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.InitFailed">
+            <summary>
+            	Exception used when links associated to an action don't match with logic expression of this action.
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.InitFailed.#ctor">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY_plugins.Monitoring.InitFailed"/> class.
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.InitFailed.#ctor(System.String,System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY_plugins.Monitoring.InitFailed"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.InvalidTraceException">
+            <summary>
+            	Exception used when the data given to build the trace are not matching any ComponentMonitoring or monitored Family.
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.InvalidTraceException.#ctor(System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY_plugins.Monitoring.InvalidTraceException"/> class.
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.InvalidTraceException.#ctor(System.String,System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY_plugins.Monitoring.InvalidTraceException"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.TraceAborted">
+            <summary>
+            	Exception used when links associated to an action don't match with logic expression of this action.
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.TraceAborted.#ctor">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY_plugins.Monitoring.TraceAborted"/> class.
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.TraceAborted.#ctor(System.String,System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY_plugins.Monitoring.TraceAborted"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.WarningException">
+            <summary>
+            	Exception used to build a clickable warning message.
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.WarningException.#ctor(System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY_plugins.Monitoring.WarningException"/> class.
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.WarningException.#ctor(System.String,System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY_plugins.Monitoring.WarningException"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.ComponentMonitoring">
+            <summary>
+            	Add monitoring functionalities to a Game Object
+            </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.ComponentMonitoring.PnmlFile">
+            <summary> Pnml File associated to the monitor </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.ComponentMonitoring.comments">
+            <summary> Comments of this monitor </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.ComponentMonitoring.id">
+            <summary> Component id </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.ComponentMonitoring.fullPnSelected">
+            <summary> Name of the parent Petri net to include this monitor</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.ComponentMonitoring.transitionLinks">
+            <summary> List of transitions influenced by links. </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.ComponentMonitoring.#ctor">
+            <summary>
+            Contructor of the ComponentMonitoring
+            In Editor: called at compilation, right before and right after Play/Pause, and when a new component is created
+            At runtime: called when a new component is created
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.ComponentMonitoring.OnBeforeSerialize">
+            <summary>
+            This fonction is called by Unity right before it serializes data from every component
+            It has to be implemented because ComponentMonitoring inherits from the interface ISerializationCallbackReceiver
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.ComponentMonitoring.OnAfterDeserialize">
+            <summary>
+            This fonction is called by Unity right after it serializes data from every component
+            We set the ComponentMonitoring to ready when it is done
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.ComponentMonitoring.getTransitionLinkByTransitionLabel(System.String)">
+            <summary> Look for a transition matching with label influenced by links </summary>
+            <param name="label">The label of the transition to find.</param>
+            <return> If a transition with appropriate label exists, returns this transition and links. Returns null otherwise. </return>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.ComponentMonitoring.getPossibleSetOfLinks(System.String)">
+            <summary>
+            Each list element is a set of AND links, then the main list model OR set of links.
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.ComponentMonitoring.isStillReachable(System.String)">
+            <summary>
+            Check if action named actionName is still reachable inside the Petri net associated to this monitor
+            </summary>
+        </member>
+        <member name="P:FYFY_plugins.Monitoring.ComponentMonitoring.PetriNet">
+            <summary> PetriNet getter and setter. Set the PetriNet implies reset transitionLinks. </summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.FamilyMonitoring">
+            <summary>
+            	Add monitoring functionalities to a Family
+            </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.FamilyMonitoring.equivalentName">
+            <summary> Name of an equivalent family name in an other system. </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.FamilyMonitoring.descriptor">
+            <summary> descriptor of the Family associated to this monitor. </summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.Link">
+            <summary>
+            Contains Link data
+            </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Link.label">
+            <summary>Link label used in logic expression.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Link.type">
+            <summary>The type of this link encoded as an int: 0 means Get, 1 means Produce, 2 means Require.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Link.flagsType">
+            <summary>The flag type of this link encoded as an int: 0 means "at least", 1 means "less than".</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Link.weight">
+            <summary>Link weight.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Link.placeId">
+            <summary>Place Id associated to this link.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Link.scroll">
+            <summary>The current scrolling value for this link.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Link.linkedObject">
+            <summary>The Game Object associated to this link.</summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.Link.#ctor">
+            <summary>Initializes a new instance of the <see cref="T:FYFY_plugins.Monitoring.Link"/> class.</summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.Link.getPlacesNameFromLinkedObject">
+            <summary>Returns the list of places' name included into the linked Game Object.</summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.MonitoringManager">
+            <summary>
+            	This component trigger the building of PetriNets and Features and write traces when the game is over.
+            </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.MonitoringManager.waitingForLaalys">
+            <summary>
+            This boolean is set to false when Laalys is connected or if an error occured while trying to launch Laalys
+            </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.MonitoringManager.PetriNetsName">
+            <summary>List of Petri Nets name</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.MonitoringManager.inGameAnalysis">
+            <summary>Is analysis run in game?</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.MonitoringManager.debugLogs">
+            <summary>Is debug logs displayed?</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.MonitoringManager.fullPetriNetsPath">
+            <summary>Full Petri nets location to use if in game analysis is enabled</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.MonitoringManager.filteredPetriNetsPath">
+            <summary>Filtered Petri nets location to use if in game analysis is enabled</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.MonitoringManager.featuresPath">
+            <summary>Features location to use if in game analysis is enabled</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.MonitoringManager.laalysPath">
+            <summary>Path to the jar file of Laalys</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.MonitoringManager.Instance">
+            <summary>
+            Instance of the singleton MonitoringManager
+            The value is set in the constructor
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.MonitoringManager.#ctor">
+            <summary> Set singleton instance of MonitoringManager </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.MonitoringManager.getMonitorById(System.Int32)">
+            <summary>
+            	Get monitor with asked id.
+            </summary>
+            <param name="id">The id of the monitor to get.</param>
+            <return> The ComponentMonitoring object associated to the id if it exists. Return null otherwise. <see cref="T:FYFY_plugins.Monitoring.ComponentMonitoring"/> </return>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.MonitoringManager.trace(FYFY_plugins.Monitoring.ComponentMonitoring,System.String,System.String,System.Boolean,System.String[])">
+            <summary>
+            	Trace game action.
+            </summary>
+            <param name="monitor">The ComponentMonitoring to use to build trace.</param>
+            <param name="actionName">Action name you want to trace, this name has to match with a transition defined into associated Petri Net of the "monitor" parameter <see cref="F:FYFY_plugins.Monitoring.ComponentMonitoring.PnmlFile"/>.</param>
+            <param name="performedBy">Specify who perform this action, the player or the system. <see cref="T:FYFY_plugins.Monitoring.MonitoringManager.Source"/></param>
+            <param name="processLinks">Set to false if the logic expression associated to the action include "+" operators AND the action performed by the player is not allowed by the system. In this case fourth parameters will not be processed. True (default) means fourth parameter will be analysed.</param>
+            <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to build the trace: l0 and l3 OR l1 and l3 =&gt; <code>MonitoringManager.trace(..., "l0", "l3");</code> OR <code>MonitoringManager.trace(..., "l1", "l3");</code></param>
+            <return> labels found for this game action if in game analysis is enabled (see: MonitoringManager). return empty Array else </return>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.MonitoringManager.trace(FYFY.Family,System.String,System.String,System.Boolean,System.String[])">
+            <summary>
+            	Trace game action.
+            </summary>
+            <param name="family">The monitored Family to use to build trace.</param>
+            <param name="actionName">Action name you want to trace, this name has to match with a transition defined into associated Petri Net of the "family" parameter <see cref="F:FYFY_plugins.Monitoring.ComponentMonitoring.PnmlFile"/>.</param>
+            <param name="performedBy">Specify who perform this action, the player or the system. <see cref="T:FYFY_plugins.Monitoring.MonitoringManager.Source"/></param>
+            <param name="processLinks">Set to false if the logic expression associated to the action include "+" operators AND the action performed by the player is not allowed by the system. In this case fourth parameters will not be processed. True (default) means fourth parameter will be analysed.</param>
+            <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to build the trace: l0 and l3 OR l1 and l3 =&gt; <code>MonitoringManager.trace(..., "l0", "l3");</code> OR <code>MonitoringManager.trace(..., "l1", "l3");</code></param>
+            <return> labels found for this game action if in game analysis is enabled (see: MonitoringManager). return empty Array else </return>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.MonitoringManager.getNextActionsToReach(FYFY_plugins.Monitoring.ComponentMonitoring,System.String,System.Int32,System.String[])">
+            <summary>
+            	Get next actions to perform in order to reach targeted game action.
+            </summary>
+            <param name="monitor">The ComponentMonitoring on which you want reach action.</param>
+            <param name="targetedActionName">Action name you want to reach, this name has to match with a transition defined into associated Petri Net of the "monitor" parameter <see cref="F:FYFY_plugins.Monitoring.ComponentMonitoring.PnmlFile"/>. The special key word "##playerObjectives##" enable to target all player objective actions defined inside full Petri Net from which the monitor is part of (in this special case, "linksConcerned" parameter will be ignore).</param>
+            <param name="maxActions">Maximum number of actions returned.</param>
+            <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to look for the trace: l0 and l3 OR l1 and l3 =&gt; <code>MonitoringManager.getNextActionToReach(..., "l0", "l3");</code> OR <code>MonitoringManager.getNextActionToReach(..., "l1", "l3");</code></param>
+            <return>List of Pairs including a ComponentMonitoring and its associated game action useful to reach the targeted action, the number of actions returned is less or equal to maxActions parameters.</return>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.MonitoringManager.getNextActionsToReach(FYFY.Family,System.String,System.Int32,System.String[])">
+            <summary>
+            	Get next actions to perform in order to reach targeted game action.
+            </summary>
+            <param name="family">The monitored Family on which you want reach action.</param>
+            <param name="targetedActionName">Action name you want to reach, this name has to match with a transition defined into associated Petri Net  of the "family" parameter <see cref="F:FYFY_plugins.Monitoring.ComponentMonitoring.PnmlFile"/> The special key word "##playerObjectives##" enable to target all player objective actions defined inside full Petri Net from which the monitor is part of (in this special case, "linksConcerned" parameter will be ignore).</param>
+            <param name="maxActions">Maximum number of actions returned.</param>
+            <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to look for the trace: l0 and l3 OR l1 and l3 =&gt; <code>MonitoringManager.getNextActionToReach(..., "l0", "l3");</code> OR <code>MonitoringManager.getNextActionToReach(..., "l1", "l3");</code></param>
+            <return>List of Pairs including a ComponentMonitoring and its associated game action useful to reach the targeted action, the number of actions returned is less or equal to maxActions parameters.</return>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.MonitoringManager.getNextActionsToReachPlayerObjective(System.String,System.Int32)">
+            <summary>
+            	Get next actions to perform in order to reach the player objective of the Petri net.
+            </summary>
+            <param name="pnName">The Petri net name to process.</param>
+            <param name="maxActions">Maximum number of actions returned.</param>
+            <return>List of Pairs including a ComponentMonitoring and its associated game action useful to reach the player objective, the number of actions returned is less or equal to maxActions parameters.</return>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.MonitoringManager.getTriggerableActions">
+            <summary>Ask to Laalys to provide all triggerable actions</summary>
+            <return>List of Pairs including a ComponentMonitoring and its associated game action that may be triggered.</return>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.MonitoringManager.getPetriNetsMarkings">
+            <summary>
+            Returns a non readable list of markings of the complete and filtered nets
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.MonitoringManager.setPetriNetsMarkings(System.Collections.Generic.List{System.String})">
+            <summary>
+            Takes a list generated by "getPetriNetsMarkings" and sends it to Laalys to set markings of complete and filtered nets
+            </summary>
+            <param name="markingsList"></param>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.MonitoringManager.getFamilyMonitoring(FYFY.Family)">
+            <summary>
+            	Get the FamilyMonitoring associated to a family if it exists.
+            </summary>
+            <param name="family">The Family to ask for.</param>
+            <return>The FamilyMonitoring associated to the family if it exists. Null otherwise.</return>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.MonitoringManager.synchronizeFamilies">
+            <summary>Parse all systems and inspect their families</summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.MonitoringManager.Source">
+            <summary>Define the different source that can trigger a game action.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.MonitoringManager.Source.SYSTEM">
+            <summary></summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.MonitoringManager.Source.PLAYER">
+            <summary></summary>
+        </member>
+        <member name="T:ReadOnlyAttribute">
+            <summary>
+            	Add [ReadOnly] meta tag to avoid to modify property in Inspector
+            </summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.TransitionLink">
+            <summary>
+            	Links on transition
+            </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.TransitionLink.links">
+            <summary>List of links associated to this transition.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.TransitionLink.transition">
+            <summary>The transition linked.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.TransitionLink.isSystemAction">
+            <summary>Define if this transition is a system action.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.TransitionLink.isEndAction">
+            <summary>Define if this transition is an end action.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.TransitionLink.logic">
+            <summary>The logic expression for this transition.</summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.Arc.ToString">
+            <summary>Returns a string that represents the current Arc.</summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.Node">
+            <summary>Defines a node of the PetriNet. It could be a place or a transition.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Node.label">
+            <summary>The label of this node.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Node.overridedLabel">
+            <summary>The overrided label of this node.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.Node.initialMarking">
+            <summary>
+            	If Node is a place, contains the initial marking of this place.
+            	If Node is a transition, contains -1
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.Node.ToString">
+            <summary>Returns a string that represents the current Node.</summary>
+        </member>
+        <member name="T:FYFY_plugins.Monitoring.PetriNet">
+            <summary>
+            	Store the PetriNet structure used by its monitor.
+            </summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.PetriNet.places">
+            <summary>List of places of this PetriNet.</summary> 
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.PetriNet.loadFromFile(System.String,System.Int32)">
+            <summary>Parse and load pnml file.</summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.PetriNet.getTransitionsNames">
+            <summary>Returns the name of transitions defined into the PetriNet.</summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.PetriNet.getPlacesNames">
+            <summary>Returns the name of places defined into the PetriNet.</summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.PetriNet.ToString">
+            <summary>Returns a string that represents the current PetriNet.</summary>
+        </member>
+        <member name="F:FYFY_plugins.Monitoring.PnmlParser.ns">
+            <summary>
+            Namespace defined to read pnml file format
+            </summary>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.PnmlParser.loadFromPath(System.String)">
+            <summary>
+            Create a PetriNet class whithin data filled from a pnml file 
+            </summary>
+            <returns>PetriNet or null if doesn't exists</returns>
+            <param name="path">Full path of the pnml file</param>
+        </member>
+        <member name="M:FYFY_plugins.Monitoring.XmlHandler.addTrace(System.String,System.String,System.String)">
+            Add a new trace
+        </member>
+    </members>
+</doc>

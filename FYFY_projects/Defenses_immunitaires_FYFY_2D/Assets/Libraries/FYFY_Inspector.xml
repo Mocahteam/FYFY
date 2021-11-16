@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>FYFY_Inspector</name>
+    </assembly>
+    <members>
+        <member name="T:FYFY_Inspector.MainLoopCreationMenu">
+            <summary>
+            	Class automatically loaded by Unity Editor to create the FYFY menu.
+            </summary>
+        </member>
+        <member name="T:FYFY_Inspector.MainLoopEditorScanner">
+            <summary>
+            	Refresh current active Game Object to be aware from user changes inside inspector
+            </summary>
+        </member>
+        <member name="M:FYFY_Inspector.MainLoopEditorScanner.OnEnable">
+            <summary></summary>
+        </member>
+        <member name="T:FYFY_Inspector.MainLoopInspector">
+            <summary>
+            	Custom inspector automatically used by Unity Editor when a <see cref="T:FYFY.MainLoop"/> is find in inspector view.
+            </summary>
+        </member>
+        <member name="M:FYFY_Inspector.MainLoopInspector.OnInspectorGUI">
+            <summary></summary>
+        </member>
+        <member name="T:FYFY_Inspector.SystemsMonitor">
+            <summary>Display curves to show systems' load</summary>
+        </member>
+        <member name="M:FYFY_Inspector.SystemsMonitor.#ctor(System.Int32)">
+            <summary>Constructor</summary>
+        </member>
+        <member name="M:FYFY_Inspector.SystemsMonitor.Draw(System.Single[],System.Single[],System.Single[],System.Single)">
+            <summary>Draw lines</summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,846 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>FYFY</name>
+    </assembly>
+    <members>
+        <member name="T:FYFY.ArgumentNullException">
+            <summary>
+            	Exception used when a null reference is passed to a method that doesn't accept it as a valid argument.
+            </summary>
+        </member>
+        <member name="T:FYFY.ExceptionWithCustomStackTrace">
+            <summary>
+            	Exception with custom stack trace representation.
+            </summary>
+            <remarks>
+            	<para>By default, the stack trace is captured immediately before an exception object is thrown.</para>
+            </remarks>
+        </member>
+        <member name="M:FYFY.ExceptionWithCustomStackTrace.#ctor(System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.ExceptionWithCustomStackTrace"/> class.
+            </summary>
+        </member>
+        <member name="M:FYFY.ExceptionWithCustomStackTrace.#ctor(System.String,System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.ExceptionWithCustomStackTrace"/> class.
+            </summary>
+        </member>
+        <member name="M:FYFY.ExceptionWithCustomStackTrace.#ctor(System.String,System.Exception,System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.ExceptionWithCustomStackTrace"/> class.
+            </summary>
+        </member>
+        <member name="P:FYFY.ExceptionWithCustomStackTrace.StackTrace">
+            <summary>
+            	Gets a string represention that describes the function calls that led up
+            	to the <c>Exception</c>.
+            </summary>
+            <remarks>
+            	The stack trace representation can be set in constructor to get customs 
+            	informations, otherwise, if it equals to null, the stack trace is captured 
+            	immediately before the exception object is thrown.
+            </remarks>
+        </member>
+        <member name="M:FYFY.ArgumentNullException.#ctor(System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.ArgumentNullException"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY.DestroyedComponentException">
+            <summary>
+            	Exception used when you try to access to a <c>Component</c> that has been destroyed.
+            </summary>
+        </member>
+        <member name="M:FYFY.DestroyedComponentException.#ctor(System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.DestroyedComponentException"/> class.
+            </summary>
+        </member>
+        <member name="M:FYFY.DestroyedComponentException.#ctor(System.String,System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.DestroyedComponentException"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY.DestroyedGameObjectException">
+            <summary>
+            	Exception used when you try to access to a <c>GameObject</c> that has been destroyed.
+            </summary>
+        </member>
+        <member name="M:FYFY.DestroyedGameObjectException.#ctor(System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.DestroyedGameObjectException"/> class.
+            </summary>
+        </member>
+        <member name="M:FYFY.DestroyedGameObjectException.#ctor(System.String,System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.FyfyException"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY.FyfyException">
+            <summary>
+            	Default exception used when a problem occurs with <c>Fyfy</c>.
+            </summary>
+        </member>
+        <member name="M:FYFY.FyfyException.#ctor(System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.FyfyException"/> class.
+            </summary>
+        </member>
+        <member name="M:FYFY.FyfyException.#ctor(System.String,System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.FyfyException"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY.UnknownComponentException">
+            <summary>
+            	Exception used when you try to access to a <c>Component</c> that is unknown to <c>FYFY</c>.
+            </summary>
+        </member>
+        <member name="M:FYFY.UnknownComponentException.#ctor(System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.UnknownComponentException"/> class.
+            </summary>
+        </member>
+        <member name="M:FYFY.UnknownComponentException.#ctor(System.String,System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.UnknownComponentException"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY.UnknownGameObjectException">
+            <summary>
+            	Exception used when you try to access to a <c>GameObject</c> that is unknown to <c>FYFY</c>.
+            </summary>
+        </member>
+        <member name="M:FYFY.UnknownGameObjectException.#ctor(System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.UnknownGameObjectException"/> class.
+            </summary>
+        </member>
+        <member name="M:FYFY.UnknownGameObjectException.#ctor(System.String,System.String)">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.FyfyException"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY.Family">
+            <summary>
+            	<c>Family</c> is a container of <c>GameObjects</c> which respect constraints specified by <see cref="T:FYFY.Matcher"/>.
+            </summary>
+            <remarks>
+            	<para>The family is updated before each <c>FixedUpdate</c>, <c>Update</c>, <c>LateUpdate</c> blocks of the <see cref="T:FYFY.MainLoop"/>.</para>
+            	<para>The family state is the same for each system in a same block of update.</para>
+            	<para>
+            		The family works only with the <c>GameObjects</c> known by <c>FYFY</c> (create in editor outside runtime or in code with 
+            		<see cref="T:FYFY.GameObjectManager">functions</see>).
+            	</para>
+            </remarks>
+        </member>
+        <member name="F:FYFY.Family.showContent">
+            <summary>
+            	Show game objects included into this family
+            </summary>
+        </member>
+        <member name="M:FYFY.Family.GetEnumerator">
+            <summary>
+            	Gets the enumerator over this <see cref="T:FYFY.Family"/>.
+            </summary>
+            <returns>
+            	The enumerator.
+            </returns>
+        </member>
+        <member name="M:FYFY.Family.getAt(System.Int32)">
+            <summary>
+            	Gets the GameObject at the specified index <see cref="T:FYFY.Family"/>.
+            	Warning: this function can return null if a Game Object is Destroyed without beeing unbinded, you still have to unbind Game Object before destroying them.
+            </summary>
+            <returns>
+            	The GameObject at the specified index.
+            </returns>
+        </member>
+        <member name="M:FYFY.Family.contains(System.Int32)">
+            <summary>
+            	Checks if a <c>GameObject</c> belongs to this <see cref="T:FYFY.Family"/>.
+            </summary>
+            <param name="gameObjectId">
+            	The Game object identifier.
+            </param>
+        </member>
+        <member name="M:FYFY.Family.addEntryCallback(FYFY.Family.EntryCallback)">
+            <summary>
+            	Adds callback function which will be executed when an entry occurs in this <see cref="T:FYFY.Family"/>.
+            </summary>
+            <param name="callback">
+            	Callback function.
+            </param>
+        </member>
+        <member name="M:FYFY.Family.addExitCallback(FYFY.Family.ExitCallback)">
+            <summary>
+            	Adds callback function which will be executed when an exit occurs in this <see cref="T:FYFY.Family"/>.
+            </summary>
+            <param name="callback">
+            	Callback function.
+            </param>
+        </member>
+        <member name="M:FYFY.Family.Equals(FYFY.Family)">
+            <summary>
+            	Check if two families are equals.
+            </summary>
+        </member>
+        <member name="M:FYFY.Family.Equals(System.String[])">
+            <summary>
+            	Check if this is equal with descriptor
+            </summary>
+        </member>
+        <member name="M:FYFY.Family.getDescriptor">
+            <summary>
+            	Return a descriptor of this family
+            </summary>
+        </member>
+        <member name="M:FYFY.Family.getInlineDescriptor">
+            <summary>
+            	Return a descriptor of this family
+            </summary>
+        </member>
+        <member name="M:FYFY.Family.First">
+            <summary>
+            	Get the first Game Object included into the family
+            </summary>
+            <returns>
+            	The first GameObject or null if the family is empty.
+            </returns>
+        </member>
+        <member name="P:FYFY.Family.Count">
+            <summary>
+            	Gets the number of <c>GameObjects</c> belonging to this <see cref="T:FYFY.Family"/>.
+            </summary>
+        </member>
+        <member name="T:FYFY.Family.EntryCallback">
+            <summary>
+            	Type of the entry callbacks.
+            </summary>
+        </member>
+        <member name="T:FYFY.Family.ExitCallback">
+            <summary>
+            	Type of the exit callbacks.
+            </summary>
+        </member>
+        <member name="T:FYFY.FamilyManager">
+            <summary>
+            	Manager of <see cref="T:FYFY.Family"/>.
+            </summary>
+        </member>
+        <member name="M:FYFY.FamilyManager.getFamily(FYFY.Matcher[])">
+            <summary>
+            	Gets the family defined by a set of <see cref="T:FYFY.Matcher"/>.
+            </summary>
+            <remarks>
+            	<para>
+            		You get always a family that is initialized, ie which contains the <c>GameObjects</c>
+            		of the actual scene which respect all the contraints and which are known by <c>FYFY</c>.
+            		So you can parse it directly.
+            	</para>
+            	<para>
+            		To be known by <c>FYFY</c>, a <c>GameObject</c> must be created in editor outside runtime
+            		or in code with <see cref="T:FYFY.GameObjectManager">functions</see>.
+            	</para>
+            	<para>
+            		This is the only way to get family reference. 
+            		You cannot create a <see cref="T:FYFY.Family"/> object by yourself.
+            	</para>
+            </remarks>
+            <returns>
+            	The reference of the corresponding family.
+            </returns>
+            <param name="matchers">
+            	Matchers.
+            </param>
+        </member>
+        <member name="P:FYFY.FamilyManager.Count">
+            <summary>
+            	Gets the number of families created.
+            </summary>
+        </member>
+        <member name="T:FYFY.FSystem">
+            <summary>
+            	Base class every FYFY system derives from.
+            </summary>
+            <remarks>
+            	FYFY systems have to be setted in the <c>Unity Editor</c> in a MainLoop's block of update.
+            </remarks>
+        </member>
+        <member name="F:FYFY.FSystem.avgExecDuration">
+            <summary>
+            	Gets the average execution time taken by onProcess
+            </summary>
+        </member>
+        <member name="F:FYFY.FSystem.maxExecDuration">
+            <summary>
+            	Gets the maximum execution time taken by onProcess
+            </summary>
+        </member>
+        <member name="F:FYFY.FSystem.showFamilies">
+            <summary>
+            	Show families used in this system
+            </summary>
+        </member>
+        <member name="M:FYFY.FSystem.onPause(System.Int32)">
+            <summary>
+            	Function called when this <see cref="T:FYFY.FSystem"/> paused.
+            </summary>
+            <param name="currentFrame">
+            	The <c>Unity</c> frame number when this function is called.
+            </param>
+        </member>
+        <member name="M:FYFY.FSystem.onResume(System.Int32)">
+            <summary>
+            	Function called when this <see cref="T:FYFY.FSystem"/> resumed.
+            </summary>
+            <param name="currentFrame">
+            	The <c>Unity</c> frame number when this function is called.
+            </param>
+        </member>
+        <member name="M:FYFY.FSystem.onProcess(System.Int32)">
+            <summary>
+            	Function called each time when FYFY enter in the update block where this <see cref="T:FYFY.FSystem"/> is.
+            </summary>
+            <remarks>
+            	Called only is this <see cref="T:FYFY.FSystem"/> is active.
+            </remarks>
+            <param name="familiesUpdateCount">
+            	Number of times the families have been updated.
+            </param>
+        </member>
+        <member name="P:FYFY.FSystem.Pause">
+            <summary>
+            	Gets or sets a value indicating whether this <see cref="T:FYFY.FSystem"/> is paused.
+            </summary>
+        </member>
+        <member name="T:FYFY.FSystemManager">
+            <summary>
+            	Manager of <see cref="T:FYFY.FSystem"/>.
+            </summary>
+        </member>
+        <member name="M:FYFY.FSystemManager.fixedUpdateSystems">
+            <summary>
+            	Get enumerator over systems which are executed in the fixed update block.
+            </summary>
+        </member>
+        <member name="M:FYFY.FSystemManager.updateSystems">
+            <summary>
+            	Get enumerator over systems which are executed in the update block.
+            </summary>
+        </member>
+        <member name="M:FYFY.FSystemManager.lateUpdateSystems">
+            <summary>
+            	Get enumerator over systems which are executed in the late update block.
+            </summary>
+        </member>
+        <member name="T:FYFY.GameObjectManager">
+            <summary>
+            	Manager of GameObject.
+            </summary>
+            <remarks>
+            	<para>
+            		You must use the <see cref="T:FYFY.GameObjectManager"/> functions when you deal with FYFY otherwise, FYFY can't retrieve information to maintain
+            		uptodate families. 
+            	</para>
+            	<para>
+            		When you call a <see cref="T:FYFY.GameObjectManager"/> function, the real action is done at the beginning of the next update block.
+            		This has the effect to maintain a consistent state inside a update block.
+            		For example, in a <c>Update block</c>, if you call the remove function on a component inside a system, the component is really removed in the 
+            		<c>Late update block</c>. For all the system in the <c>Update block</c>, the component is yet present.
+            	</para>
+            </remarks>
+        </member>
+        <member name="M:FYFY.GameObjectManager.loadScene(System.Int32,UnityEngine.SceneManagement.LoadSceneMode)">
+            <summary>
+            	Loads the specified scene at the beginning of the next update block.
+            </summary>
+            <param name="sceneBuildIndex">
+            	Index of the scene in the Build Settings to load.
+            </param>
+            <param name="mode">
+            	Allows you to specify whether or not to load the Scene additively. See UnityEngine.SceneManagement.LoadSceneMode for more information about the options.
+            </param>
+        </member>
+        <member name="M:FYFY.GameObjectManager.loadScene(System.String,UnityEngine.SceneManagement.LoadSceneMode)">
+            <summary>
+            	Loads the scene at the beginning of the next update block.
+            </summary>
+            <param name="sceneName">
+            	Name of the scene to load.
+            </param>
+            <param name="mode">
+            	Allows you to specify whether or not to load the Scene additively. See UnityEngine.SceneManagement.LoadSceneMode for more information about the options.
+            </param>
+        </member>
+        <member name="M:FYFY.GameObjectManager.unloadScene(System.String)">
+            <summary>
+            	Destroys all GameObjects associated with the given Scene and removes the Scene from the SceneManager.
+            </summary>
+            <param name="sceneName">
+            	Name of the scene to load.
+            </param>
+        </member>
+        <member name="M:FYFY.GameObjectManager.unloadScene(System.Int32)">
+            <summary>
+            	Destroys all GameObjects associated with the given Scene and removes the Scene from the SceneManager.
+            </summary>
+            <param name="sceneBuildIndex">
+            	Index of the scene in the Build Settings to load.
+            </param>
+        </member>
+        <member name="M:FYFY.GameObjectManager.dontDestroyOnLoadAndRebind(UnityEngine.GameObject)">
+            <summary>
+            	Makes the game object target not be destroyed automatically when loading a new scene and rebind it automatically with FYFY.
+            </summary>
+            <param name="target">
+            	The game object to configure.
+            </param>
+        </member>
+        <member name="M:FYFY.GameObjectManager.bind(UnityEngine.GameObject)">
+            <summary>
+            	Bind a game object with FYFY. The game object will be registered by FYFY at the beginning of the next update block.
+            </summary>
+            <remarks>
+            	In the same frame of binding, you can use it in other <see cref="T:FYFY.GameObjectManager">functions</see>.
+            </remarks>
+        </member>
+        <member name="M:FYFY.GameObjectManager.unbind(UnityEngine.GameObject)">
+            <summary>
+            	Unbind a game object to FYFY at the beginning of the next update block.
+            </summary>
+        </member>
+        <member name="M:FYFY.GameObjectManager.setGameObjectState(UnityEngine.GameObject,System.Boolean)">
+            <summary>
+            	Sets the state (enable/disable) of the game object at the beginning of the next update block.
+            </summary>
+        </member>
+        <member name="M:FYFY.GameObjectManager.setGameObjectParent(UnityEngine.GameObject,UnityEngine.GameObject,System.Boolean)">
+            <summary>
+            	Sets the game object parent at the beginning of the next update block.
+            </summary>
+            <param name="gameObject">
+            	The game object to change.
+            </param>
+            <param name="parent">
+            	The game object which become the new parent. This parameter can be null to reset the parent of <paramref name="gameObject"/>.
+            </param>
+            <param name="worldPositionStays">
+            	If true, the parent-relative position, scale and rotation is modified such that the object keeps the same world space position, rotation and scale as before.
+            </param>
+        </member>
+        <member name="M:FYFY.GameObjectManager.setGameObjectLayer(UnityEngine.GameObject,System.Int32)">
+            <summary>
+            	Sets the game object layer at the beginning of the next update block.
+            </summary>
+        </member>
+        <member name="M:FYFY.GameObjectManager.setGameObjectTag(UnityEngine.GameObject,System.String)">
+            <summary>
+            	Sets the game object tag at the beginning of the next update block.
+            </summary>
+        </member>
+        <member name="M:FYFY.GameObjectManager.addComponent``1(UnityEngine.GameObject,System.Object)">
+            <summary>
+            	Adds a component to the game object at the beginning of the next update block.
+            </summary>
+            <param name="gameObject">
+            	The game object to change.
+            </param>
+            <param name="componentValues">
+            	The component values to affect. It must be an anonymous type object.
+            </param>
+            <typeparam name="T">
+            	The component type to add.
+            </typeparam>
+        </member>
+        <member name="M:FYFY.GameObjectManager.addComponent(UnityEngine.GameObject,System.Type,System.Object)">
+            <summary>
+            	Adds a component to the game object at the beginning of the next update block.
+            </summary>
+            <param name="gameObject">
+            	The game object to change.
+            </param>
+            <param name="componentType">
+            	The component type to add.
+            </param>
+            <param name="componentValues">
+            	The component values to affect. It must be an anonymous type object.
+            </param>
+        </member>
+        <member name="M:FYFY.GameObjectManager.removeComponent``1(UnityEngine.GameObject)">
+            <summary>
+            	Removes a component of a game object at the beginning of the next update block.
+            </summary>
+            <param name="gameObject">
+            	The game object to change.
+            </param>
+            <typeparam name="T">
+            	The component type to remove.
+            </typeparam>
+        </member>
+        <member name="M:FYFY.GameObjectManager.removeComponent(UnityEngine.Component)">
+            <summary>
+            	Removes the component from its game object at the beginning of the next update block.
+            </summary>
+        </member>
+        <member name="M:FYFY.GameObjectManager.refresh(UnityEngine.GameObject)">
+            <summary>
+            	Force FYFY to refresh families for this GameObject at the beginning of the next update block.
+            </summary>
+        </member>
+        <member name="P:FYFY.GameObjectManager.Count">
+            <summary>
+            	Gets the number of <c>GameObjects</c> of the scene known by FYFY.
+            </summary>
+        </member>
+        <member name="T:FYFY.FyfyBridge">
+            <summary>
+            Notify Fyfy for each Unity callback usefull to update families
+            </summary>
+        </member>
+        <member name="T:FYFY.SystemDescription">
+            <summary></summary>
+        </member>
+        <member name="F:FYFY.SystemDescription._typeAssemblyQualifiedName">
+            <summary></summary>
+        </member>
+        <member name="F:FYFY.SystemDescription._typeFullName">
+            <summary></summary>
+        </member>
+        <member name="F:FYFY.SystemDescription._pause">
+            <summary></summary>
+        </member>
+        <member name="T:FYFY.MainLoop">
+            <summary>
+            MainLoop enables:
+             (1) to set systems into the three contexts (fixedUpdate, update and lateUpdate)
+             (2) to define which game object binding on start
+             (3) to follow system load and families content during playing mode
+            </summary>
+        </member>
+        <member name="F:FYFY.MainLoop.instance">
+            <summary>MainLoop instance (singleton)</summary>
+        </member>
+        <member name="F:FYFY.MainLoop.mainLoopEditorScanner">
+            <summary>
+            	Reference to the mainLoopEditorScanner defined into FYFY_Inspector package. Because we have not access
+            	to this package here, we use super class type (MonoBehaviour). This reference will not be null if 
+            	MainLoopEditorScanner.OnEnable start before MainLoop.OnEnable.
+            </summary>
+        </member>
+        <member name="F:FYFY.MainLoop.lastFrameSceneLoaded">
+            <summary>Defined in GameObjectManager to know the last frame number a scene is loaded</summary>
+        </member>
+        <member name="F:FYFY.MainLoop.loadedSceneById">
+            <summary>List of scene id to parse</summary>
+        </member>
+        <member name="F:FYFY.MainLoop.loadedSceneByName">
+            <summary>List of scene name to parse</summary>
+        </member>
+        <member name="F:FYFY.MainLoop.unloadedSceneById">
+            <summary>List of scene id to unload</summary>
+        </member>
+        <member name="F:FYFY.MainLoop.unloadedSceneByName">
+            <summary>List of scene name to unload</summary>
+        </member>
+        <member name="F:FYFY.MainLoop._fixedUpdateSystemDescriptions">
+            <summary>List of systems defined in fixedUpdate context through the Inspector</summary>
+        </member>
+        <member name="F:FYFY.MainLoop._updateSystemDescriptions">
+            <summary>List of systems defined in Update context through the Inspector</summary>
+        </member>
+        <member name="F:FYFY.MainLoop._lateUpdateSystemDescriptions">
+            <summary>List of systems defined in lateUpdate context through the Inspector</summary>
+        </member>
+        <member name="F:FYFY.MainLoop._forceUpdateInspector">
+            <summary>Used in FSystem to force Inspector redraw when pause is update by code</summary>
+        </member>
+        <member name="F:FYFY.MainLoop._loadingState">
+            <summary>
+            Define how game objects are binded on start
+            0 means bind all game objects on start but exclude game objects defined into _specialGameObjects
+            1 means bind only game objects defined into _specialGameObjects
+            </summary>
+        </member>
+        <member name="F:FYFY.MainLoop._specialGameObjects">
+            <summary></summary>
+        </member>
+        <member name="F:FYFY.MainLoop.showSystemProfiler">
+            <summary>Show system profiler</summary>
+        </member>
+        <member name="F:FYFY.MainLoop.showFamilyInspector">
+            <summary>Show families used in systems</summary>
+        </member>
+        <member name="F:FYFY.MainLoop.showFamilyInspectorFixedUpdate">
+            <summary>Show families used in fixed update systems</summary>
+        </member>
+        <member name="F:FYFY.MainLoop.showFamilyInspectorUpdate">
+            <summary>Show families used in update systems</summary>
+        </member>
+        <member name="F:FYFY.MainLoop.showFamilyInspectorLateUpdate">
+            <summary>Show families used in late update systems</summary>
+        </member>
+        <member name="F:FYFY.MainLoop.fixedUpdateStats">
+            <summary>How much time (ms) the previous fixed update execution lasted</summary>
+        </member>
+        <member name="F:FYFY.MainLoop.updateStats">
+            <summary>How much time (ms) the previous update execution lasted</summary>
+        </member>
+        <member name="F:FYFY.MainLoop.lateUpdateStats">
+            <summary>How much time (ms) the previous late update execution lasted</summary>
+        </member>
+        <member name="F:FYFY.MainLoop._outputWrappers">
+            <summary>Directory to store wrapper to system's public functions</summary>
+        </member>
+        <member name="M:FYFY.MainLoop.callAppropriateSystemMethod(System.String,System.String,System.Object)">
+            <summary>Call function "functionName" defined inside "systemName" system with "parameter" parameter </summary>
+        </member>
+        <member name="M:FYFY.MainLoop.synchronizeWrappers">
+            <summary>Synchronize systems' wrappers</summary>
+        </member>
+        <member name="T:FYFY.AllOfComponents">
+            <summary>
+            	Matcher used to exclude all the <c>GameObjects</c> which don't have
+            	a specific list of components.
+            </summary>
+        </member>
+        <member name="T:FYFY.ComponentMatcher">
+            <summary>
+            	Base class every matcher working on <c>Component</c> derives from.
+            </summary>
+        </member>
+        <member name="T:FYFY.Matcher">
+            <summary>
+            	Base class every matcher derives from.
+            </summary>
+            <remarks>
+            	A matcher is a filter on <c>GameObject</c> features which allows to specify on what a family works.
+            </remarks>
+        </member>
+        <member name="P:FYFY.Matcher.Descriptor">
+            <summary>
+            	Gets the string description of this <see cref="T:FYFY.Matcher"/>.
+            </summary>
+            <remarks>
+            	It is composed of its type and the values on which it operates.
+            </remarks>
+        </member>
+        <member name="F:FYFY.ComponentMatcher._componentTypeNames">
+            <summary>
+            	Targets used to match.
+            </summary>
+        </member>
+        <member name="M:FYFY.AllOfComponents.#ctor(System.Type[])">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.AllOfComponents"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY.AnyOfComponents">
+            <summary>
+            	Matcher used to exclude all the <c>GameObjects</c> which don't have
+            	at least one component among a specific list of components.
+            </summary>
+        </member>
+        <member name="M:FYFY.AnyOfComponents.#ctor(System.Type[])">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.AnyOfComponents"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY.NoneOfComponents">
+            <summary>
+            	Matcher used to exclude all the <c>GameObjects</c> which have
+            	at least one component among a specific list of components.
+            </summary>
+        </member>
+        <member name="M:FYFY.NoneOfComponents.#ctor(System.Type[])">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.NoneOfComponents"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY.AnyOfLayers">
+            <summary>
+            	Matcher used to exclude all the <c>GameObjects</c> which aren't in
+            	one of layers of a specific list of layers.
+            </summary>
+        </member>
+        <member name="T:FYFY.LayerMatcher">
+            <summary>
+            	Base class every matcher working on <c>Layer</c> derives from.
+            </summary>
+        </member>
+        <member name="F:FYFY.LayerMatcher._layers">
+            <summary>
+            	Targets used to match.
+            </summary>
+        </member>
+        <member name="M:FYFY.AnyOfLayers.#ctor(System.Int32[])">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.AnyOfLayers"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY.NoneOfLayers">
+            <summary>
+            	Matcher used to exclude all the <c>GameObjects</c> which are in
+            	one of layers of a specific list of layers.
+            </summary>
+        </member>
+        <member name="M:FYFY.NoneOfLayers.#ctor(System.Int32[])">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.NoneOfLayers"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY.AllOfProperties">
+            <summary>
+            	Matcher used to exclude all the <c>GameObjects</c> which don't have
+            	a specific list of properties.
+            </summary>
+        </member>
+        <member name="T:FYFY.PropertyMatcher">
+            <summary>
+            	Base class every matcher working on <c>Unity property</c> derives from.
+            </summary>
+            <remarks>
+            	Matcher can filter on parentality and activation.
+            </remarks>
+        </member>
+        <member name="F:FYFY.PropertyMatcher._properties">
+            <summary>
+            	Targets used to match.
+            </summary>
+        </member>
+        <member name="M:FYFY.PropertyMatcher.hasProperty(UnityEngine.GameObject,FYFY.PropertyMatcher.PROPERTY)">
+            <summary>
+            	Checks if gameobject has a certain property.
+            </summary>
+        </member>
+        <member name="T:FYFY.PropertyMatcher.PROPERTY">
+            <summary>
+            	List of properties of GameObject which can be used by the PropertyMatcher.
+            </summary>
+        </member>
+        <member name="F:FYFY.PropertyMatcher.PROPERTY.ACTIVE_SELF">
+            <summary>
+            	The GameObject has the variables <c>activeSelf</c> true.
+            </summary>
+        </member>
+        <member name="F:FYFY.PropertyMatcher.PROPERTY.ACTIVE_IN_HIERARCHY">
+            <summary>
+            	The GameObject has the variables <c>activeInHierarchy</c> true.
+            </summary>
+        </member>
+        <member name="F:FYFY.PropertyMatcher.PROPERTY.HAS_PARENT">
+            <summary>
+            	The GameObject has one direct parent.
+            </summary>
+        </member>
+        <member name="F:FYFY.PropertyMatcher.PROPERTY.HAS_CHILD">
+            <summary>
+            	The GameObject has at least one direct child.
+            </summary>
+        </member>
+        <member name="M:FYFY.AllOfProperties.#ctor(FYFY.PropertyMatcher.PROPERTY[])">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.AllOfProperties"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY.AnyOfProperties">
+            <summary>
+            	Matcher used to exclude all the <c>GameObjects</c> which don't have
+            	at least one property among a specific list of properties.
+            </summary>
+        </member>
+        <member name="M:FYFY.AnyOfProperties.#ctor(FYFY.PropertyMatcher.PROPERTY[])">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.AnyOfProperties"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY.NoneOfProperties">
+            <summary>
+            	Matcher used to exclude all the <c>GameObjects</c> which have
+            	at least one property among a specific list of properties.
+            </summary>
+        </member>
+        <member name="M:FYFY.NoneOfProperties.#ctor(FYFY.PropertyMatcher.PROPERTY[])">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.NoneOfProperties"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY.AnyOfTags">
+            <summary>
+            	Matcher used to exclude all the <c>GameObjects</c> which haven't
+            	one of tags of a specific list of tags.
+            </summary>
+        </member>
+        <member name="T:FYFY.TagMatcher">
+            <summary>
+            	Base class every matcher working on <c>Tag</c> derives from.
+            </summary>
+        </member>
+        <member name="F:FYFY.TagMatcher._tags">
+            <summary>
+            	Targets used to match.
+            </summary>
+        </member>
+        <member name="M:FYFY.AnyOfTags.#ctor(System.String[])">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.AnyOfTags"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY.NoneOfTags">
+            <summary>
+            	Matcher used to exclude all the <c>GameObjects</c> which have
+            	one of tags of a specific list of tags.
+            </summary>
+        </member>
+        <member name="M:FYFY.NoneOfTags.#ctor(System.String[])">
+            <summary>
+            	Initializes a new instance of the <see cref="T:FYFY.NoneOfTags"/> class.
+            </summary>
+        </member>
+        <member name="T:FYFY.ActionPerformed">
+            <summary>
+            Data describing the traced action.
+            The system processing these data will search on the gameobject of this component a ComponentMonitoring corresponding to the data filled and trace it.
+            If no ComponentMonitoring is found and a family is filled in the data, the system will trace the family.
+            This component is only used by FYFY_plugins.Monitoring but is attached to FYFY so the stacktrace can be save when the component is added using GameObjectManaber.AddComponent
+            </summary>
+        </member>
+        <member name="F:FYFY.ActionPerformed.name">
+            <summary>
+            Name of the traced action matching a transition in the Petri net of the ComponentMonitoring.
+            </summary>
+        </member>
+        <member name="F:FYFY.ActionPerformed.overrideName">
+            <summary>
+            Name overriding the name of the traced transition in the Monitoring Editor.
+            </summary>
+        </member>
+        <member name="F:FYFY.ActionPerformed.performedBy">
+            <summary>
+            Specify who perform this action, the player or the system. If not filled or different than "player" or "system", it will be set to "player" by default.
+            </summary>
+        </member>
+        <member name="F:FYFY.ActionPerformed.orLabels">
+            <summary>
+            links label concerned by this action. You can leave empty if only "*" operators
+            are used in logic expression. Must be defined if logic expression associated
+            to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3"
+            you have to indicate which links to use to build the trace: l0 and l3 OR l1 and
+            l3 => orLabels = new string[] {..., "l0", "l3"}; OR orLabels = new string[] {..., "l1", "l3"};
+            </summary>
+        </member>
+        <member name="F:FYFY.ActionPerformed.family">
+            <summary>
+            The monitored Family to use to build trace.
+            If there is a ComponentMonitoring matching the name and/or the overrideName filled, this field will be ignored.
+            </summary>
+        </member>
+        <member name="F:FYFY.ActionPerformed.exceptionStackTrace">
+            <summary>
+            String that describes the immediate frames of the call stack when this component is added to a GameObject.
+            </summary>
+        </member>
+    </members>
+</doc>
