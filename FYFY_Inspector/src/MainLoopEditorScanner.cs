@@ -12,11 +12,14 @@ namespace FYFY_Inspector {
 	/// </summary>
 	[ExecuteInEditMode] // permet dexecuter awake et start etc aussi en mode edition
 	[DisallowMultipleComponent]
+	[DefaultExecutionOrder(51)] // start after MainLoop
 	public class MainLoopEditorScanner : MonoBehaviour {
 		private static MainLoopEditorScanner _mainLoopScanner; // avoid to have more than one component inside scene (see Awake)
+
+		private bool alreadyNotified = false;
 		
 		private void Awake() {
-			// Severals instances of MainLoop are not allowed.
+			// Severals instances of MainLoopScanner are not allowed.
 			if(_mainLoopScanner != null) {
 				EditorUtility.DisplayDialog("Invalid operation", "Can't add 'MainLoopEditorScanner' to "+gameObject.name+" because a 'MainLoopEditorScanner' is already added to another game object in the scene!", "Ok", "");
 				DestroyImmediate(this);
@@ -29,6 +32,8 @@ namespace FYFY_Inspector {
 		public void OnEnable(){
 			if(Application.isPlaying)
 				return;
+			
+			alreadyNotified = false;
 	
 			// After each compilations we have to synchronize families in case of user update them inside systems.
 			// Because we are here in FYFY_Inspector package we have no garanty that user use Monitoring plugin.
@@ -55,16 +60,9 @@ namespace FYFY_Inspector {
 					UnityEngine.Debug.LogError("Warning, inconsistent field inside FYFY_plugins.Monitoring.MonitoringManager, \"Instance\" field require.");
 			}
 			
-			// depending on script execution order, the MainLoopEditorScanner can process before MainLoop
-			// in this case MainLoop.instance == null and we can't call synchronizerWrappers.
-			// Then we ask MainLoop to call back this script and refresh data base
-			if (MainLoop.instance != null){
-				if (MainLoop.instance.synchronizeWrappers())
-					AssetDatabase.Refresh();
-			}
-			else{
-				// Notify MainLoop to call back MainLoopEditorScanner OnEnable
-				MainLoop.mainLoopEditorScanner = this;
+			// We ask MainLoop to call back this script and refresh data base
+			if (MainLoop.instance.synchronizeWrappers()){
+				AssetDatabase.Refresh();
 			}
 		}
 
@@ -77,6 +75,12 @@ namespace FYFY_Inspector {
 		private void Update(){
 			if(Application.isPlaying == false){
 				return;
+			}
+			
+			if (EditorApplication.isCompiling && EditorApplication.isPlaying && !alreadyNotified){
+				EditorUtility.DisplayDialog("Stop playing", "FYFY doesn't support live compiling.\nPlaying mode stopped.", "Ok", "");
+				EditorApplication.isPlaying = false;
+				alreadyNotified = true;
 			}
 			
 			if (UnityEditor.Selection.activeGameObject)

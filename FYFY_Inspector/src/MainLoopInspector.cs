@@ -31,8 +31,8 @@ namespace FYFY_Inspector {
 		private const int HISTORY_DATA_LENGTH = 100;
 		private Queue<float> _fixedUpdateStatsHistory;
 		private Queue<float> _updateStatsHistory;
-		private Queue<float> _lateUpdateStatsHistory;			
-
+		private Queue<float> _lateUpdateStatsHistory;
+		
 		// string elision if the area content is too small
 		private string findFittableString(string originalString, Rect textArea){
 			int cpt = originalString.Length;
@@ -204,8 +204,9 @@ namespace FYFY_Inspector {
 		
 		private void refreshWrappers()
 		{
-			if ((target as MainLoop).synchronizeWrappers())
+			if ((target as MainLoop).synchronizeWrappers()){
 				AssetDatabase.Refresh();
+			}
 		}
 
 		private void OnEnable(){
@@ -276,7 +277,7 @@ namespace FYFY_Inspector {
 			_fixedUpdateDrawingList.DoLayoutList();
 			_updateDrawingList.DoLayoutList();
 			_lateUpdateDrawingList.DoLayoutList();
-
+			
 			if (!Application.isPlaying) {
 				EditorGUILayout.Space ();
 				string[] options = new string[] {
@@ -323,6 +324,7 @@ namespace FYFY_Inspector {
 						if(File.Exists(_outputWrappers.stringValue+".meta"))
 							File.Delete(_outputWrappers.stringValue+".meta");
 						_outputWrappers.stringValue = newWrapperPath;
+						UnityEngine.Debug.Log("Refresh Data base");
 						AssetDatabase.Refresh();
 					} else
 						_outputWrappers.stringValue = _outputWrappers.stringValue; // reset value

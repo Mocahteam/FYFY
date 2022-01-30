@@ -29,14 +29,16 @@ namespace FYFY_plugins.Monitoring
         /// </summary>
         public ActionsManager()
         {
-            if (Application.isPlaying)
-            {
-                traces = new GameObject("Traces");
-                GameObjectManager.bind(traces);
-            }
             instance = this;
         }
 		
+        /// <summary>
+        /// Function called when this <see cref="FYFY.FSystem"/> started. All families are populated and can be parsed.
+        /// </summary>
+		protected override void onStart(){
+			traces = new GameObject("Traces");
+            GameObjectManager.bind(traces);
+		}
 
         /// <summary>
         /// Use to process your families.

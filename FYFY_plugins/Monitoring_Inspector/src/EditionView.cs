@@ -51,6 +51,8 @@ namespace FYFY_plugins.Monitoring {
         private bool showStates = false;
 		private bool showActions = false;
 		private bool showOptions = false;
+		
+		private GameObject mainLoop;
 
 	    [MenuItem("Tools/FYFY/Edit Monitoring")]
 	    private static void ShowWindow()
@@ -82,6 +84,9 @@ namespace FYFY_plugins.Monitoring {
             }
         }
 
+		void Start(){
+			mainLoop = GameObject.Find("Main_Loop");
+		}
 
         void OnGUI()
         {
@@ -93,7 +98,6 @@ namespace FYFY_plugins.Monitoring {
 	        //Menu
 	        makeMenu();
 			MonitoringManager mm = MonitoringManager.Instance;
-			GameObject mainLoop = GameObject.Find("Main_Loop");
 			if (goMenuItemActive)
 			{
                 if (Event.current != null && Event.current.type == EventType.MouseDown)

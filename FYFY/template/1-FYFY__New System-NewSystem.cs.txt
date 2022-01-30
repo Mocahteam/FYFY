@@ -2,6 +2,18 @@
 using FYFY;
 
 public class #SCRIPTNAME# : FSystem {
+
+	public static #SCRIPTNAME# instance;
+
+	public #SCRIPTNAME#()
+	{
+		instance = this;
+	}
+	
+	// Use this to init system before the first onProcess call
+	protected override void onStart(){
+	}
+
 	// Use this to update member variables when system pause. 
 	// Advice: avoid to update your families inside this function.
 	protected override void onPause(int currentFrame) {

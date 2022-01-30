@@ -27,20 +27,15 @@ namespace FYFY {
 	///  (1) to set systems into the three contexts (fixedUpdate, update and lateUpdate)
 	///  (2) to define which game object binding on start
 	///  (3) to follow system load and families content during playing mode
+	///  (4) to maintain Monobehavior wrappers to systems
 	/// </summary>
 	[ExecuteInEditMode] // permet dexecuter awake et start etc aussi en mode edition
 	[DisallowMultipleComponent]
 	[AddComponentMenu("")]
+	[DefaultExecutionOrder(50)] //FYFY_Inspector.MainLoopEditorScanner has to be executed after MainLoop
 	public class MainLoop : MonoBehaviour {
 		/// <summary>MainLoop instance (singleton)</summary>
 		public static MainLoop instance; // eviter davoir plusieurs composants MainLoop dans toute la scene (cf Awake)
-		
-		/// <summary>
-		///		Reference to the mainLoopEditorScanner defined into FYFY_Inspector package. Because we have not access
-		///		to this package here, we use super class type (MonoBehaviour). This reference will not be null if 
-		///		MainLoopEditorScanner.OnEnable start before MainLoop.OnEnable.
-		/// </summary>
-		internal static MonoBehaviour mainLoopEditorScanner = null;
 		
 		// this static flag is used by monitoring module to know if the scene will change
 		internal static bool sceneChanging = false;
@@ -99,7 +94,6 @@ namespace FYFY {
 		/// <summary>Directory to store wrapper to system's public functions</summary>
 		public string _outputWrappers = "Assets/AutomaticScript";
 
-		// Parse scene to get all entities.
 		private void Awake() {
 			// Severals instances of MainLoop are not allowed.
 			if(instance != null) {
@@ -130,39 +124,74 @@ namespace FYFY {
 		}
 		
 		
-		/// <summary>Call function "functionName" defined inside "systemName" system with "parameter" parameter </summary>
-		public static void callAppropriateSystemMethod(string systemName, string functionName, object parameter)
+		/// <summary>Call function "functionName" defined inside "system" system with "parameter" parameter </summary>
+		public static void callAppropriateSystemMethod(FSystem system, string functionName, object parameter)
 		{
-			// Get instances of all systems
-			List<FSystem> allSystems = new List<FSystem>(FSystemManager.fixedUpdateSystems());
-			allSystems.AddRange(FSystemManager.updateSystems());
-			allSystems.AddRange(FSystemManager.lateUpdateSystems());
-			// Parse all system to find the one associated to first parameter
-			foreach (FSystem system in allSystems)
-			{
+			if (system != null){
 				Type systemType = system.GetType();
-				if (systemType.FullName == systemName)
-				{
-					// We found the system, now found the target funcion
-					MethodInfo systemMethod;
+				// Found the target funcion
+				MethodInfo systemMethod;
+				if (parameter != null)
+					systemMethod = systemType.GetMethod(functionName, new Type[] { parameter.GetType() });
+				else
+					systemMethod = systemType.GetMethod(functionName, new Type[] { });
+				if (systemMethod != null){
+					// We found the function, then we invoke it
 					if (parameter != null)
-						systemMethod = systemType.GetMethod(functionName, new Type[] { parameter.GetType() });
+						systemMethod.Invoke(system, new object[] { parameter });
 					else
-						systemMethod = systemType.GetMethod(functionName, new Type[] { });
-					if (systemMethod != null){
-						// We found the function, then we invoke it
-						if (parameter != null)
-							systemMethod.Invoke(system, new object[] { parameter });
-						else
-							systemMethod.Invoke(system, new object[] { });
-					}
-				}
-			}
+						systemMethod.Invoke(system, new object[] { });
+				} else
+					UnityEngine.Debug.LogError(functionName + " is not available in " + systemType.FullName);
+			} else
+				UnityEngine.Debug.LogError("callAppropriateSystemMethod aborted because first parameter is null");
+		}
+		
+		/// <summary>Set field "fieldName" defined inside "system" system with "parameter" parameter </summary>
+		public static void initAppropriateSystemField(FSystem system, string fieldName, object parameter)
+		{
+			if (system != null){
+				Type systemType = system.GetType();
+				// We found the system, now found the target field
+				FieldInfo fieldInfo = systemType.GetField(fieldName);
+				if (fieldInfo != null)
+					fieldInfo.SetValue(system, parameter);
+				else
+					UnityEngine.Debug.LogError(fieldName + " is not available in " + systemType.FullName);
+			} else
+				UnityEngine.Debug.LogError("initAppropriateSystemField aborted because first parameter is null");
+		}
+		
+		private bool isSerializableType(Type t){
+			return t.IsPrimitive ||
+				t.Equals(typeof(string)) ||
+				typeof(UnityEngine.Object).IsAssignableFrom(t) ||
+				typeof(Vector2).IsAssignableFrom(t) ||
+				typeof(Vector3).IsAssignableFrom(t) ||
+				typeof(Vector4).IsAssignableFrom(t) ||
+				typeof(Rect).IsAssignableFrom(t) ||
+				typeof(Quaternion).IsAssignableFrom(t) ||
+				typeof(Matrix4x4).IsAssignableFrom(t) ||
+				typeof(Color).IsAssignableFrom(t) ||
+				typeof(Color32).IsAssignableFrom(t) ||
+				typeof(LayerMask).IsAssignableFrom(t) ||
+				typeof(AnimationCurve).IsAssignableFrom(t) ||
+				typeof(Gradient).IsAssignableFrom(t) ||
+				typeof(RectOffset).IsAssignableFrom(t) ||
+				typeof(GUIStyle).IsAssignableFrom(t);
+		}
+		
+		private string getFormatedType(Type t){
+			string tString = t.ToString();
+			if (tString.Contains("List`1["))
+				return tString.Replace("`1[", "<").Replace("]", ">");
+			else
+				return tString;
+			
 		}
 		
 		/// <summary>Synchronize systems' wrappers</summary>
 		public bool synchronizeWrappers(){
-
 			bool needRefresh = false;
 
 			// Get FSystem type and all public methods. This list is used to exclude inheritance methods from FSystem.
@@ -193,12 +222,33 @@ namespace FYFY {
 				string cSharpCode = "using UnityEngine;\n";
 				cSharpCode += "using FYFY;\n\n";
 				
-				cSharpCode += "[ExecuteInEditMode]\n";
-				cSharpCode += "public class " + compilableName + "_wrapper : MonoBehaviour\n";
+				cSharpCode += "public class " + compilableName + "_wrapper : BaseWrapper\n";
 				cSharpCode += "{\n"; 
+				
+				// create mirror fields
+				FieldInfo[] fieldsInfo = systemType.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+				foreach (FieldInfo fieldInfo in fieldsInfo)
+				{
+					if (isSerializableType(fieldInfo.FieldType) ||
+							(fieldInfo.FieldType.IsArray && isSerializableType(fieldInfo.FieldType.GetElementType())) ||
+							(fieldInfo.FieldType.IsGenericType && fieldInfo.FieldType.GetGenericTypeDefinition() == typeof(List<>) && isSerializableType(fieldInfo.FieldType.GetGenericArguments()[0]))){
+						cSharpCode += "\tpublic " + getFormatedType(fieldInfo.FieldType) + " " + fieldInfo.Name + ";\n";
+					}
+				}
+				
 				cSharpCode += "\tprivate void Start()\n";
 				cSharpCode += "\t{\n";
-				cSharpCode += "\t\tthis.hideFlags = HideFlags.HideInInspector; // Hide this component in Inspector\n";
+				cSharpCode += "\t\tthis.hideFlags = HideFlags.NotEditable;\n";
+				
+				// Load all attributes of this System
+				foreach (FieldInfo fieldInfo in fieldsInfo)
+				{	
+					if (isSerializableType(fieldInfo.FieldType) ||
+							(fieldInfo.FieldType.IsArray && isSerializableType(fieldInfo.FieldType.GetElementType())) ||
+							(fieldInfo.FieldType.IsGenericType && fieldInfo.FieldType.GetGenericTypeDefinition() == typeof(List<>) && isSerializableType(fieldInfo.FieldType.GetGenericArguments()[0])))
+						cSharpCode += "\t\tMainLoop.initAppropriateSystemField (system, \"" + fieldInfo.Name + "\", " + fieldInfo.Name + ");\n";
+				}
+				
 				cSharpCode += "\t}\n\n";
 
 				// Load all methods of this System
@@ -209,8 +259,19 @@ namespace FYFY {
 					if (!fSystemMethodsName.Contains(methodInfo.Name))
 					{
 						ParameterInfo[] parametersInfo = methodInfo.GetParameters();
-						// Unity accept only void functions with only one parameter, so we don't process non void functions and functions with more than one parmater
-						if (methodInfo.ReturnType == typeof(void) && parametersInfo.Length < 2)
+						// Unity accept only void functions with only one parameter (int, float, string, bool or UnityEngine.Object), so we don't process non void functions and functions with more than one parameter
+						if (methodInfo.ReturnType == typeof(void) && (
+								parametersInfo.Length == 0 || 
+								(
+									parametersInfo.Length == 1 &&
+									parametersInfo[0].ParameterType.Equals(typeof(int)) ||
+									parametersInfo[0].ParameterType.Equals(typeof(bool)) ||
+									parametersInfo[0].ParameterType.Equals(typeof(float)) ||
+									parametersInfo[0].ParameterType.Equals(typeof(string)) ||
+									typeof(UnityEngine.Object).IsAssignableFrom(parametersInfo[0].ParameterType)
+								)
+							)
+						)
 						{
 							cSharpCode += "\tpublic void " + methodInfo.Name + "(";
 							// Store the optional parameter
@@ -219,7 +280,7 @@ namespace FYFY {
 								cSharpCode += parametersInfo[0].ParameterType + " " + parametersInfo[0].Name;
 							cSharpCode += ")\n";
 							cSharpCode += "\t{\n";
-							cSharpCode += "\t\tMainLoop.callAppropriateSystemMethod (\"" + systemType.FullName + "\", \"" + methodInfo.Name + "\", " + (parametersInfo.Length == 1 ? parametersInfo[0].Name : "null") + ");\n";
+							cSharpCode += "\t\tMainLoop.callAppropriateSystemMethod (system, \"" + methodInfo.Name + "\", " + (parametersInfo.Length == 1 ? parametersInfo[0].Name : "null") + ");\n";
 							cSharpCode += "\t}\n\n";
 						}
 					}
@@ -294,34 +355,13 @@ namespace FYFY {
 			return system;
 		}
 		
+		// Parse scene and bind all GameObjects to FYFY
+		// Create all systems
 		private void OnEnable(){
 			// if upgrade FYFY, old version instance could be null because Awake is not called again, we set instance reference properly
 			if(instance == null)
 				instance = this;
-			// Check if we have to call back MainLoopEditorScanner OnEnable
-			if(mainLoopEditorScanner != null){
-				// Yes, we have to do so we do it
-				// Because we are here in game context we can't use class defined in inspector context (build will fail)
-				// So we have to inspect types dynamically, first we try to find the MainLoopEditorScanner type (it will be the
-				// case if we are in Unity editor context
-				Type MainLoopEditorScanner_Type = Type.GetType("FYFY_Inspector.MainLoopEditorScanner, FYFY_Inspector");
-				if (MainLoopEditorScanner_Type != null){ // could be null if we are not in Unity editor context (game built)
-					// Here we found the MainLoopEditorScanner type, so we inspect it to find "OnEnable" method
-					MethodInfo OnEnable_Method = MainLoopEditorScanner_Type.GetMethod("OnEnable", new Type[] { });
-					if (OnEnable_Method != null)
-						// And call the method on the Instance field
-						OnEnable_Method.Invoke(mainLoopEditorScanner, new object[] { });
-					else
-						UnityEngine.Debug.LogError("Warning, inconsistent method inside FYFY_Inspector.MainLoopEditorScanner, \"OnEnable\" method is not defined.");
-				}
-				mainLoopEditorScanner = null;
-			}
-		}
-		
-
-		// Parse scene and bind all GameObjects to FYFY
-		// Create all systems
-		private void Start() {
+			
 			if(Application.isPlaying == false){
 				return;
 			}
@@ -384,7 +424,7 @@ namespace FYFY {
 					GameObjectManager._gameObjectWrappers.Add(gameObject.GetInstanceID(), gameObjectWrapper);
 				}
 			}
-
+			
 			// Create all systems
 			for (int i = 0; i < _fixedUpdateSystemDescriptions.Length; ++i) {
 				SystemDescription systemDescription = _fixedUpdateSystemDescriptions[i];
@@ -392,7 +432,13 @@ namespace FYFY {
 					FSystem system = this.createSystemInstance(systemDescription);
 
 					if(system != null) {
-						FSystemManager._fixedUpdateSystems.Add(system);	
+						FSystemManager._fixedUpdateSystems.Add(system);
+						// set reference of this system in its wrapper
+						string compilableName = systemDescription._typeFullName.Replace('.', '_');
+						Component wrapper = gameObject.GetComponent(compilableName + "_wrapper");
+						if (wrapper != null){
+							(wrapper as BaseWrapper).system = system;
+						}
 					} else {
 						UnityEngine.Debug.LogError(systemDescription._typeFullName + " class doesn't exist, hooking up this FSystem to FixedUpdate context aborted. Check your MainLoop Game Object.");
 					}
@@ -407,6 +453,12 @@ namespace FYFY {
 
 					if(system != null) {
 						FSystemManager._updateSystems.Add(system);
+						// set reference of this system in its wrapper
+						string compilableName = systemDescription._typeFullName.Replace('.', '_');
+						Component wrapper = gameObject.GetComponent(compilableName + "_wrapper");
+						if (wrapper != null){
+							(wrapper as BaseWrapper).system = system;
+						}
 					} else {
 						UnityEngine.Debug.LogError(systemDescription._typeFullName + " class doesn't exist, hooking up this FSystem to Update context aborted. Check your MainLoop Game Object.");
 					}
@@ -421,6 +473,12 @@ namespace FYFY {
 					
 					if(system != null) {
 						FSystemManager._lateUpdateSystems.Add(system);
+						// set reference of this system in its wrapper
+						string compilableName = systemDescription._typeFullName.Replace('.', '_');
+						Component wrapper = gameObject.GetComponent(compilableName + "_wrapper");
+						if (wrapper != null){
+							(wrapper as BaseWrapper).system = system;
+						}
 					} else {
 						UnityEngine.Debug.LogError(systemDescription._typeFullName + " class doesn't exist, hooking up this FSystem to LateUpdate context aborted. Check your MainLoop Game Object.");
 					}
@@ -428,6 +486,39 @@ namespace FYFY {
 					UnityEngine.Debug.LogException(e);
 				}
 			}
+			 
+			_stopwatch = new Stopwatch ();
+		}
+		
+
+		// Start all systems
+		private void Start() {
+			if(Application.isPlaying == false){
+				return;
+			}
+			
+			// Call all systems onStart
+			foreach(FSystem system in FSystemManager._fixedUpdateSystems)
+				try{
+					system.start();
+				}
+				catch (System.Exception e){
+					UnityEngine.Debug.LogException(e);
+				}
+			foreach(FSystem system in FSystemManager._updateSystems)
+				try{
+					system.start();
+				}
+				catch (System.Exception e){
+					UnityEngine.Debug.LogException(e);
+				}
+			foreach(FSystem system in FSystemManager._lateUpdateSystems)
+				try{
+					system.start();
+				}
+				catch (System.Exception e){
+					UnityEngine.Debug.LogException(e);
+				}
 
 			_stopwatch = new Stopwatch ();
 		}

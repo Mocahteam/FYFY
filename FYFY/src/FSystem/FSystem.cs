@@ -21,7 +21,8 @@ namespace FYFY {
 		/// 	Show families used in this system
 		/// </summary>
 		public bool showFamilies = false;
-
+		
+		private bool started = false;
 		private double _accumulatedExecDuration = 0;
 		private int _execDurationCount = 0;
 		private Stopwatch _stopwatch = new Stopwatch ();
@@ -36,18 +37,32 @@ namespace FYFY {
 			set {
 				if(value != _pause) {
 					_pause = value;
-
-					if (value == false) {
-						this.onResume(UnityEngine.Time.frameCount);
-					} else {
-						this.onPause(UnityEngine.Time.frameCount);
+					
+					if (started){
+						if (value) {
+							this.onPause(UnityEngine.Time.frameCount);
+						} else {
+							this.onResume(UnityEngine.Time.frameCount);
+						}
 					}
-
-					MainLoop.instance._forceUpdateInspector++;
+					
+					if (MainLoop.instance)
+						MainLoop.instance._forceUpdateInspector++;
 				}
 			}
 		}
 
+		/// <summary>
+		/// 	Function called when this <see cref="FYFY.FSystem"/> started. All families are populated and can be parsed.
+		/// </summary>
+		protected virtual void onStart(){
+		}
+		
+		internal void start() {
+			this.onStart();
+			started = true;
+		}
+		
 		/// <summary>
 		/// 	Function called when this <see cref="FYFY.FSystem"/> paused.
 		/// </summary>
