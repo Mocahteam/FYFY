@@ -508,21 +508,23 @@ namespace FYFY_plugins.Monitoring{
 							FieldInfo field = (FieldInfo)member;
 							if (field.FieldType == typeof(FYFY.Family)) {
 								Family f = (Family)field.GetValue (system);
-								// Check if this family is equivalent to another family already loaded
-								string equivFamily = null;
-								foreach (FamilyAssociation f_alreadyStored in availableFamilies)
-									if (f.Equals(f_alreadyStored.family))
-										equivFamily = f_alreadyStored.equivWith;
-								// store data and link with equivalent family
-								FamilyAssociation entry = new FamilyAssociation ();
-								entry.systemName = systemType.FullName;
-								entry.familyName = field.Name;
-								entry.family = f;
-								if (equivFamily != null)
-									entry.equivWith = equivFamily; 
-								else
-									entry.equivWith = "equivWith_" + entry.systemName + "_" + entry.familyName;
-								availableFamilies.Add (entry);
+								if (f != null){ // could be null if family is declared but not instantiated
+									// Check if this family is equivalent to another family already loaded
+									string equivFamily = null;
+									foreach (FamilyAssociation f_alreadyStored in availableFamilies)
+										if (f.Equals(f_alreadyStored.family))
+											equivFamily = f_alreadyStored.equivWith;
+									// store data and link with equivalent family
+									FamilyAssociation entry = new FamilyAssociation ();
+									entry.systemName = systemType.FullName;
+									entry.familyName = field.Name;
+									entry.family = f;
+									if (equivFamily != null)
+										entry.equivWith = equivFamily; 
+									else
+										entry.equivWith = "equivWith_" + entry.systemName + "_" + entry.familyName;
+									availableFamilies.Add (entry);
+								}
                             }
 						}
                     }
