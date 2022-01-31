@@ -10,16 +10,16 @@ public class #SCRIPTNAME# : FSystem {
 		instance = this;
 	}
 	
-	// Use this to init system before the first onProcess call
+	// Use to init system before the first onProcess call
 	protected override void onStart(){
 	}
 
-	// Use this to update member variables when system pause. 
+	// Use to update member variables when system pause. 
 	// Advice: avoid to update your families inside this function.
 	protected override void onPause(int currentFrame) {
 	}
 
-	// Use this to update member variables when system resume.
+	// Use to update member variables when system resume.
 	// Advice: avoid to update your families inside this function.
 	protected override void onResume(int currentFrame){
 	}
