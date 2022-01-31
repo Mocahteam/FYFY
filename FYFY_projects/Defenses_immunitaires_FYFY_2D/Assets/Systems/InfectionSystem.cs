@@ -9,7 +9,7 @@ public class InfectionSystem : FSystem {
 			new NoneOfComponents(typeof(Death))
 		);
 
-	public InfectionSystem() {
+	protected override void onStart() {
 		// gestion des cellules défà infectées à l'initialisation
 		foreach (GameObject infected_go in f_infected)
 			setInfected(infected_go);

@@ -284,6 +284,11 @@
             	Show families used in this system
             </summary>
         </member>
+        <member name="M:FYFY.FSystem.onStart">
+            <summary>
+            	Function called when this <see cref="T:FYFY.FSystem"/> started. All families are populated and can be parsed.
+            </summary>
+        </member>
         <member name="M:FYFY.FSystem.onPause(System.Int32)">
             <summary>
             	Function called when this <see cref="T:FYFY.FSystem"/> paused.
@@ -495,6 +500,14 @@
             	Gets the number of <c>GameObjects</c> of the scene known by FYFY.
             </summary>
         </member>
+        <member name="T:FYFY.BaseWrapper">
+            <summary>
+            Base class for systems' wrappers
+            </summary>
+        </member>
+        <member name="F:FYFY.BaseWrapper.system">
+            <summary>Reference to the wrapped system</summary>
+        </member>
         <member name="T:FYFY.FyfyBridge">
             <summary>
             Notify Fyfy for each Unity callback usefull to update families
@@ -518,17 +531,11 @@
              (1) to set systems into the three contexts (fixedUpdate, update and lateUpdate)
              (2) to define which game object binding on start
              (3) to follow system load and families content during playing mode
+             (4) to maintain Monobehavior wrappers to systems
             </summary>
         </member>
         <member name="F:FYFY.MainLoop.instance">
             <summary>MainLoop instance (singleton)</summary>
-        </member>
-        <member name="F:FYFY.MainLoop.mainLoopEditorScanner">
-            <summary>
-            	Reference to the mainLoopEditorScanner defined into FYFY_Inspector package. Because we have not access
-            	to this package here, we use super class type (MonoBehaviour). This reference will not be null if 
-            	MainLoopEditorScanner.OnEnable start before MainLoop.OnEnable.
-            </summary>
         </member>
         <member name="F:FYFY.MainLoop.lastFrameSceneLoaded">
             <summary>Defined in GameObjectManager to know the last frame number a scene is loaded</summary>
@@ -594,8 +601,11 @@
         <member name="F:FYFY.MainLoop._outputWrappers">
             <summary>Directory to store wrapper to system's public functions</summary>
         </member>
-        <member name="M:FYFY.MainLoop.callAppropriateSystemMethod(System.String,System.String,System.Object)">
-            <summary>Call function "functionName" defined inside "systemName" system with "parameter" parameter </summary>
+        <member name="M:FYFY.MainLoop.callAppropriateSystemMethod(FYFY.FSystem,System.String,System.Object)">
+            <summary>Call function "functionName" defined inside "system" system with "parameter" parameter </summary>
+        </member>
+        <member name="M:FYFY.MainLoop.initAppropriateSystemField(FYFY.FSystem,System.String,System.Object)">
+            <summary>Set field "fieldName" defined inside "system" system with "parameter" parameter </summary>
         </member>
         <member name="M:FYFY.MainLoop.synchronizeWrappers">
             <summary>Synchronize systems' wrappers</summary>

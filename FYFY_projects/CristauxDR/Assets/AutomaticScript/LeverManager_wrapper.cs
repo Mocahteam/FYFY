@@ -1,12 +1,11 @@
 using UnityEngine;
 using FYFY;
 
-[ExecuteInEditMode]
-public class LeverManager_wrapper : MonoBehaviour
+public class LeverManager_wrapper : BaseWrapper
 {
 	private void Start()
 	{
-		this.hideFlags = HideFlags.HideInInspector; // Hide this component in Inspector
+		this.hideFlags = HideFlags.NotEditable;
 	}
 
 }

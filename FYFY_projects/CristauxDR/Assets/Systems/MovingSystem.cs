@@ -3,23 +3,16 @@ using FYFY;
 
 public class MovingSystem : FSystem {
 
-	private Family hero = FamilyManager.getFamily(new AllOfComponents(typeof(Animator), typeof(Rigidbody), typeof(Controllable)));
+	public GameObject hero_GO;
 	private Rigidbody rb = null;
 	private Controllable control = null;
 	private Animator anim = null;
 
-	public MovingSystem (){
-		if (Application.isPlaying) {
-			// Get hero
-			GameObject hero_GO = hero.First ();
-			if (hero_GO == null)
-				Debug.Log ("MovingSystem: Warning!!! no hero in this scene on start.");
-			else {
-				rb = hero_GO.GetComponent<Rigidbody> ();
-				control = hero_GO.GetComponent<Controllable> ();
-				anim = hero_GO.GetComponent<Animator> ();
-			}
-		}
+	protected override void onStart(){
+		// Get hero components
+		rb = hero_GO.GetComponent<Rigidbody> ();
+		control = hero_GO.GetComponent<Controllable> ();
+		anim = hero_GO.GetComponent<Animator> ();
 	}
 
 	// Use to process your families.

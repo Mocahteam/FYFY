@@ -1,54 +1,18 @@
 ﻿using UnityEngine;
 using FYFY;
-using System.Collections.Generic;
 using FYFY_plugins.Monitoring;
 
 public class TemperatureManager : FSystem {
-	private Family temperature = FamilyManager.getFamily(new AllOfComponents(typeof(Temperature)));
-	private Family boilers = FamilyManager.getFamily(new AllOfComponents(typeof(Boiler)));
 	private Family levers = FamilyManager.getFamily(new AllOfComponents(typeof(Lever)));
 	private Family iceCubes = FamilyManager.getFamily(new AnyOfTags("IceCubeScaller"));
-	private Family iceCollider = FamilyManager.getFamily(new AnyOfTags("IceCubeCollider"));
-	private Family iceMonitor_F = FamilyManager.getFamily(new AnyOfTags("IceCubeMonitor"));
-	private Family puddle = FamilyManager.getFamily(new AnyOfTags("Puddle"));
 
-	private GameObject temp_GO = null;
-	private Temperature temp = null;
-	private GameObject boiler_GO = null;
-	private Boiler boiler = null;
-	private GameObject iceCollider_GO = null;
-	private GameObject iceMonitor_GO = null;
-	private ComponentMonitoring iceMonitor = null;
-	private GameObject puddle_GO = null;
+	public Temperature temp = null;
+	public Boiler boiler = null;
+	public GameObject iceCollider_GO = null;
+	public ComponentMonitoring iceMonitor = null;
+	public GameObject puddle_GO = null;
 
 	private bool inTransition = false;
-
-
-	public TemperatureManager (){
-		if (Application.isPlaying) {
-			temp_GO = temperature.First ();
-			if (temp_GO != null)
-				temp = temp_GO.GetComponent<Temperature> ();
-			else
-				Debug.Log ("TemperatureManager: Warning!!! no temperature in this scene on start.");
-			boiler_GO = boilers.First ();
-			if (boiler_GO != null)
-				boiler = boiler_GO.GetComponent<Boiler> ();
-			else
-				Debug.Log ("TemperatureManager: Warning!!! no boiler in this scene on start.");
-			iceCollider_GO = iceCollider.First ();
-			if (iceCollider_GO == null)
-				Debug.Log ("TemperatureManager: Warning!!! no iceCollider in this scene on start.");
-			iceMonitor_GO = iceMonitor_F.First ();
-			if (iceMonitor_GO != null)
-				iceMonitor = iceMonitor_GO.GetComponent<ComponentMonitoring> ();
-			else
-				Debug.Log ("TemperatureManager: Warning!!! no iceMonitor in this scene on start.");
-			puddle_GO = puddle.First ();
-			if (puddle_GO == null)
-				Debug.Log ("TemperatureManager: Warning!!! no puddle in this scene on start.");
-		}
-	}
 
 	// Use to process your families.
 	protected override void onProcess(int familiesUpdateCount) {
@@ -140,7 +104,7 @@ public class TemperatureManager : FSystem {
 				temp.current = 120;
 			if (temp.current < -50)
 				temp.current = -50;
-			temp_GO.transform.localScale = new Vector3 (1f, (temp.current + 50) * 1.0353f, 1f); // 1.0353f is the magic constant to align temperature value with asset graduation
+			temp.gameObject.transform.localScale = new Vector3 (1f, (temp.current + 50) / 170 * 2.165f, 1f); // 1.0353f is the magic constant to align temperature value with asset graduation
 		}
 	}
 }

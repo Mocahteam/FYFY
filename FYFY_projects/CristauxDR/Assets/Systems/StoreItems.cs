@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using FYFY;
 using FYFY_plugins.TriggerManager;
 using FYFY_plugins.PointerManager;

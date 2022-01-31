@@ -8,6 +8,6 @@ public class VirusProperties {
 	public GameObject _virusPrefab;
 }
 
-public class Virus : UnityEngine.MonoBehaviour {
+public class Virus : MonoBehaviour {
 	public VirusProperties _properties = new VirusProperties();
 }

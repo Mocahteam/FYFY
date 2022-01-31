@@ -4,9 +4,9 @@ using FYFY_plugins.PointerManager;
 
 // Ce système se charge de la sélection des unitées contrôlables par le joueur
 public class InputSystem : FSystem {
-	private KeyCode _selectionButton = KeyCode.Mouse0;
-	private KeyCode _actionButton = KeyCode.Mouse1;
-	private KeyCode _multipleSelectionKey = KeyCode.LeftControl;
+	public KeyCode _selectionButton = KeyCode.Mouse0; 
+	public KeyCode _actionButton = KeyCode.Mouse1;
+	public KeyCode _multipleSelectionKey = KeyCode.LeftControl;
 
 	private Family _mouseOverAndSelected = FamilyManager.getFamily(
 		new AllOfProperties(PropertyMatcher.PROPERTY.ACTIVE_IN_HIERARCHY),

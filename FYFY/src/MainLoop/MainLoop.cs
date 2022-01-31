@@ -164,6 +164,7 @@ namespace FYFY {
 		
 		private bool isSerializableType(Type t){
 			return t.IsPrimitive ||
+				t.IsEnum ||
 				t.Equals(typeof(string)) ||
 				typeof(UnityEngine.Object).IsAssignableFrom(t) ||
 				typeof(Vector2).IsAssignableFrom(t) ||

@@ -14,7 +14,7 @@ public class SelectionSystem : FSystem {
 			new NoneOfComponents(typeof(Death), typeof(Selected))
 		);
 
-	public SelectionSystem() {
+	protected override void onStart() {
 		// Ajout d'une callback lorsqu'une cellule est sélectionnée
 		f_livingSelected.addEntryCallback(onNewCellSelected);
 		// Ajout d'une callback lorsqu'une cellule est dé-sélectionnée

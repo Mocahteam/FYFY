@@ -19,6 +19,11 @@
             The contructor of this system.
             </summary>
         </member>
+        <member name="M:FYFY_plugins.Monitoring.ActionsManager.onStart">
+            <summary>
+            Function called when this <see cref="T:FYFY.FSystem"/> started. All families are populated and can be parsed.
+            </summary>
+        </member>
         <member name="M:FYFY_plugins.Monitoring.ActionsManager.onProcess(System.Int32)">
             <summary>
             Use to process your families.

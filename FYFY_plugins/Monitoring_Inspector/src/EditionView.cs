@@ -84,10 +84,6 @@ namespace FYFY_plugins.Monitoring {
             }
         }
 
-		void Start(){
-			mainLoop = GameObject.Find("Main_Loop");
-		}
-
         void OnGUI()
         {
             // Check if MonitoringManager is still available
@@ -98,6 +94,8 @@ namespace FYFY_plugins.Monitoring {
 	        //Menu
 	        makeMenu();
 			MonitoringManager mm = MonitoringManager.Instance;
+			if (mainLoop == null)
+				mainLoop = GameObject.Find("Main_Loop");
 			if (goMenuItemActive)
 			{
                 if (Event.current != null && Event.current.type == EventType.MouseDown)

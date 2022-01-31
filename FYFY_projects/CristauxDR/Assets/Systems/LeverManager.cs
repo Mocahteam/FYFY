@@ -2,24 +2,21 @@
 using FYFY;
 using FYFY_plugins.TriggerManager;
 using FYFY_plugins.PointerManager;
-using System.Collections.Generic;
 using FYFY_plugins.Monitoring;
 
 public class LeverManager : FSystem {
 	private Family levers = FamilyManager.getFamily(new AllOfComponents(typeof(PointerOver), typeof(Lever), typeof(SpriteRenderer)));
 	private Family leverMonitor_F = FamilyManager.getFamily(new AllOfComponents(typeof(FamilyMonitoring)));
 
-	private GameObject leverMonitor_GO = null;
+	private GameObject leverMonitor_GO;
 	private FamilyMonitoring fm = null;
 
-	public LeverManager(){
-		if (Application.isPlaying) {
-			leverMonitor_GO = leverMonitor_F.First ();
-			if (leverMonitor_GO != null)
-				fm = leverMonitor_GO.GetComponent<FamilyMonitoring> ();
-			else
-				Debug.Log ("LeverManager: Warning!!! no monitor for levers in this scene on start.");
-		}
+	protected override void onStart(){
+		leverMonitor_GO = leverMonitor_F.First ();
+		if (leverMonitor_GO != null)
+			fm = leverMonitor_GO.GetComponent<FamilyMonitoring> ();
+		else
+			Debug.Log ("LeverManager: Warning!!! no monitor for levers in this scene on start.");
 	}
 
 	// Use to process your families.

@@ -1,28 +1,12 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
 using FYFY;
 using FYFY_plugins.TriggerManager;
 using FYFY_plugins.PointerManager;
 using FYFY_plugins.Monitoring;
 
 public class ExitManager : FSystem {
-	private Family exit_F = FamilyManager.getFamily(new AllOfComponents(typeof(TriggerSensitive3D), typeof(Exit), typeof(ComponentMonitoring)));
-	private Family endScreen_F = FamilyManager.getFamily(new AnyOfTags("EndScreen"));
-	private GameObject exit_GO = null;
-	private GameObject endScreen_GO = null;
-
-	public ExitManager(){
-		if (Application.isPlaying) {
-			// Get the exit (only one)
-			exit_GO = exit_F.First ();
-			if (exit_GO == null)
-				Debug.Log ("ExitManager: Warning!!! no exit in this scene on start.");
-			// Get the end screen (only one)
-			endScreen_GO = endScreen_F.First ();
-			if (endScreen_GO == null)
-				Debug.Log ("ExitManager: Warning!!! no end screen in this scene on start.");
-		}
-	}
+	public GameObject exit_GO;
+	public GameObject endScreen_GO;
 
 	// Use to process your families.
 	protected override void onProcess(int familiesUpdateCount) {

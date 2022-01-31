@@ -1,12 +1,17 @@
 using UnityEngine;
 using FYFY;
 
-[ExecuteInEditMode]
-public class InputSystem_wrapper : MonoBehaviour
+public class InputSystem_wrapper : BaseWrapper
 {
+	public UnityEngine.KeyCode _selectionButton;
+	public UnityEngine.KeyCode _actionButton;
+	public UnityEngine.KeyCode _multipleSelectionKey;
 	private void Start()
 	{
-		this.hideFlags = HideFlags.HideInInspector; // Hide this component in Inspector
+		this.hideFlags = HideFlags.NotEditable;
+		MainLoop.initAppropriateSystemField (system, "_selectionButton", _selectionButton);
+		MainLoop.initAppropriateSystemField (system, "_actionButton", _actionButton);
+		MainLoop.initAppropriateSystemField (system, "_multipleSelectionKey", _multipleSelectionKey);
 	}
 
 }

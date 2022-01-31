@@ -7,48 +7,38 @@ using FYFY_plugins.Monitoring;
 
 public class InventoryManager : FSystem {
 	private Family inInventoryObjectsFocused = FamilyManager.getFamily(new AllOfComponents(typeof(PointerOver), typeof(ComponentMonitoring)), new AllOfProperties(PropertyMatcher.PROPERTY.ACTIVE_IN_HIERARCHY), new AnyOfLayers(5)); // Layer 5 == UI
-	private Family highlightable = FamilyManager.getFamily(new AllOfComponents(typeof(PointerOver), typeof(Image)), new AnyOfLayers(5)); // Layer 5 == UI
+	private Family highlighted = FamilyManager.getFamily(new AllOfComponents(typeof(PointerOver), typeof(Image)), new AnyOfLayers(5)); // Layer 5 == UI
+	private Family notHighlighted = FamilyManager.getFamily(new NoneOfComponents(typeof(PointerOver)), new AllOfComponents(typeof(Image)), new AnyOfLayers(5)); // Layer 5 == UI
 	private Family itemSelected = FamilyManager.getFamily(new AllOfComponents(typeof(CurrentSelection), typeof(ComponentMonitoring)));
-	private Dictionary<int, GameObject> goId2GO = new Dictionary<int, GameObject> ();
+	private Family itemNotSelected = FamilyManager.getFamily(new NoneOfComponents(typeof(CurrentSelection)), new AllOfComponents(typeof(ComponentMonitoring)));
 
-	public InventoryManager () {
-		highlightable.addEntryCallback (onMouseEnter);
-		highlightable.addExitCallback (onMouseExit);
+	protected override void onStart() {
+		highlighted.addEntryCallback (onMouseEnter);
+		notHighlighted.addEntryCallback(onMouseExit);
 		itemSelected.addEntryCallback (onNewItemSelected);
-		itemSelected.addExitCallback (onOldItemSelected);
+		itemNotSelected.addEntryCallback(onOldItemSelected);
 	}
 
 	void onMouseEnter(GameObject addingGO){
 		Image img = addingGO.GetComponent<Image> ();
 		img.color = new Color(1f, 0.9f, 0f);
-		if (!goId2GO.ContainsKey(addingGO.GetInstanceID ()))
-			goId2GO.Add (addingGO.GetInstanceID (), addingGO);
 	}
 
-	void onMouseExit(int removingGOid){
-		if (goId2GO.ContainsKey(removingGOid) && goId2GO [removingGOid] != null) {
-			Image img = goId2GO [removingGOid].GetComponent<Image> ();
-			img.color = Color.white;
-		} else
-			goId2GO.Remove (removingGOid);
+	void onMouseExit(GameObject removingGO){
+		Image img = removingGO.GetComponent<Image> ();
+		img.color = Color.white;
 	}
 
 	void onNewItemSelected(GameObject newItem){
 		GameObject child = newItem.transform.parent.GetChild (1).gameObject; // get second child
 		if (!child.activeInHierarchy)
-			child.SetActive (true);
-		if (!goId2GO.ContainsKey(newItem.GetInstanceID ()))
-			goId2GO.Add (newItem.GetInstanceID (), newItem);
+			GameObjectManager.setGameObjectState(child, true);
 	}
 
-	void onOldItemSelected (int oldItemId){
-		if (goId2GO.ContainsKey(oldItemId) && goId2GO [oldItemId] != null) {
-			GameObject child = goId2GO [oldItemId].transform.parent.GetChild (1).gameObject; // get second child
-			if (child.activeInHierarchy)
-				child.SetActive (false);
-		} else
-			goId2GO.Remove (oldItemId);
-
+	void onOldItemSelected (GameObject oldItem){
+		GameObject child = oldItem.transform.parent.GetChild (1).gameObject; // get second child
+		if (child.activeInHierarchy)
+			GameObjectManager.setGameObjectState(child, false);
 	}
 
 	// Use to process your families.
