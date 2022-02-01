@@ -18,7 +18,7 @@ namespace FYFY {
 		/// </summary>
 		public double maxExecDuration = 0;
 		/// <summary>
-		/// 	Show families used in this system
+		/// 	Show families used in this system inside Unity Inspector
 		/// </summary>
 		public bool showFamilies = false;
 		
@@ -83,7 +83,7 @@ namespace FYFY {
 		/// 	Function called each time when FYFY enter in the update block where this <see cref="FYFY.FSystem"/> is.
 		/// </summary>
 		/// <remarks>
-		/// 	Called only is this <see cref="FYFY.FSystem"/> is active.
+		/// 	Called only if this <see cref="FYFY.FSystem"/> is active.
 		/// </remarks>
 		/// <param name="familiesUpdateCount">
 		/// 	Number of times the families have been updated.

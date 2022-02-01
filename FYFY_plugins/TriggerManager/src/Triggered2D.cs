@@ -2,12 +2,8 @@
 
 namespace FYFY_plugins.TriggerManager {
 	/// <summary>
-	/// 	Component specifying that the GameObject is in contact with at least one other GameObject.
+	/// 	Component specifying that the <c>GameObject</c> is in contact with at least one other <c>GameObject</c>. This component is managed by <see cref="FYFY_plugins.TriggerManager.TriggerSensitive2D" />, you do not have to add, update or remove it manually.
 	/// </summary>
-	/// <remarks>
-	/// 	<para>! AUTOMATICALLY ADDED, UPDATED OR REMOVED !</para>
-	/// 	<para>! DO NOT TOUCH MANUALLY OTHERWISE WE CAN'T GUARANTEE THE COMPORTMENT !</para>
-	/// </remarks>
 	[DisallowMultipleComponent]
 	[AddComponentMenu("")]
 	public class Triggered2D : MonoBehaviour {

@@ -9,13 +9,13 @@
             	Component specifying that the pointer is over the <c>GameObject</c>.
             </summary>
             <remarks>
-            	Automatically added or removed by the relative <see cref="T:FYFY_plugins.PointerManager.PointerSensitive">component</see>.
+            	Automatically added or removed by <see cref="T:FYFY_plugins.PointerManager.PointerSensitive"/>.
             </remarks>
         </member>
         <member name="T:FYFY_plugins.PointerManager.PointerSensitive">
             <summary>
             	Component allowing <c>GameObject</c> to be sensitive to the pointer.
-            	Add automatically a <see cref="T:FYFY_plugins.PointerManager.PointerOver">component</see> when the pointer points the <c>GameObject</c>.
+            	Add automatically a <see cref="T:FYFY_plugins.PointerManager.PointerOver"/> when the pointer points the <c>GameObject</c>.
             </summary>
         </member>
         <member name="M:FYFY_plugins.PointerManager.PointerSensitive.OnPointerEnter(UnityEngine.EventSystems.PointerEventData)">

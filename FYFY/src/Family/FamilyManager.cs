@@ -18,13 +18,8 @@ namespace FYFY {
 		/// </summary>
 		/// <remarks>
 		/// 	<para>
-		/// 		You get always a family that is initialized, ie which contains the <c>GameObjects</c>
-		///			of the actual scene which respect all the contraints and which are known by <c>FYFY</c>.
-		/// 		So you can parse it directly.
-		/// 	</para>
-		/// 	<para>
-		/// 		To be known by <c>FYFY</c>, a <c>GameObject</c> must be created in editor outside runtime
-		/// 		or in code with <see cref="FYFY.GameObjectManager">functions</see>.
+		/// 		A <c>Family</c> is a container of <c>GameObjects</c> which respect constraints specified by
+		///			<see cref="FYFY.Matcher"/>. Only <c>GameObjects</c> <see cref="FYFY.GameObjectManager.bind">binded</see> to FYFY are available in families.
 		/// 	</para>
 		/// 	<para>
 		/// 		This is the only way to get family reference. 

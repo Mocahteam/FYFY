@@ -9,8 +9,8 @@ namespace FYFY {
 	/// 	<para>The family is updated before each <c>FixedUpdate</c>, <c>Update</c>, <c>LateUpdate</c> blocks of the <see cref="FYFY.MainLoop"/>.</para>
 	/// 	<para>The family state is the same for each system in a same block of update.</para>
 	/// 	<para>
-	/// 		The family works only with the <c>GameObjects</c> known by <c>FYFY</c> (create in editor outside runtime or in code with 
-	/// 		<see cref="FYFY.GameObjectManager">functions</see>).
+	/// 		The family works only with the <c>GameObjects</c> known by <c>FYFY</c> 
+	/// 		(see <see cref="FYFY.GameObjectManager.bind" />).
 	/// 	</para>
 	/// </remarks>
 	public class Family : IEnumerable<GameObject> {
@@ -23,7 +23,7 @@ namespace FYFY {
 		/// </summary>
 		public delegate void ExitCallback(int gameObjectId);
 		/// <summary>
-		/// 	Show game objects included into this family
+		/// 	Show game objects included into this family inside Unity Inspector
 		/// </summary>
 		public bool showContent = false;
 		

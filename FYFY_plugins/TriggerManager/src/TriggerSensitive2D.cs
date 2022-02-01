@@ -5,8 +5,8 @@ using System.Linq;
 
 namespace FYFY_plugins.TriggerManager {
 	/// <summary>
-	/// 	TriggerSensitive2D allows GameObject to be noticed when it is in contact with another GameObject.
-	///     In this case the Triggered2d component (dynamically added) provides the list of GameObject in contact with him.
+	/// 	Component allowing <c>GameObject</c> to be noticed when it is in contact with another <c>GameObject</c>.
+	///     In this case the <see cref="FYFY_plugins.TriggerManager.Triggered2D" /> component (dynamically added) provides the list of <c>GameObject</c> in contact with him.
 	/// </summary>
 	[DisallowMultipleComponent]
 	public class TriggerSensitive2D : MonoBehaviour {

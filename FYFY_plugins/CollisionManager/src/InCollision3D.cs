@@ -2,12 +2,8 @@
 
 namespace FYFY_plugins.CollisionManager {
 	/// <summary>
-	/// 	Component specifying that the GameObject is in contact with at least one other GameObject.
+	/// 	Component specifying that the <c>GameObject</c> is in collision with at least one other <c>GameObject</c>. This component is managed by <see cref="FYFY_plugins.CollisionManager.CollisionSensitive3D" />, you do not have to add, update or remove it manually.
 	/// </summary>
-	/// <remarks>
-	/// 	<para>! AUTOMATICALLY ADDED, UPDATED OR REMOVED !</para>
-	/// 	<para>! DO NOT TOUCH MANUALLY OTHERWISE WE CAN'T GUARANTEE THE COMPORTMENT !</para>
-	/// </remarks>
 	[DisallowMultipleComponent]
 	[AddComponentMenu("")]
 	public class InCollision3D : MonoBehaviour {

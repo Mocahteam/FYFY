@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace FYFY_plugins.PointerManager {
 	/// <summary>
 	/// 	Component allowing <c>GameObject</c> to be sensitive to the pointer.
-	/// 	Add automatically a <see cref="FYFY_plugins.PointerManager.PointerOver">component</see> when the pointer points the <c>GameObject</c>.
+	/// 	Add automatically a <see cref="FYFY_plugins.PointerManager.PointerOver"/> when the pointer points the <c>GameObject</c>.
 	/// </summary>
 
 	// Overlay of the Unity Pointer System.

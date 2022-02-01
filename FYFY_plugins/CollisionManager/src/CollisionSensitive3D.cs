@@ -5,8 +5,8 @@ using System.Linq;
 
 namespace FYFY_plugins.CollisionManager {
 	/// <summary>
-	/// 	CollisionSensitive3D allows GameObject to be noticed when it is in contact with another GameObject.
-	///     In this case the InCollision3d component (dynamically added) provides the list of GameObject in contact with him.
+	/// 	Component allowing <c>GameObject</c> to be noticed when it is in collision with another <c>GameObject</c>.
+	///     In this case the <see cref="FYFY_plugins.CollisionManager.InCollision3D"/> component (dynamically added) provides the list of <c>GameObject</c> in collision with him.
 	/// </summary>
 	[DisallowMultipleComponent]
 	public class CollisionSensitive3D : MonoBehaviour {

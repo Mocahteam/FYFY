@@ -6,8 +6,8 @@
     <members>
         <member name="T:FYFY_plugins.CollisionManager.CollisionSensitive2D">
             <summary>
-            	CollisionSensitive2D allows GameObject to be noticed when it is in contact with another GameObject.
-                In this case the InCollision2d component (dynamically added) provides the list of GameObject in contact with him.
+            	Component allowing <c>GameObject</c> to be noticed when it is in collision with another <c>GameObject</c>.
+                In this case the <see cref="T:FYFY_plugins.CollisionManager.InCollision2D"/> component (dynamically added) provides the list of <c>GameObject</c> in collision with him.
             </summary>
         </member>
         <member name="T:FYFY_plugins.CollisionManager.CollisionSensitive2DTarget">
@@ -18,8 +18,8 @@
         </member>
         <member name="T:FYFY_plugins.CollisionManager.CollisionSensitive3D">
             <summary>
-            	CollisionSensitive3D allows GameObject to be noticed when it is in contact with another GameObject.
-                In this case the InCollision3d component (dynamically added) provides the list of GameObject in contact with him.
+            	Component allowing <c>GameObject</c> to be noticed when it is in collision with another <c>GameObject</c>.
+                In this case the <see cref="T:FYFY_plugins.CollisionManager.InCollision3D"/> component (dynamically added) provides the list of <c>GameObject</c> in collision with him.
             </summary>
         </member>
         <member name="T:FYFY_plugins.CollisionManager.CollisionSensitive3DTarget">
@@ -30,12 +30,8 @@
         </member>
         <member name="T:FYFY_plugins.CollisionManager.InCollision2D">
             <summary>
-            	Component specifying that the GameObject is in contact with at least one other GameObject.
+            	Component specifying that the <c>GameObject</c> is in collision with at least one other <c>GameObject</c>. This component is managed by <see cref="T:FYFY_plugins.CollisionManager.CollisionSensitive2D"/>, you do not have to add, update or remove it manually.
             </summary>
-            <remarks>
-            	<para>! AUTOMATICALLY ADDED, UPDATED OR REMOVED !</para>
-            	<para>! DO NOT TOUCH MANUALLY OTHERWISE WE CAN'T GUARANTEE THE COMPORTMENT !</para>
-            </remarks>
         </member>
         <member name="P:FYFY_plugins.CollisionManager.InCollision2D.Targets">
             <summary>
@@ -49,12 +45,8 @@
         </member>
         <member name="T:FYFY_plugins.CollisionManager.InCollision3D">
             <summary>
-            	Component specifying that the GameObject is in contact with at least one other GameObject.
+            	Component specifying that the <c>GameObject</c> is in collision with at least one other <c>GameObject</c>. This component is managed by <see cref="T:FYFY_plugins.CollisionManager.CollisionSensitive3D"/>, you do not have to add, update or remove it manually.
             </summary>
-            <remarks>
-            	<para>! AUTOMATICALLY ADDED, UPDATED OR REMOVED !</para>
-            	<para>! DO NOT TOUCH MANUALLY OTHERWISE WE CAN'T GUARANTEE THE COMPORTMENT !</para>
-            </remarks>
         </member>
         <member name="P:FYFY_plugins.CollisionManager.InCollision3D.Targets">
             <summary>

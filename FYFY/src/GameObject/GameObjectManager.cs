@@ -18,8 +18,7 @@ namespace FYFY {
 	/// 	<para>
 	/// 		When you call a <see cref="FYFY.GameObjectManager"/> function, the real action is done at the beginning of the next update block.
 	/// 		This has the effect to maintain a consistent state inside a update block.
-	/// 		For example, in a <c>Update block</c>, if you call the remove function on a component inside a system, the component is really removed in the 
-	/// 		<c>Late update block</c>. For all the system in the <c>Update block</c>, the component is yet present.
+	/// 		For example, in a <c>Update block</c>, if you call the remove function on a component inside a system, the component is really removed in the next FYFY update (just before the <c>Late update block</c> in this example. For all the system in the <c>Update block</c>, the component is yet present.
 	/// 	</para>
 	/// </remarks>
 	public static class GameObjectManager {
@@ -110,7 +109,7 @@ namespace FYFY {
 		/// 	Bind a game object with FYFY. The game object will be registered by FYFY at the beginning of the next update block.
 		/// </summary>
 		/// <remarks>
-		/// 	In the same frame of binding, you can use it in other <see cref="FYFY.GameObjectManager">functions</see>.
+		/// 	In the same frame of binding, you can use it in other <see cref="FYFY.GameObjectManager"/>.
 		/// </remarks>
 		public static void bind(GameObject gameObject) {
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations

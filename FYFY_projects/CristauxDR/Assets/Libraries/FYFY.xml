@@ -131,14 +131,14 @@
             	<para>The family is updated before each <c>FixedUpdate</c>, <c>Update</c>, <c>LateUpdate</c> blocks of the <see cref="T:FYFY.MainLoop"/>.</para>
             	<para>The family state is the same for each system in a same block of update.</para>
             	<para>
-            		The family works only with the <c>GameObjects</c> known by <c>FYFY</c> (create in editor outside runtime or in code with 
-            		<see cref="T:FYFY.GameObjectManager">functions</see>).
+            		The family works only with the <c>GameObjects</c> known by <c>FYFY</c> 
+            		(see <see cref="M:FYFY.GameObjectManager.bind(UnityEngine.GameObject)"/>).
             	</para>
             </remarks>
         </member>
         <member name="F:FYFY.Family.showContent">
             <summary>
-            	Show game objects included into this family
+            	Show game objects included into this family inside Unity Inspector
             </summary>
         </member>
         <member name="M:FYFY.Family.GetEnumerator">
@@ -236,13 +236,8 @@
             </summary>
             <remarks>
             	<para>
-            		You get always a family that is initialized, ie which contains the <c>GameObjects</c>
-            		of the actual scene which respect all the contraints and which are known by <c>FYFY</c>.
-            		So you can parse it directly.
-            	</para>
-            	<para>
-            		To be known by <c>FYFY</c>, a <c>GameObject</c> must be created in editor outside runtime
-            		or in code with <see cref="T:FYFY.GameObjectManager">functions</see>.
+            		A <c>Family</c> is a container of <c>GameObjects</c> which respect constraints specified by
+            		<see cref="T:FYFY.Matcher"/>. Only <c>GameObjects</c> <see cref="M:FYFY.GameObjectManager.bind(UnityEngine.GameObject)">binded</see> to FYFY are available in families.
             	</para>
             	<para>
             		This is the only way to get family reference. 
@@ -281,7 +276,7 @@
         </member>
         <member name="F:FYFY.FSystem.showFamilies">
             <summary>
-            	Show families used in this system
+            	Show families used in this system inside Unity Inspector
             </summary>
         </member>
         <member name="M:FYFY.FSystem.onStart">
@@ -310,7 +305,7 @@
             	Function called each time when FYFY enter in the update block where this <see cref="T:FYFY.FSystem"/> is.
             </summary>
             <remarks>
-            	Called only is this <see cref="T:FYFY.FSystem"/> is active.
+            	Called only if this <see cref="T:FYFY.FSystem"/> is active.
             </remarks>
             <param name="familiesUpdateCount">
             	Number of times the families have been updated.
@@ -353,8 +348,7 @@
             	<para>
             		When you call a <see cref="T:FYFY.GameObjectManager"/> function, the real action is done at the beginning of the next update block.
             		This has the effect to maintain a consistent state inside a update block.
-            		For example, in a <c>Update block</c>, if you call the remove function on a component inside a system, the component is really removed in the 
-            		<c>Late update block</c>. For all the system in the <c>Update block</c>, the component is yet present.
+            		For example, in a <c>Update block</c>, if you call the remove function on a component inside a system, the component is really removed in the next FYFY update (just before the <c>Late update block</c> in this example. For all the system in the <c>Update block</c>, the component is yet present.
             	</para>
             </remarks>
         </member>
@@ -409,7 +403,7 @@
             	Bind a game object with FYFY. The game object will be registered by FYFY at the beginning of the next update block.
             </summary>
             <remarks>
-            	In the same frame of binding, you can use it in other <see cref="T:FYFY.GameObjectManager">functions</see>.
+            	In the same frame of binding, you can use it in other <see cref="T:FYFY.GameObjectManager"/>.
             </remarks>
         </member>
         <member name="M:FYFY.GameObjectManager.unbind(UnityEngine.GameObject)">
@@ -527,11 +521,14 @@
         </member>
         <member name="T:FYFY.MainLoop">
             <summary>
-            MainLoop enables:
-             (1) to set systems into the three contexts (fixedUpdate, update and lateUpdate)
-             (2) to define which game object binding on start
-             (3) to follow system load and families content during playing mode
-             (4) to maintain Monobehavior wrappers to systems
+            MainLoop is the heart of FYFY, it manages <see cref="T:FYFY.FSystem"/> execution and keeps <see cref="T:FYFY.Family"/> synchronized.
+            
+            In Unity Inspector it enables:
+            	<list type="number">
+            		<item>to set systems into the three contexts (fixedUpdate, update and lateUpdate)</item>
+            		<item>to define which game object binding on start</item>
+            		<item>to follow systems load and families content during playing mode</item>
+            	</list>
             </summary>
         </member>
         <member name="F:FYFY.MainLoop.instance">

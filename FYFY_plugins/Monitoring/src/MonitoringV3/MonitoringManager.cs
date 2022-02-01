@@ -93,7 +93,7 @@ namespace FYFY_plugins.Monitoring{
         /// 	Get monitor with asked id.
         /// </summary>
         /// <param name="id">The id of the monitor to get.</param>
-        /// <return> The ComponentMonitoring object associated to the id if it exists. Return null otherwise. <see cref="ComponentMonitoring"/> </return>
+        /// <returns> The ComponentMonitoring object associated to the id if it exists. Return null otherwise. <see cref="ComponentMonitoring"/> </returns>
         public static ComponentMonitoring getMonitorById (int id){
 			if (MonitoringManager.Instance == null)
 				throw new TraceAborted ("No MonitoringManager found. You must add MonitoringManager component to one of your GameObject first (the Main_Loop for instance).", null);
@@ -116,7 +116,7 @@ namespace FYFY_plugins.Monitoring{
 		/// <param name="performedBy">Specify who perform this action, the player or the system. <see cref="MonitoringManager.Source"/></param>
 		/// <param name="processLinks">Set to false if the logic expression associated to the action include "+" operators AND the action performed by the player is not allowed by the system. In this case fourth parameters will not be processed. True (default) means fourth parameter will be analysed.</param>
 		/// <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to build the trace: l0 and l3 OR l1 and l3 => <code>MonitoringManager.trace(..., "l0", "l3");</code> OR <code>MonitoringManager.trace(..., "l1", "l3");</code></param>
-		/// <return> labels found for this game action if in game analysis is enabled (see: MonitoringManager). return empty Array else </return>
+		/// <returns> labels found for this game action if in game analysis is enabled (see: MonitoringManager). return empty Array else </returns>
 		public static string[] trace(ComponentMonitoring monitor, string actionName, string performedBy, bool processLinks = true, params string[] linksConcerned)
 		{
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame (1, true);										// get caller stackFrame with informations
@@ -140,7 +140,7 @@ namespace FYFY_plugins.Monitoring{
 		/// <param name="performedBy">Specify who perform this action, the player or the system. <see cref="MonitoringManager.Source"/></param>
 		/// <param name="processLinks">Set to false if the logic expression associated to the action include "+" operators AND the action performed by the player is not allowed by the system. In this case fourth parameters will not be processed. True (default) means fourth parameter will be analysed.</param>
 		/// <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to build the trace: l0 and l3 OR l1 and l3 => <code>MonitoringManager.trace(..., "l0", "l3");</code> OR <code>MonitoringManager.trace(..., "l1", "l3");</code></param>
-		/// <return> labels found for this game action if in game analysis is enabled (see: MonitoringManager). return empty Array else </return>
+		/// <returns> labels found for this game action if in game analysis is enabled (see: MonitoringManager). return empty Array else </returns>
 		public static string[] trace(Family family, string actionName, string performedBy, bool processLinks = true, params string[] linksConcerned)
 		{
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame (1, true);										// get caller stackFrame with informations
@@ -167,7 +167,7 @@ namespace FYFY_plugins.Monitoring{
 		/// <param name="targetedActionName">Action name you want to reach, this name has to match with a transition defined into associated Petri Net of the "monitor" parameter <see cref="ComponentMonitoring.PnmlFile"/>. The special key word "##playerObjectives##" enable to target all player objective actions defined inside full Petri Net from which the monitor is part of (in this special case, "linksConcerned" parameter will be ignore).</param>
 		/// <param name="maxActions">Maximum number of actions returned.</param>
 		/// <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to look for the trace: l0 and l3 OR l1 and l3 => <code>MonitoringManager.getNextActionToReach(..., "l0", "l3");</code> OR <code>MonitoringManager.getNextActionToReach(..., "l1", "l3");</code></param>
-		/// <return>List of Pairs including a ComponentMonitoring and its associated game action useful to reach the targeted action, the number of actions returned is less or equal to maxActions parameters.</return>
+		/// <returns>List of Pairs including a ComponentMonitoring and its associated game action useful to reach the targeted action, the number of actions returned is less or equal to maxActions parameters.</returns>
 		public static List<KeyValuePair<ComponentMonitoring, string>> getNextActionsToReach(ComponentMonitoring monitor, string targetedActionName, int maxActions, params string[] linksConcerned)
 		{
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame (1, true);										// get caller stackFrame with informations
@@ -192,7 +192,7 @@ namespace FYFY_plugins.Monitoring{
 		/// <param name="targetedActionName">Action name you want to reach, this name has to match with a transition defined into associated Petri Net  of the "family" parameter <see cref="ComponentMonitoring.PnmlFile"/> The special key word "##playerObjectives##" enable to target all player objective actions defined inside full Petri Net from which the monitor is part of (in this special case, "linksConcerned" parameter will be ignore).</param>
 		/// <param name="maxActions">Maximum number of actions returned.</param>
 		/// <param name="linksConcerned">links label concerned by this action. You can leave empty if only "*" operators are used in logic expression. Must be defined if logic expression associated to the action include "+" operators. For instance, if logic expression is "(l0+l1)*l3" you have to indicate which links to use to look for the trace: l0 and l3 OR l1 and l3 => <code>MonitoringManager.getNextActionToReach(..., "l0", "l3");</code> OR <code>MonitoringManager.getNextActionToReach(..., "l1", "l3");</code></param>
-		/// <return>List of Pairs including a ComponentMonitoring and its associated game action useful to reach the targeted action, the number of actions returned is less or equal to maxActions parameters.</return>
+		/// <returns>List of Pairs including a ComponentMonitoring and its associated game action useful to reach the targeted action, the number of actions returned is less or equal to maxActions parameters.</returns>
 		public static List<KeyValuePair<ComponentMonitoring, string>> getNextActionsToReach(Family family, string targetedActionName, int maxActions, params string[] linksConcerned)
 		{
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame (1, true);										// get caller stackFrame with informations
@@ -219,7 +219,7 @@ namespace FYFY_plugins.Monitoring{
 		/// </summary>
 		/// <param name="pnName">The Petri net name to process.</param>
 		/// <param name="maxActions">Maximum number of actions returned.</param>
-		/// <return>List of Pairs including a ComponentMonitoring and its associated game action useful to reach the player objective, the number of actions returned is less or equal to maxActions parameters.</return>
+		/// <returns>List of Pairs including a ComponentMonitoring and its associated game action useful to reach the player objective, the number of actions returned is less or equal to maxActions parameters.</returns>
 		public static List<KeyValuePair<ComponentMonitoring, string>> getNextActionsToReachPlayerObjective(string pnName, int maxActions)
 		{
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame (1, true);										// get caller stackFrame with informations
@@ -235,7 +235,7 @@ namespace FYFY_plugins.Monitoring{
 		}
 		
 		/// <summary>Ask to Laalys to provide all triggerable actions</summary>
-		/// <return>List of Pairs including a ComponentMonitoring and its associated game action that may be triggered.</return>
+		/// <returns>List of Pairs including a ComponentMonitoring and its associated game action that may be triggered.</returns>
 		public static List<KeyValuePair<ComponentMonitoring, string>> getTriggerableActions(){
 			
 			if (MonitoringManager.Instance == null)
@@ -398,7 +398,7 @@ namespace FYFY_plugins.Monitoring{
 		/// 	Get the FamilyMonitoring associated to a family if it exists.
 		/// </summary>
 		/// <param name="family">The Family to ask for.</param>
-		/// <return>The FamilyMonitoring associated to the family if it exists. Null otherwise.</return>
+		/// <returns>The FamilyMonitoring associated to the family if it exists. Null otherwise.</returns>
 		public FamilyMonitoring getFamilyMonitoring (Family family){
 			foreach (FamilyMonitoring fm in f_monitors){
 				if (family.Equals(fm.descriptor)){

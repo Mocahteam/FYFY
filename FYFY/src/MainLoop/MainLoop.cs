@@ -23,11 +23,14 @@ namespace FYFY {
 	}
 
 	/// <summary>
-	/// MainLoop enables:
-	///  (1) to set systems into the three contexts (fixedUpdate, update and lateUpdate)
-	///  (2) to define which game object binding on start
-	///  (3) to follow system load and families content during playing mode
-	///  (4) to maintain Monobehavior wrappers to systems
+	/// MainLoop is the heart of FYFY, it manages <see cref="FYFY.FSystem"/> execution and keeps <see cref="FYFY.Family"/> synchronized.
+	///	
+	///	In Unity Inspector it enables:
+	///		<list type="number">
+	///			<item>to set systems into the three contexts (fixedUpdate, update and lateUpdate)</item>
+	///			<item>to define which game object binding on start</item>
+	///			<item>to follow systems load and families content during playing mode</item>
+	///		</list>
 	/// </summary>
 	[ExecuteInEditMode] // permet dexecuter awake et start etc aussi en mode edition
 	[DisallowMultipleComponent]

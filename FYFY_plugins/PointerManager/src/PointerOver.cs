@@ -5,7 +5,7 @@ namespace FYFY_plugins.PointerManager {
 	/// 	Component specifying that the pointer is over the <c>GameObject</c>.
 	/// </summary>
 	/// <remarks>
-	/// 	Automatically added or removed by the relative <see cref="FYFY_plugins.PointerManager.PointerSensitive">component</see>.
+	/// 	Automatically added or removed by <see cref="FYFY_plugins.PointerManager.PointerSensitive" />.
 	/// </remarks>
 	[RequireComponent(typeof(PointerSensitive))]
 	[AddComponentMenu("")]
