@@ -263,7 +263,7 @@ namespace FYFY {
 					if (!fSystemMethodsName.Contains(methodInfo.Name))
 					{
 						ParameterInfo[] parametersInfo = methodInfo.GetParameters();
-						// Unity accept only void functions with only one parameter (int, float, string, bool or UnityEngine.Object), so we don't process non void functions and functions with more than one parameter
+						// Unity accept only void functions with only one parameter (int, float, string, bool, UnityEngine.Object or UnityEngine.EventSystems.BaseEventData), so we don't process non void functions and functions with more than one parameter
 						if (methodInfo.ReturnType == typeof(void) && (
 								parametersInfo.Length == 0 || 
 								(
@@ -272,7 +272,8 @@ namespace FYFY {
 									parametersInfo[0].ParameterType.Equals(typeof(bool)) ||
 									parametersInfo[0].ParameterType.Equals(typeof(float)) ||
 									parametersInfo[0].ParameterType.Equals(typeof(string)) ||
-									typeof(UnityEngine.Object).IsAssignableFrom(parametersInfo[0].ParameterType)
+									typeof(UnityEngine.Object).IsAssignableFrom(parametersInfo[0].ParameterType) ||
+									typeof(UnityEngine.EventSystems.BaseEventData).IsAssignableFrom(parametersInfo[0].ParameterType)
 								)
 							)
 						)
