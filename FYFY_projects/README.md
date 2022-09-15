@@ -3,6 +3,8 @@ CristauxDR contains some codes that illustrate FYFY usage.
 
 Other examples:
 * E-LearningScape: https://github.com/Mocahteam/E-LearningScape
+* Covid-25: https://github.com/Muratet/Covid25
+* SPY: https://github.com/Mocahteam/SPY
 * Some students projects:
 	* http://seriousgames.lip6.fr/Androide/projets1718/AngryNewton/
 	* http://seriousgames.lip6.fr/Androide/projets1718/ForceFields3D/
