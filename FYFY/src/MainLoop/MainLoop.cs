@@ -576,9 +576,11 @@ namespace FYFY {
 
 			// Working on a copy to avoid collection was modified during enumeration
 			HashSet<int> copy = new HashSet<int>(GameObjectManager._modifiedGameObjectIds);
-			foreach(int gameObjectId in copy){
+			foreach(int gameObjectId in copy)
 				FamilyManager.updateAfterGameObjectModified(gameObjectId);
-			}
+			// Call all stacked callbacks
+			FamilyManager.popStackedCallbacks();
+			
 			GameObjectManager._modifiedGameObjectIds.Clear();
 
 			++_familiesUpdateCount;

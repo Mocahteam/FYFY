@@ -26,6 +26,7 @@ namespace FYFY_plugins.PointerManager {
 			// back up frameCount in case of OnEnable will be called in the same frame
 			_frame = Time.frameCount;
 			way_bk = way;
+			way = Way.Undefined;
 			// ask to remove pointerOver if one exists
 			pointerOverExists_bk = removePointerOver();
 		}
@@ -131,7 +132,7 @@ namespace FYFY_plugins.PointerManager {
 				// If so, we don't add this action because it will be queued after unbind and will not be able to proceed (unknown game object).
 				Transform[] parents = this.gameObject.GetComponentsInParent<Transform>(true); // this.gameobject.transform is include
 				if (!GameObjectManager.containActionFor(typeof(UnbindGameObject), parents)){
-					// We don't find an unbind action, then we can add PointerOver component with classic Unity function
+					// We don't find an unbind action, then we can add PointerOver component with FYFY
 					GameObjectManager.addComponent<PointerOver>(this.gameObject, true);
 				}
 			}

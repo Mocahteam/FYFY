@@ -108,10 +108,16 @@ namespace FYFY {
 		/// <summary>
 		/// 	Bind a game object with FYFY. The game object will be registered by FYFY at the beginning of the next update block.
 		/// </summary>
+		/// <param name="gameObject">
+		/// 	The game object to bind.
+		/// </param>
+		/// <param name="recursive">
+		/// 	Should bind child recursively (true default)
+		/// </param>
 		/// <remarks>
 		/// 	In the same frame of binding, you can use it in other <see cref="FYFY.GameObjectManager"/>.
 		/// </remarks>
-		public static void bind(GameObject gameObject) {
+		public static void bind(GameObject gameObject, bool recursive = true) {
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
 			
@@ -119,16 +125,26 @@ namespace FYFY {
 				throw new FYFY.ArgumentNullException(exceptionStackTrace);
 			}
 
-			// Bind the gameobject and all its children.
-			foreach(Transform t in gameObject.GetComponentsInChildren<Transform>(true)) { // gameobject.transform is include
-				_delayedActions.Enqueue(new BindGameObject(t.gameObject, exceptionStackTrace));
-			}
+			if (recursive)
+				// Bind the gameobject and all its children.
+				foreach(Transform t in gameObject.GetComponentsInChildren<Transform>(true)) { // gameobject.transform is include
+					_delayedActions.Enqueue(new BindGameObject(t.gameObject, exceptionStackTrace));
+				}
+			else
+				// Bind only this gameobject
+				_delayedActions.Enqueue(new BindGameObject(gameObject, exceptionStackTrace));
 		}
 
 		/// <summary>
 		/// 	Unbind a game object to FYFY at the beginning of the next update block.
 		/// </summary>
-		public static void unbind(GameObject gameObject){
+		/// <param name="gameObject">
+		/// 	The game object to unbind.
+		/// </param>
+		/// <param name="recursive">
+		/// 	Should unbind child recursively (true default)
+		/// </param>
+		public static void unbind(GameObject gameObject, bool recursive = true){
 			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
 			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
 
@@ -136,10 +152,24 @@ namespace FYFY {
 				throw new FYFY.ArgumentNullException(exceptionStackTrace);
 			}
 			
-			// Unbind the gameobject and all its children.
-			foreach(Transform t in gameObject.GetComponentsInChildren<Transform>(true)) { // gameobject.transform is include
-				_delayedActions.Enqueue(new UnbindGameObject(t.gameObject, exceptionStackTrace));
-			}
+			if (recursive)
+				// Unbind the gameobject and all its children.
+				foreach(Transform t in gameObject.GetComponentsInChildren<Transform>(true)) { // gameobject.transform is include
+					_delayedActions.Enqueue(new UnbindGameObject(t.gameObject, exceptionStackTrace));
+				}
+			else
+				// Unbind only this gameobject
+				_delayedActions.Enqueue(new UnbindGameObject(gameObject, exceptionStackTrace));
+		}
+		
+		/// <summary>
+		/// 	Return true is the gameObject is bound, false else.
+		/// </summary>
+		/// <param name="gameObject">
+		/// 	The game object to check.
+		/// </param>
+		public static bool isBound(GameObject gameObject){
+			return _gameObjectWrappers.ContainsKey(gameObject.GetInstanceID());
 		}
 
 		/// <summary>

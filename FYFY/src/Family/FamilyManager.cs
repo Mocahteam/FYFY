@@ -8,6 +8,22 @@ namespace FYFY {
 		// FamilyDescriptor (ie the ordered aggregation of the descriptions of family's matchers) / Family corresponding
 		internal static readonly Dictionary<string, Family> _families = new Dictionary<string, Family>(); 
 
+		internal struct StackedCallback{
+			public string type; // "entry" or "exit"
+			public Family family;
+			public UnityEngine.GameObject gameObject;
+			public int gameObjectId;
+			public StackedCallback(string type, Family family, UnityEngine.GameObject gameObject, int gameObjectId){
+				this.type = type;
+				this.family = family;
+				this.gameObject = gameObject;
+				this.gameObjectId = gameObjectId;
+			}
+		}
+
+		// The list of callbacks to call
+		internal static List<StackedCallback> stackedCallbacks = new List<StackedCallback>();
+		
 		/// <summary>
 		/// 	Gets the number of families created.
 		/// </summary>
@@ -80,12 +96,12 @@ namespace FYFY {
 					foreach(Family family in FamilyManager._families.Values) {
 						if(family.matches(gameObjectWrapper)) {
 							if(family.Add(gameObjectId, gameObject) && family._entryCallbacks != null) {
-								// execute family's entry callbacks on the GameObject if added
-								family._entryCallbacks(gameObject);
+								// stack a family's entry callbacks on the GameObject if added
+								stackedCallbacks.Add(new StackedCallback("entry", family, gameObject, -1));
 							}
 						} else if(family.Remove(gameObjectId) && family._exitCallbacks != null) {
-							// execute family's exit callbacks on the GameObject if removed
-							family._exitCallbacks(gameObjectId);
+							// stack a family's exit callbacks on the GameObject if removed
+							stackedCallbacks.Add(new StackedCallback("exit", family, null, gameObjectId));
 						}
 					}
 				}
@@ -95,10 +111,21 @@ namespace FYFY {
 		internal static void updateAfterGameObjectUnbinded(int gameObjectId){
 			foreach(Family family in FamilyManager._families.Values) {
 				if (family.Remove(gameObjectId) && family._exitCallbacks != null) {
-					// execute family's exit callbacks on the GameObject if removed
-					family._exitCallbacks(gameObjectId);
+					// stack a family's exit callbacks on the unbinded GameObject
+					stackedCallbacks.Add(new StackedCallback("exit", family, null, gameObjectId));
 				}
 			}
+		}
+		
+		internal static void popStackedCallbacks(){
+			// call all callbacks
+			foreach(StackedCallback sc in stackedCallbacks){
+				if (sc.type == "entry")
+					sc.family._entryCallbacks(sc.gameObject);
+				else if (sc.type == "exit")
+					sc.family._exitCallbacks(sc.gameObjectId);
+			}
+			stackedCallbacks = new List<StackedCallback>();
 		}
 	}
 }
