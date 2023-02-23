@@ -6,9 +6,11 @@ namespace FYFY {
 		private readonly GameObject _gameObject;
 		private readonly object _componentValues;
 		private readonly string _exceptionStackTrace;
+		private readonly int _gameObjectId;
 
 		internal AddComponent(GameObject gameObject, object componentValues, string exceptionStackTrace) {
 			_gameObject = gameObject;
+			_gameObjectId = _gameObject.GetInstanceID();
 			_componentValues = componentValues;
 			_exceptionStackTrace = exceptionStackTrace;
 		}
@@ -19,19 +21,18 @@ namespace FYFY {
 
 		void IGameObjectManagerAction.perform() {
 			if(_gameObject == null) {
-				throw new DestroyedGameObjectException("You try to update a GameObject that will be destroyed during this frame. In a same frame, your must not destroy a GameObject and ask Fyfy to perform an action on it.", _exceptionStackTrace);
+				throw new DestroyedGameObjectException("You try to update a GameObject (id: "+_gameObjectId+") that will be destroyed during this frame. In a same frame, your must not destroy a GameObject and ask Fyfy to perform an action on it.", _exceptionStackTrace);
 			}
 
-			int gameObjectId = _gameObject.GetInstanceID();
-			if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false){
-				throw new UnknownGameObjectException("You try to update a GameObject which is not already binded to FYFY.", _exceptionStackTrace);
+			if(GameObjectManager._gameObjectWrappers.ContainsKey(_gameObjectId) == false){
+				throw new UnknownGameObjectException("You try to update a GameObject from \"" + _gameObject.name + "\" GameObject (id: "+_gameObjectId+") which is not already binded to FYFY.", _exceptionStackTrace);
 			}
 
 			System.Type componentType = typeof(T);
 			// Check if the component added is the first one in the GO of this type, if true update wrapper
 			if (_gameObject.GetComponent<T>() == null) {
-				GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeNames.Add(componentType.FullName);
-				GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
+				GameObjectManager._gameObjectWrappers[_gameObjectId]._componentTypeNames.Add(componentType.FullName);
+				GameObjectManager._modifiedGameObjectIds.Add(_gameObjectId);
 			}
 
 			T component = _gameObject.AddComponent<T>();
@@ -64,9 +65,11 @@ namespace FYFY {
 		private readonly System.Type _componentType;
 		private readonly object _componentValues;
 		private readonly string _exceptionStackTrace;
+		private readonly int _gameObjectId;
 
 		internal AddComponent(GameObject gameObject, System.Type componentType, object componentValues, string exceptionStackTrace) {
 			_gameObject = gameObject;
+			_gameObjectId = _gameObject.GetInstanceID();
 			_componentType = componentType;
 			_componentValues = componentValues;
 			_exceptionStackTrace = exceptionStackTrace;
@@ -79,23 +82,22 @@ namespace FYFY {
 		void IGameObjectManagerAction.perform() {
 			if(_gameObject == null) {
 				if (_exceptionStackTrace != "")
-					throw new DestroyedGameObjectException("You try to update a GameObject that will be destroyed during this frame. In a same frame, your must not destroy a GameObject and ask Fyfy to perform an action on it.", _exceptionStackTrace);
+					throw new DestroyedGameObjectException("You try to update a GameObject (id: "+_gameObjectId+") that will be destroyed during this frame. In a same frame, your must not destroy a GameObject and ask Fyfy to perform an action on it.", _exceptionStackTrace);
 				else
 					return;
 			}
 
-			int gameObjectId = _gameObject.GetInstanceID();
-			if(GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId) == false){
+			if(GameObjectManager._gameObjectWrappers.ContainsKey(_gameObjectId) == false){
 				if (_exceptionStackTrace != "")
-					throw new UnknownGameObjectException("You try to update a GameObject which is not already binded to FYFY.", _exceptionStackTrace);
+					throw new UnknownGameObjectException("You try to update a GameObject \"" + _gameObject.name + "\" GameObject (id: "+_gameObjectId+") which is not already binded to FYFY.", _exceptionStackTrace);
 				else
 					return;
 			}
 
 			// Check if the component added is the first one in the GO of this type, if true update wrapper
 			if (_gameObject.GetComponent(_componentType) == null) {
-				GameObjectManager._gameObjectWrappers[gameObjectId]._componentTypeNames.Add(_componentType.FullName);
-				GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
+				GameObjectManager._gameObjectWrappers[_gameObjectId]._componentTypeNames.Add(_componentType.FullName);
+				GameObjectManager._modifiedGameObjectIds.Add(_gameObjectId);
 			}
 
 			Component component = _gameObject.AddComponent(_componentType);

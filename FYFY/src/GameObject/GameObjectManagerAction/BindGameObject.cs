@@ -6,10 +6,14 @@ namespace FYFY {
 		private readonly GameObject _gameObject;
 		private readonly HashSet<string> _componentTypeNames;
 		private readonly string _exceptionStackTrace;
+		private readonly int _gameObjectId;
+		private readonly bool _recCall;
 
-		internal BindGameObject(GameObject gameObject, string exceptionStackTrace) {
+		internal BindGameObject(GameObject gameObject, string exceptionStackTrace, bool recCall = false) {
 			_gameObject = gameObject;
+			_gameObjectId = _gameObject.GetInstanceID();
 			_componentTypeNames = new HashSet<string>();
+			_recCall = recCall;
 
 			foreach(Component c in gameObject.GetComponents<Component>()) {
 				if (c != null){ // it is possible if a GameObject contains a breaked component (Missing script)
@@ -27,7 +31,7 @@ namespace FYFY {
 
 		void IGameObjectManagerAction.perform(){ // before this call GO is like a ghost for FYFY (not known by families but present into the scene)
 			if(_gameObject == null) { // The GO has been destroyed !!!
-				throw new DestroyedGameObjectException("You try to bind a GameObject that will be destroyed during this frame. In a same frame, your must not destroy a GameObject and ask Fyfy to perform an action on it.", _exceptionStackTrace);
+				throw new DestroyedGameObjectException("You try to bind a GameObject (id: "+_gameObjectId+") that will be destroyed during this frame. In a same frame, your must not destroy a GameObject and ask Fyfy to perform an action on it.", _exceptionStackTrace);
 			}
 
 			int gameObjectId = _gameObject.GetInstanceID();
@@ -38,7 +42,8 @@ namespace FYFY {
 				// Add the bridge if not already added
 				if (!_gameObject.GetComponent<FyfyBridge>())
 					_gameObject.AddComponent<FyfyBridge>();
-			} else
+			}
+			else if (!_recCall) // throw exception only for non recursive call
 				throw new FyfyException("A game object can be binded to Fyfy only once. The game object \""+_gameObject.name+"\" (instance id:"+gameObjectId+") is already binded.", _exceptionStackTrace);
 		}
 	}

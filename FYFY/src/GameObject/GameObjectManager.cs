@@ -128,7 +128,7 @@ namespace FYFY {
 			if (recursive)
 				// Bind the gameobject and all its children.
 				foreach(Transform t in gameObject.GetComponentsInChildren<Transform>(true)) { // gameobject.transform is include
-					_delayedActions.Enqueue(new BindGameObject(t.gameObject, exceptionStackTrace));
+					_delayedActions.Enqueue(new BindGameObject(t.gameObject, exceptionStackTrace, t != gameObject.transform));
 				}
 			else
 				// Bind only this gameobject
@@ -155,7 +155,7 @@ namespace FYFY {
 			if (recursive)
 				// Unbind the gameobject and all its children.
 				foreach(Transform t in gameObject.GetComponentsInChildren<Transform>(true)) { // gameobject.transform is include
-					_delayedActions.Enqueue(new UnbindGameObject(t.gameObject, exceptionStackTrace));
+					_delayedActions.Enqueue(new UnbindGameObject(t.gameObject, exceptionStackTrace, t != gameObject.transform));
 				}
 			else
 				// Unbind only this gameobject
@@ -163,7 +163,7 @@ namespace FYFY {
 		}
 		
 		/// <summary>
-		/// 	Return true is the gameObject is bound, false else.
+		/// 	Return true if the gameObject is bound, false else.
 		/// </summary>
 		/// <param name="gameObject">
 		/// 	The game object to check.
