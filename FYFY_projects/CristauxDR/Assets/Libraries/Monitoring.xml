@@ -374,7 +374,7 @@
         <member name="F:FYFY_plugins.Monitoring.MonitoringManager.Source.PLAYER">
             <summary></summary>
         </member>
-        <member name="T:ReadOnlyAttribute">
+        <member name="T:FYFY_plugins.Monitoring.ReadOnlyAttribute">
             <summary>
             	Add [ReadOnly] meta tag to avoid to modify property in Inspector
             </summary>

@@ -17,7 +17,6 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
     <StopOnFirstFailure>true</StopOnFirstFailure>
-	<DefineConstants>NET3_5</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
     <NoConfig>true</NoConfig>

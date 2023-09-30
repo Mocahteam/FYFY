@@ -486,17 +486,19 @@ namespace FYFY_plugins.Monitoring{
 			availableFamilies = new List<FamilyAssociation>();
 			
 			// Load all FSystem included into assembly
-#if NET3_5
-			System.Type[] systemTypes = (from assembly in System.AppDomain.CurrentDomain.GetAssemblies()
-#else
-			System.Type[] systemTypes = (from assembly in System.AppDomain.CurrentDomain.GetAssemblies().Where(p => !p.IsDynamic)
-#endif
-				from type in assembly.GetExportedTypes()
-				where (type.IsClass == true && type.IsAbstract == false && type.IsSubclassOf(typeof(FSystem)) == true)
-				select type).ToArray();
+			List<System.Type> systemTypes = new List<System.Type>();
+			System.Reflection.Assembly[] assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
+			foreach (System.Reflection.Assembly assembly in assemblies)
+				if (!assembly.IsDynamic)
+				{
+					System.Type[] types = assembly.GetExportedTypes();
+					foreach (System.Type type in types)
+						if (type.IsClass == true && type.IsAbstract == false && type.IsSubclassOf(typeof(FSystem)) == true)
+							systemTypes.Add(type);
+				}
+				
             // Parse all FSystems
-            for (int i = 0; i < systemTypes.Length; ++i) {
-				System.Type systemType = systemTypes [i];
+            foreach (System.Type systemType in systemTypes) {
 				try{
 
 					// Create instance of FSystem in order to know its Families types

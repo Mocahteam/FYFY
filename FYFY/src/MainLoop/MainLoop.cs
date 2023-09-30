@@ -219,15 +219,31 @@ namespace FYFY {
 			{
 				// Get current system Type
 				Type systemType = Type.GetType(systemDesc._typeAssemblyQualifiedName);
+				if (systemType == null){
+					UnityEngine.Debug.LogError("No class found for "+systemDesc._typeFullName+" system, you should remove it from the MainLoop.");
+					continue;
+				}
 				allSystemsName.Add(systemType.FullName);
 				
-				string compilableName = systemType.FullName.Replace('.', '_'); // class name can't contains '.' character and it could be the case for systems included inside libraries
-
+				List<string> subs = new List<string>(systemType.FullName.Split('.'));
+				string className = subs[subs.Count-1]; // the class name is the last
+				subs.RemoveAt(subs.Count-1);
+				string namespaceName = String.Join(".", subs); // the namespace name are the firsts
+				
+				string fileName = systemType.FullName.Replace('.', '_'); // file name should not contains '.' character and it would be the case for systems using namespace
+				
 				string cSharpCode = "using UnityEngine;\n";
 				cSharpCode += "using FYFY;\n\n";
 				
-				cSharpCode += "public class " + compilableName + "_wrapper : BaseWrapper\n";
-				cSharpCode += "{\n"; 
+				string tab = "";
+				if (namespaceName != null && namespaceName != ""){
+					cSharpCode += "namespace "+namespaceName+"\n";
+					cSharpCode += "{\n";
+					tab = "\t";
+				}
+				
+				cSharpCode += tab+"public class " + className + "_wrapper : BaseWrapper\n";
+				cSharpCode += tab+"{\n"; 
 				
 				// create mirror fields
 				FieldInfo[] fieldsInfo = systemType.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
@@ -236,13 +252,13 @@ namespace FYFY {
 					if (isSerializableType(fieldInfo.FieldType) ||
 							(fieldInfo.FieldType.IsArray && isSerializableType(fieldInfo.FieldType.GetElementType())) ||
 							(fieldInfo.FieldType.IsGenericType && fieldInfo.FieldType.GetGenericTypeDefinition() == typeof(List<>) && isSerializableType(fieldInfo.FieldType.GetGenericArguments()[0]))){
-						cSharpCode += "\tpublic " + getFormatedType(fieldInfo.FieldType) + " " + fieldInfo.Name + ";\n";
+						cSharpCode += tab+"\tpublic " + getFormatedType(fieldInfo.FieldType) + " " + fieldInfo.Name + ";\n";
 					}
 				}
 				
-				cSharpCode += "\tprivate void Start()\n";
-				cSharpCode += "\t{\n";
-				cSharpCode += "\t\tthis.hideFlags = HideFlags.NotEditable;\n";
+				cSharpCode += tab+"\tprivate void Start()\n";
+				cSharpCode += tab+"\t{\n";
+				cSharpCode += tab+"\t\tthis.hideFlags = HideFlags.NotEditable;\n";
 				
 				// Load all attributes of this System
 				foreach (FieldInfo fieldInfo in fieldsInfo)
@@ -250,10 +266,10 @@ namespace FYFY {
 					if (isSerializableType(fieldInfo.FieldType) ||
 							(fieldInfo.FieldType.IsArray && isSerializableType(fieldInfo.FieldType.GetElementType())) ||
 							(fieldInfo.FieldType.IsGenericType && fieldInfo.FieldType.GetGenericTypeDefinition() == typeof(List<>) && isSerializableType(fieldInfo.FieldType.GetGenericArguments()[0])))
-						cSharpCode += "\t\tMainLoop.initAppropriateSystemField (system, \"" + fieldInfo.Name + "\", " + fieldInfo.Name + ");\n";
+						cSharpCode += tab+"\t\tMainLoop.initAppropriateSystemField (system, \"" + fieldInfo.Name + "\", " + fieldInfo.Name + ");\n";
 				}
 				
-				cSharpCode += "\t}\n\n";
+				cSharpCode += tab+"\t}\n\n";
 
 				// Load all methods of this System
 				MethodInfo[] methodsInfo = systemType.GetMethods();
@@ -268,54 +284,56 @@ namespace FYFY {
 								parametersInfo.Length == 0 || 
 								(
 									parametersInfo.Length == 1 &&
-									parametersInfo[0].ParameterType.Equals(typeof(int)) ||
+									(parametersInfo[0].ParameterType.Equals(typeof(int)) ||
 									parametersInfo[0].ParameterType.Equals(typeof(bool)) ||
 									parametersInfo[0].ParameterType.Equals(typeof(float)) ||
 									parametersInfo[0].ParameterType.Equals(typeof(string)) ||
 									typeof(UnityEngine.Object).IsAssignableFrom(parametersInfo[0].ParameterType) ||
-									typeof(UnityEngine.EventSystems.BaseEventData).IsAssignableFrom(parametersInfo[0].ParameterType)
+									typeof(UnityEngine.EventSystems.BaseEventData).IsAssignableFrom(parametersInfo[0].ParameterType))
 								)
 							)
 						)
 						{
-							cSharpCode += "\tpublic void " + methodInfo.Name + "(";
+							cSharpCode += tab+"\tpublic void " + methodInfo.Name + "(";
 							// Store the optional parameter
 							List<Type> parametersType = new List<Type>();
 							if (parametersInfo.Length == 1)
 								cSharpCode += parametersInfo[0].ParameterType + " " + parametersInfo[0].Name;
 							cSharpCode += ")\n";
-							cSharpCode += "\t{\n";
-							cSharpCode += "\t\tMainLoop.callAppropriateSystemMethod (system, \"" + methodInfo.Name + "\", " + (parametersInfo.Length == 1 ? parametersInfo[0].Name : "null") + ");\n";
-							cSharpCode += "\t}\n\n";
+							cSharpCode += tab+"\t{\n";
+							cSharpCode += tab+"\t\tMainLoop.callAppropriateSystemMethod (system, \"" + methodInfo.Name + "\", " + (parametersInfo.Length == 1 ? parametersInfo[0].Name : "null") + ");\n";
+							cSharpCode += tab+"\t}\n\n";
 						}
 					}
 				}
-				cSharpCode += "}\n";
+				cSharpCode += tab+"}\n";
+				
+				if (namespaceName != null && namespaceName != "")
+					cSharpCode += "}\n";
 				
 				// Write .cs file inside _outputWrappers directory
 				Directory.CreateDirectory(_outputWrappers);
-				if (File.Exists(_outputWrappers + "/" + compilableName + "_wrapper.cs"))
+				if (File.Exists(_outputWrappers + "/" + fileName + "_wrapper.cs"))
 				{
-					if (cSharpCode != File.ReadAllText(_outputWrappers + "/" + compilableName + "_wrapper.cs"))
+					if (cSharpCode != File.ReadAllText(_outputWrappers + "/" + fileName + "_wrapper.cs"))
 					{
 						needRefresh = true;
-						File.WriteAllText(_outputWrappers + "/" + compilableName + "_wrapper.cs", cSharpCode);
+						File.WriteAllText(_outputWrappers + "/" + fileName + "_wrapper.cs", cSharpCode);
 					}
 				}
 				else
 				{
 					needRefresh = true;
-					File.WriteAllText(_outputWrappers + "/" + compilableName + "_wrapper.cs", cSharpCode);
+					File.WriteAllText(_outputWrappers + "/" + fileName + "_wrapper.cs", cSharpCode);
 				}
 			}
 
 			if (!needRefresh){
 				// Add components to the MainLoop for each system registered
 				foreach (string systemName in allSystemsName){
-					string compilableName = systemName.Replace('.', '_'); // class name can't contains '.' character and it could be the case for systems included inside libraries
-					if (gameObject.GetComponent(compilableName + "_wrapper") == null){
+					if (gameObject.GetComponent(systemName + "_wrapper") == null){
 						// the ", Assembly-CSharp" enable to find the type that is not included into FYFY namespace (indead it is user type defined inside Unity project)
-						gameObject.AddComponent(Type.GetType(compilableName + "_wrapper, Assembly-CSharp")); // Because we are in editmode, we don't use GameObjectManager
+						gameObject.AddComponent(Type.GetType(systemName + "_wrapper, Assembly-CSharp")); // Because we are in editmode, we don't use GameObjectManager
 					}
 				}
 			}
@@ -331,7 +349,7 @@ namespace FYFY {
 					{
 						bool found = false;
 						for (int i = 0; i < allSystemsName.Count && !found; i++)
-							found = (componentType.FullName == (allSystemsName[i].Replace('.', '_') + "_wrapper"));
+							found = (componentType.FullName == allSystemsName[i] + "_wrapper");
 						if (!found){
 							DestroyImmediate(currentComponent);  // Because we are in editmode, we don't use GameObjectManager
 						}
@@ -439,8 +457,7 @@ namespace FYFY {
 					if(system != null) {
 						FSystemManager._fixedUpdateSystems.Add(system);
 						// set reference of this system in its wrapper
-						string compilableName = systemDescription._typeFullName.Replace('.', '_');
-						Component wrapper = gameObject.GetComponent(compilableName + "_wrapper");
+						Component wrapper = gameObject.GetComponent(systemDescription._typeFullName + "_wrapper");
 						if (wrapper != null){
 							(wrapper as BaseWrapper).system = system;
 						}
@@ -459,8 +476,7 @@ namespace FYFY {
 					if(system != null) {
 						FSystemManager._updateSystems.Add(system);
 						// set reference of this system in its wrapper
-						string compilableName = systemDescription._typeFullName.Replace('.', '_');
-						Component wrapper = gameObject.GetComponent(compilableName + "_wrapper");
+						Component wrapper = gameObject.GetComponent(systemDescription._typeFullName + "_wrapper");
 						if (wrapper != null){
 							(wrapper as BaseWrapper).system = system;
 						}
@@ -479,8 +495,7 @@ namespace FYFY {
 					if(system != null) {
 						FSystemManager._lateUpdateSystems.Add(system);
 						// set reference of this system in its wrapper
-						string compilableName = systemDescription._typeFullName.Replace('.', '_');
-						Component wrapper = gameObject.GetComponent(compilableName + "_wrapper");
+						Component wrapper = gameObject.GetComponent(systemDescription._typeFullName + "_wrapper");
 						if (wrapper != null){
 							(wrapper as BaseWrapper).system = system;
 						}

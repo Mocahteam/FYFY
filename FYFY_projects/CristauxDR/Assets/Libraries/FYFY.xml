@@ -132,7 +132,7 @@
             	<para>The family state is the same for each system in a same block of update.</para>
             	<para>
             		The family works only with the <c>GameObjects</c> known by <c>FYFY</c> 
-            		(see <see cref="M:FYFY.GameObjectManager.bind(UnityEngine.GameObject)"/>).
+            		(see <see cref="M:FYFY.GameObjectManager.bind(UnityEngine.GameObject,System.Boolean)"/>).
             	</para>
             </remarks>
         </member>
@@ -237,7 +237,7 @@
             <remarks>
             	<para>
             		A <c>Family</c> is a container of <c>GameObjects</c> which respect constraints specified by
-            		<see cref="T:FYFY.Matcher"/>. Only <c>GameObjects</c> <see cref="M:FYFY.GameObjectManager.bind(UnityEngine.GameObject)">binded</see> to FYFY are available in families.
+            		<see cref="T:FYFY.Matcher"/>. Only <c>GameObjects</c> <see cref="M:FYFY.GameObjectManager.bind(UnityEngine.GameObject,System.Boolean)">binded</see> to FYFY are available in families.
             	</para>
             	<para>
             		This is the only way to get family reference. 
@@ -398,18 +398,38 @@
             	The game object to configure.
             </param>
         </member>
-        <member name="M:FYFY.GameObjectManager.bind(UnityEngine.GameObject)">
+        <member name="M:FYFY.GameObjectManager.bind(UnityEngine.GameObject,System.Boolean)">
             <summary>
             	Bind a game object with FYFY. The game object will be registered by FYFY at the beginning of the next update block.
             </summary>
+            <param name="gameObject">
+            	The game object to bind.
+            </param>
+            <param name="recursive">
+            	Should bind child recursively (true default)
+            </param>
             <remarks>
             	In the same frame of binding, you can use it in other <see cref="T:FYFY.GameObjectManager"/>.
             </remarks>
         </member>
-        <member name="M:FYFY.GameObjectManager.unbind(UnityEngine.GameObject)">
+        <member name="M:FYFY.GameObjectManager.unbind(UnityEngine.GameObject,System.Boolean)">
             <summary>
             	Unbind a game object to FYFY at the beginning of the next update block.
             </summary>
+            <param name="gameObject">
+            	The game object to unbind.
+            </param>
+            <param name="recursive">
+            	Should unbind child recursively (true default)
+            </param>
+        </member>
+        <member name="M:FYFY.GameObjectManager.isBound(UnityEngine.GameObject)">
+            <summary>
+            	Return true if the gameObject is bound, false else.
+            </summary>
+            <param name="gameObject">
+            	The game object to check.
+            </param>
         </member>
         <member name="M:FYFY.GameObjectManager.setGameObjectState(UnityEngine.GameObject,System.Boolean)">
             <summary>

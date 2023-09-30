@@ -1,5 +1,5 @@
 # FYFY examples #
-CristauxDR contains some codes that illustrate FYFY usage.
+CristauxDR and Defenses_immunitaires are two example projects that illustrate FYFY usage.
 
 Other examples:
 * E-LearningScape: https://github.com/Mocahteam/E-LearningScape

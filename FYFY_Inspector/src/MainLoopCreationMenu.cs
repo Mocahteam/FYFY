@@ -21,7 +21,7 @@ namespace FYFY_Inspector {
 			Undo.RegisterCreatedObjectUndo(mainLoop, "Create MainLoop");
 		}
 
-		[MenuItem("FYFY/Create Main Loop %m", true)]
+		[MenuItem("Tools/FYFY/Create Main Loop %m", true)]
 		private static bool activeMenu() {
 			return Object.FindObjectOfType<FYFY.MainLoop>() == null && !Application.isPlaying;
 		}

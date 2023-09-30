@@ -116,18 +116,21 @@ namespace FYFY_Inspector {
 				string fullTypeName = _lateUpdateSystemDescriptions.GetArrayElementAtIndex(i).FindPropertyRelative("_typeFullName").stringValue;
 				selectedSystemTypeNames.Add(fullTypeName);
 			}
-#if NET3_5
-			System.Type[] systemTypes = (from assembly in System.AppDomain.CurrentDomain.GetAssemblies() // impossible de le mettre autre part car peut pas garantir que ca na pas change
-#else
-			System.Type[] systemTypes = (from assembly in System.AppDomain.CurrentDomain.GetAssemblies().Where(p => !p.IsDynamic) // impossible de le mettre autre part car peut pas garantir que ca na pas change
-#endif
-				from type in assembly.GetExportedTypes()
-				where (type.IsClass == true && type.IsAbstract == false && type.IsSubclassOf(typeof(FSystem)) == true)
-				select type).ToArray();
+			
+			// Load all FSystem included into assembly
+			List<System.Type> systemTypes = new List<System.Type>();
+			System.Reflection.Assembly[] assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
+			foreach (System.Reflection.Assembly assembly in assemblies)
+				if (!assembly.IsDynamic)
+				{
+					System.Type[] types = assembly.GetExportedTypes();
+					foreach (System.Type type in types)
+						if (type.IsClass == true && type.IsAbstract == false && type.IsSubclassOf(typeof(FSystem)) == true)
+							systemTypes.Add(type);
+				}
 			
 			GenericMenu menu = new GenericMenu();
-			for (int i = 0; i < systemTypes.Length; ++i) {
-				System.Type systemType = systemTypes[i];
+			foreach (System.Type systemType in systemTypes) {
 				string typeAssemblyName = systemType.Assembly.GetName ().Name;
 				string typeName = systemType.FullName;
 				string buttonText = (typeAssemblyName != "Assembly-CSharp") ? (typeAssemblyName + "/" + typeName) : typeName;
