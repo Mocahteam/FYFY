@@ -6,15 +6,15 @@ using System.Collections.Generic;
 
 namespace FYFY_plugins.PointerManager {
 	/// <summary>
-	/// 	Component allowing <c>GameObject</c> to be sensitive to the pointer.
-	/// 	Add automatically a <see cref="FYFY_plugins.PointerManager.PointerOver"/> when the pointer points the <c>GameObject</c>.
+	/// 	Component allowing <c>GameObject</c> to be sensitive to the pointer or keyboard selection.
+	/// 	Add automatically a <see cref="FYFY_plugins.PointerManager.PointerOver"/> when the pointer points the <c>GameObject</c> or when the <c>GameObject</c> is selected by keyboard navigation.
 	/// </summary>
 
 	// Overlay of the Unity Pointer System.
 	// It's a tricky component with non FYFY conventional design.
 	// It uses Unity logic inside so it can't be considered like a real FYFY component.
 	[DisallowMultipleComponent]
-	public class PointerSensitive : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
+	public class PointerSensitive : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, ISelectHandler, IDeselectHandler {
 		
 		private int _frame = -1;
 		private enum Way {PointerEnter, MouseEnter, Undefined}
@@ -80,6 +80,33 @@ namespace FYFY_plugins.PointerManager {
 			}
 		}
 		
+		
+		////////////////////////////////////////////////////
+		// On(De)Select is useful for keyboard navigation //
+		////////////////////////////////////////////////////
+		/// <summary>
+		///		Called when the GameObject is Selected.
+		/// 	Callback automatically called by Unity.
+		/// </summary>
+		public void OnSelect(BaseEventData eventData)
+		{
+			if (this.isActiveAndEnabled && way == Way.Undefined){
+				way = Way.PointerEnter;
+				addPointerOver();
+			}
+		}
+		/// <summary>
+		///		Called when the GameObject is Deselected.
+		/// 	Callback automatically called by Unity.
+		/// </summary>
+		public void OnDeselect(BaseEventData eventData)
+		{
+			if (this.isActiveAndEnabled && way == Way.PointerEnter){
+				way = Way.Undefined;
+				removePointerOver();
+			}
+		}
+		
 		///////////////////////////////////////////////////////
 		// OnMouseEnter/Exit is useful with collider and GUI //
 		///////////////////////////////////////////////////////
@@ -108,8 +135,8 @@ namespace FYFY_plugins.PointerManager {
 				// If not, we have to use FYFY to remove PointerOver in order to keep families synchronized.
 				// If so, we can't use FYFY because "remove" action will be queued after unbind and will not be able to proceed (unknown game object). Then we have to remove PointerOver component thanks to classic Unity function.
 				Transform[] parents = this.gameObject.GetComponentsInParent<Transform>(true); // this.gameobject.transform is include
-				if (GameObjectManager.containActionFor(typeof(UnbindGameObject), parents)){
-					// We find an unbind action, then we remove PointerOver component with classic Unity function
+				if (GameObjectManager.containActionFor(typeof(UnbindGameObject), parents) || !GameObjectManager.isBound(this.gameObject)){
+					// We find an unbind action or this gameobject is not bound to Fyfy, then we remove PointerOver component with classic Unity function
 					PointerOver component = GetComponent<PointerOver>();
 					if (component != null)
 						Object.Destroy(component);
@@ -132,8 +159,13 @@ namespace FYFY_plugins.PointerManager {
 				// If so, we don't add this action because it will be queued after unbind and will not be able to proceed (unknown game object).
 				Transform[] parents = this.gameObject.GetComponentsInParent<Transform>(true); // this.gameobject.transform is include
 				if (!GameObjectManager.containActionFor(typeof(UnbindGameObject), parents)){
-					// We don't find an unbind action, then we can add PointerOver component with FYFY
-					GameObjectManager.addComponent<PointerOver>(this.gameObject, true);
+					// We don't find an unbind action, then we can add PointerOver component
+					if (GameObjectManager.isBound(this.gameObject))
+						// this gameobject is bound, then we add PointerOver with FYFY
+						GameObjectManager.addComponent<PointerOver>(this.gameObject, true);
+					else
+						// this gameobject is not bound, then we add PointerOver with classic Unity functions
+						this.gameObject.AddComponent<PointerOver>();
 				}
 			}
 		}
