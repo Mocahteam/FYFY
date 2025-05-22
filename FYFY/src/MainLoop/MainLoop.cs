@@ -92,7 +92,13 @@ namespace FYFY {
 		public float lateUpdateStats = 0;
 		private Stopwatch _stopwatch;
 
-		private int _familiesUpdateCount = 0;
+				private int _familiesUpdateCount = 0;
+		/// <summary>The total families update since the start of the game (Read Only). This value starts at 0 and increases by 1 on each Fyfy update phase.</summary>
+		public int familiesUpdateCount{
+			get {
+				return _familiesUpdateCount;
+			}
+		}
 		
 		/// <summary>Directory to store wrapper to system's public functions</summary>
 		public string _outputWrappers = "Assets/AutomaticScript";
