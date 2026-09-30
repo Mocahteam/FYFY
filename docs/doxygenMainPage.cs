@@ -9,20 +9,20 @@
  * 
  * The mains entry points to FYFY are:
  * <list>
- * 		<item><see cref="FYFY.FSystem"/> the base class to create your <see cref="FYFY.FSystem">systems</see></item>
- * 		<item><see cref="FYFY.Family"/> the mechanism to access similar <c>GameObjects</c> in your <see cref="FYFY.FSystem">systems</see></item>
- * 		<item><see cref="FYFY.FamilyManager"/> the tool te create your <see cref="FYFY.Family">families</see></item>
- * 		<item><see cref="FYFY.Matcher"/> a set of constraint to create your <see cref="FYFY.Family">families</see> with the <see cref="FYFY.FamilyManager">FamilyManager</see></item>
- * 		<item><see cref="FYFY.GameObjectManager"/> the tool to manage your <c>GameObjects</c></item>
+ * 		<item>\ref FYFY.FSystem the base class to create your <see cref="FYFY.FSystem">systems</see></item>
+ * 		<item>\ref FYFY.Family the mechanism to access similar <c>GameObjects</c> in your <see cref="FYFY.FSystem">systems</see></item>
+ * 		<item>\ref FYFY.FamilyManager the tool te create your <see cref="FYFY.Family">families</see></item>
+ * 		<item>\ref FYFY.Matcher a set of constraint to create your <see cref="FYFY.Family">families</see> with the <see cref="FYFY.FamilyManager">FamilyManager</see></item>
+ * 		<item>\ref FYFY.GameObjectManager the tool to manage your <c>GameObjects</c></item>
  * </list>
  *
  * \section pluggin_sec Pluggins
  *
  * <list>
- * 		<item>The PointerManager: <see cref="FYFY_plugins.PointerManager.PointerSensitive" /></item>
- * 		<item>The TriggerManager: for 2D <see cref="FYFY_plugins.TriggerManager.TriggerSensitive2D" /> and 3D <see cref="FYFY_plugins.TriggerManager.TriggerSensitive3D" /></item>
- * 		<item>The CollisionManager: for 2D <see cref="FYFY_plugins.CollisionManager.CollisionSensitive2D" /> and 3D <see cref="FYFY_plugins.CollisionManager.CollisionSensitive3D" /></item>
- * 		<item>The MonitoringManager: <see cref="FYFY_plugins.Monitoring.MonitoringManager" /></item>
+ * 		<item>The PointerManager: \ref FYFY_plugins.PointerManager.PointerSensitive</item>
+ * 		<item>The TriggerManager: for 2D \ref FYFY_plugins.TriggerManager.TriggerSensitive2D and 3D \ref FYFY_plugins.TriggerManager.TriggerSensitive3D</item>
+ * 		<item>The CollisionManager: for 2D \ref FYFY_plugins.CollisionManager.CollisionSensitive2D and 3D \ref FYFY_plugins.CollisionManager.CollisionSensitive3D</item>
+ * 		<item>The MonitoringManager: \ref FYFY_plugins.Monitoring.MonitoringManager</item>
  * </list>
  *
  */

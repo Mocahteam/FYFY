@@ -65,10 +65,9 @@ namespace FYFY {
         }
 
         /// <summary>
-        /// 	Function called when this <see cref="FYFY.FSystem"/> was destoyed.
+        /// 	Function called when this <see cref="FYFY.FSystem"/> was destroyed.
         /// </summary>
-        protected virtual void onDestroy()
-        {
+        protected virtual void onDestroy(){
         }
 
         internal void destroy()
