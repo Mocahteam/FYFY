@@ -1,6 +1,6 @@
 # <img src="docs/Logo/Logo FYFY gris.png" alt="FYFY logo" width="50"/> - FamilY For unitY #
 
-FYFY is an Entity Component System (ECS) made for Unity. ECS software architecture is interesting for two main reasons: optimization and modularity. See [API documentation](https://webia.lip6.fr/~muratetm/docFYFY/) for details.
+FYFY is an Entity Component System (ECS) made for Unity. ECS software architecture is interesting for two main reasons: optimization and modularity. See [API documentation](https://muratetm.perso.lip6.fr/docFYFY/) for details.
 
 ## What FYFY is? ##
 
