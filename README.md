@@ -66,6 +66,10 @@ public class FYFYSystemExemple : FSystem {
     // Use this to init system before the first onProcess call
     protected override void onStart() {
     }
+    
+    // Use this to clean your system
+    protected override void onDestroy() {
+    }
 
     // Use this to update member variables when system pause. 
     protected override void onPause(int currentFrame) {

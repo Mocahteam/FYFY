@@ -56,20 +56,33 @@ namespace FYFY {
 		/// 	Function called when this <see cref="FYFY.FSystem"/> started. All families are populated and can be parsed.
 		/// </summary>
 		protected virtual void onStart(){
-		}
-		
-		internal void start() {
-			this.onStart();
-			started = true;
-		}
-		
-		/// <summary>
-		/// 	Function called when this <see cref="FYFY.FSystem"/> paused.
-		/// </summary>
-		/// <param name="currentFrame">
-		/// 	The <c>Unity</c> frame number when this function is called.
-		/// </param>
-		protected virtual void onPause(int currentFrame){
+        }
+
+        internal void start()
+        {
+            this.onStart();
+            started = true;
+        }
+
+        /// <summary>
+        /// 	Function called when this <see cref="FYFY.FSystem"/> was destoyed.
+        /// </summary>
+        protected virtual void onDestroy()
+        {
+        }
+
+        internal void destroy()
+        {
+            this.onDestroy();
+        }
+
+        /// <summary>
+        /// 	Function called when this <see cref="FYFY.FSystem"/> paused.
+        /// </summary>
+        /// <param name="currentFrame">
+        /// 	The <c>Unity</c> frame number when this function is called.
+        /// </param>
+        protected virtual void onPause(int currentFrame){
 		}
 		/// <summary>
 		/// 	Function called when this <see cref="FYFY.FSystem"/> resumed.

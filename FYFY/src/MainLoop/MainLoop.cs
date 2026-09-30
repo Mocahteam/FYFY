@@ -367,7 +367,37 @@ namespace FYFY {
 		}
 
 		private void OnDestroy(){
-			if(instance == this)
+
+            // Call all systems onDestroy
+            foreach (FSystem system in FSystemManager._fixedUpdateSystems)
+                try
+                {
+                    system.destroy();
+                }
+                catch (System.Exception e)
+                {
+                    UnityEngine.Debug.LogException(e);
+                }
+            foreach (FSystem system in FSystemManager._updateSystems)
+                try
+                {
+                    system.destroy();
+                }
+                catch (System.Exception e)
+                {
+                    UnityEngine.Debug.LogException(e);
+                }
+            foreach (FSystem system in FSystemManager._lateUpdateSystems)
+                try
+                {
+                    system.destroy();
+                }
+                catch (System.Exception e)
+                {
+                    UnityEngine.Debug.LogException(e);
+                }
+
+            if (instance == this)
 				instance = null;
 		}
 
