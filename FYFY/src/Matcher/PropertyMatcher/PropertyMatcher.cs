@@ -55,7 +55,7 @@
 		protected bool hasProperty(UnityEngine.GameObject gameObject, PROPERTY property) {
 			switch(property) {
 				case PROPERTY.ACTIVE_SELF:
-					return gameObject.activeSelf == true;
+					return gameObject.activeSelf;
 				case PROPERTY.ACTIVE_IN_HIERARCHY:
 					return gameObject.activeInHierarchy;
 				case PROPERTY.HAS_PARENT:

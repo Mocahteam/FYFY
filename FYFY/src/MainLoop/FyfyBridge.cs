@@ -7,10 +7,6 @@ namespace FYFY {
 	[DisallowMultipleComponent]
 	[AddComponentMenu("")]
 	public class FyfyBridge : MonoBehaviour {
-		private void Start () {
-			this.hideFlags = HideFlags.HideInInspector; // Hide this component in Inspector
-		}
-		
 		private void OnEnable(){
 			GameObjectManager.refresh(this.gameObject);
 		}

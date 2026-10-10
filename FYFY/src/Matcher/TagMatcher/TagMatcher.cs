@@ -17,13 +17,14 @@ namespace FYFY {
 			
 			System.Array.Sort(tags);
 
+			if (tags[0] == null) 
+				throw new System.ArgumentNullException("One of the tags is null");
+
 			System.Text.StringBuilder descriptor = new System.Text.StringBuilder(this.GetType() + ":" + tags[0]);
 			for(int i = 1; i < tags.Length; ++i) {
 				string tag = tags[i];
-				if (tag == null) {
+				if (tag == null)
 					throw new System.ArgumentNullException("One of the tags is null");
-				}
-
 				descriptor.AppendFormat("/{0}", tag);
 			}
 

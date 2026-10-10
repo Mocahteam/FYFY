@@ -47,7 +47,7 @@ namespace FYFY {
 				
 				_gameObject.transform.SetParent(_parent.transform, _worldPositionStays);
 			} else {
-				_gameObject.transform.parent = null;
+				_gameObject.transform.SetParent(null, _worldPositionStays);
 			}
 		}
 	}

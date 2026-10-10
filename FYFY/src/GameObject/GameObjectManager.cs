@@ -268,6 +268,15 @@ namespace FYFY {
 
 			_delayedActions.Enqueue(new AddComponent<T>(gameObject, componentValues, exceptionStackTrace));
 		}
+		
+		// compute the set of component type names of a gameobject
+		internal static HashSet<string> computeComponentTypeNames(GameObject go){
+			HashSet<string> names = new HashSet<string>();
+			foreach (Component c in go.GetComponents<Component>())
+				if (c != null) // it is possible if a GameObject contains a breaked component (Missing script)
+					names.Add(c.GetType().FullName);
+			return names;
+		}
 
 		/// <summary>
 		/// 	Adds a component to the game object at the beginning of the next update block.
@@ -354,25 +363,16 @@ namespace FYFY {
 		/// 	Force FYFY to refresh families for this GameObject at the beginning of the next update block.
 		/// </summary>
 		public static void refresh(GameObject gameObject){
-			System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true);                                  // get caller stackFrame with informations
-			string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
-
 			if(gameObject == null) {
+				System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame(1, true); // get caller stackFrame with informations
+				string exceptionStackTrace = "(at " + stackFrame.GetFileName() + ":" + stackFrame.GetFileLineNumber().ToString() + ")"; // to point where this function was called
 				throw new FYFY.ArgumentNullException(exceptionStackTrace);
 			}
 			
 			// Check if gameObject is binded to FYFY
 			if (_gameObjectWrappers.ContainsKey(gameObject.GetInstanceID())){
 				// rebuild wrappers
-				HashSet<string> componentTypeNames = new HashSet<string>();
-				foreach(Component c in gameObject.GetComponents<Component>()) {
-					if (c != null){ // it is possible if a GameObject contains a breaked component (Missing script)
-						System.Type type = c.GetType();
-						componentTypeNames.Add(type.FullName);
-					}
-				}
-				_gameObjectWrappers[gameObject.GetInstanceID()] = new GameObjectWrapper(gameObject, componentTypeNames);
-
+				_gameObjectWrappers[gameObject.GetInstanceID()] = new GameObjectWrapper(gameObject, computeComponentTypeNames(gameObject));
 				_modifiedGameObjectIds.Add(gameObject.GetInstanceID());
 			}
 		}

@@ -118,14 +118,23 @@ namespace FYFY {
 		}
 		
 		internal static void popStackedCallbacks(){
-			// call all callbacks
-			foreach(StackedCallback sc in stackedCallbacks){
-				if (sc.type == "entry")
-					sc.family._entryCallbacks(sc.gameObject);
-				else if (sc.type == "exit")
-					sc.family._exitCallbacks(sc.gameObjectId);
-			}
+			// Detach the list before calling anything
+			List<StackedCallback> toCall = stackedCallbacks;
 			stackedCallbacks = new List<StackedCallback>();
+
+			foreach (StackedCallback sc in toCall){
+				if (sc.type == "entry" && sc.family._entryCallbacks != null){
+					foreach (Family.EntryCallback cb in sc.family._entryCallbacks.GetInvocationList()){
+						try { cb(sc.gameObject); }
+						catch (System.Exception e) { UnityEngine.Debug.LogException(e); }
+					}
+				} else if (sc.type == "exit" && sc.family._exitCallbacks != null){
+					foreach (Family.ExitCallback cb in sc.family._exitCallbacks.GetInvocationList()){
+						try { cb(sc.gameObjectId); }
+						catch (System.Exception e) { UnityEngine.Debug.LogException(e); }
+					}
+				}
+			}
 		}
 	}
 }

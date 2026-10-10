@@ -4,7 +4,6 @@ using System.Collections.Generic;
 namespace FYFY {
 	internal class BindGameObject : IGameObjectManagerAction {
 		private readonly GameObject _gameObject;
-		private readonly HashSet<string> _componentTypeNames;
 		private readonly string _exceptionStackTrace;
 		private readonly int _gameObjectId;
 		private readonly bool _recCall;
@@ -12,15 +11,7 @@ namespace FYFY {
 		internal BindGameObject(GameObject gameObject, string exceptionStackTrace, bool recCall = false) {
 			_gameObject = gameObject;
 			_gameObjectId = _gameObject.GetInstanceID();
-			_componentTypeNames = new HashSet<string>();
 			_recCall = recCall;
-
-			foreach(Component c in gameObject.GetComponents<Component>()) {
-				if (c != null){ // it is possible if a GameObject contains a breaked component (Missing script)
-					System.Type type = c.GetType();
-					_componentTypeNames.Add(type.FullName);
-				}
-			}
 
 			_exceptionStackTrace = exceptionStackTrace;
 		}
@@ -36,7 +27,7 @@ namespace FYFY {
 
 			int gameObjectId = _gameObject.GetInstanceID();
 			if (!GameObjectManager._gameObjectWrappers.ContainsKey(gameObjectId)){
-				GameObjectWrapper gameObjectWrapper = new GameObjectWrapper(_gameObject, _componentTypeNames);
+				GameObjectWrapper gameObjectWrapper = new GameObjectWrapper(_gameObject, GameObjectManager.computeComponentTypeNames(_gameObject));
 				GameObjectManager._gameObjectWrappers.Add(gameObjectId, gameObjectWrapper);
 				GameObjectManager._modifiedGameObjectIds.Add(gameObjectId);
 				// Add the bridge if not already added

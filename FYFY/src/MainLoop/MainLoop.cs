@@ -367,6 +367,8 @@ namespace FYFY {
 		}
 
 		private void OnDestroy(){
+			if (instance != this)
+				return;
 
             // Call all systems onDestroy
             foreach (FSystem system in FSystemManager._fixedUpdateSystems)
@@ -397,8 +399,7 @@ namespace FYFY {
                     UnityEngine.Debug.LogException(e);
                 }
 
-            if (instance == this)
-				instance = null;
+            instance = null;
 		}
 
 		private FSystem createSystemInstance(SystemDescription systemDescription){
@@ -471,14 +472,7 @@ namespace FYFY {
 					gameObject.AddComponent<FyfyBridge>();
 				
 				// Compute Wrappers
-				HashSet<string> componentTypeNames = new HashSet<string>();
-				foreach(Component c in gameObject.GetComponents<Component>()) {
-					if (c != null){ // it is possible if a GameObject contains a breaked component (Missing script)
-						System.Type type = c.GetType();
-						componentTypeNames.Add(type.FullName);
-					}
-				}
-				GameObjectWrapper gameObjectWrapper = new GameObjectWrapper(gameObject, componentTypeNames);
+				GameObjectWrapper gameObjectWrapper = new GameObjectWrapper(gameObject, GameObjectManager.computeComponentTypeNames(gameObject));
 				if (!GameObjectManager._gameObjectWrappers.ContainsKey(gameObject.GetInstanceID())){
 					GameObjectManager._gameObjectWrappers.Add(gameObject.GetInstanceID(), gameObjectWrapper);
 				}
@@ -627,12 +621,11 @@ namespace FYFY {
 
 			// Working on a copy to avoid collection was modified during enumeration
 			HashSet<int> copy = new HashSet<int>(GameObjectManager._modifiedGameObjectIds);
+			GameObjectManager._modifiedGameObjectIds.Clear();
 			foreach(int gameObjectId in copy)
 				FamilyManager.updateAfterGameObjectModified(gameObjectId);
 			// Call all stacked callbacks
 			FamilyManager.popStackedCallbacks();
-			
-			GameObjectManager._modifiedGameObjectIds.Clear();
 
 			++_familiesUpdateCount;
 		}
